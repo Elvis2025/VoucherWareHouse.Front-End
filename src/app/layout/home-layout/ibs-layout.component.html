@@ -264,42 +264,39 @@
       </div>
 
       <!-- User dropdown -->
-      <div class="ibs-user dropdown ms-auto">
-        <button class="ibs-user-btn dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false">
-          <span class="ibs-avatar">{{ initials() }}</span>
-          <span class="ibs-user-name d-none d-sm-inline">{{ displayName() }}</span>
-          <i class="bi bi-chevron-down ibs-user-caret"></i>
-        </button>
+    <div class="ibs-user ms-auto">
+  <button class="ibs-user-btn"
+          type="button"
+          (click)="toggleUserMenu()"
+          [attr.aria-expanded]="userMenuOpen()">
+    <span class="ibs-avatar">{{ initials() }}</span>
+    <span class="ibs-user-name d-none d-sm-inline">{{ displayName() }}</span>
+    <i class="bi bi-chevron-down ibs-user-caret" [class.open]="userMenuOpen()"></i>
+  </button>
 
-        <ul class="dropdown-menu dropdown-menu-end ibs-user-menu ibs-module-menu">
-          <li>
-            <button class="dropdown-item ibs-user-item"
-                    type="button"
-                    (click)="goMyAccount()">
-              <span class="ibs-user-item-left">
-                <i class="bi bi-gear"></i>
-                <span>Mi cuenta</span>
-              </span>
-            </button>
-          </li>
+  <ul class="ibs-user-menu ibs-module-menu"
+      [class.show]="userMenuOpen()">
+    <li>
+      <button class="dropdown-item ibs-user-item" type="button"
+              (click)="goMyAccount(); closeUserMenu()">
+        <span class="ibs-user-item-left">
+          <i class="bi bi-gear"></i><span>Mi cuenta</span>
+        </span>
+      </button>
+    </li>
 
-          <li class="ibs-user-sep"></li>
+    <li class="ibs-user-sep"></li>
 
-          <li>
-            <button class="dropdown-item ibs-user-item danger"
-                    type="button"
-                    (click)="logout()">
-              <span class="ibs-user-item-left">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Cerrar sesión</span>
-              </span>
-            </button>
-          </li>
-        </ul>
-      </div>
+    <li>
+      <button class="dropdown-item ibs-user-item danger" type="button"
+              (click)="logout(); closeUserMenu()">
+        <span class="ibs-user-item-left">
+          <i class="bi bi-box-arrow-right"></i><span>Cerrar sesión</span>
+        </span>
+      </button>
+    </li>
+  </ul>
+</div>
     </div>
 
     <div class="ibs-content">
