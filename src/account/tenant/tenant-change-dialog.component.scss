@@ -1,0 +1,393 @@
+/* tenant-change-dialog.component.scss
+   Modal "Cambiar tenant" — UX/UI mejorado + fondo más sólido
+   (clases tn-*, basado en tu select-tenant.css)
+*/
+
+:host{
+  /* ✅ Variables iguales a tu select-tenant.css (modo oscuro por default) */
+  --bg0: #0b1220;
+  --bg1: #0f172a;
+  --card: rgba(255,255,255,.06);
+  --card2: rgba(255,255,255,.04);
+  --border: rgba(148,163,184,.22);
+  --text: #e8eefc;
+  --muted: rgba(232,238,252,.72);
+  --muted2: rgba(232,238,252,.55);
+  --primary: #4b6cff;
+  --primary2: #7c5cff;
+  --shadow: 0 22px 70px rgba(0,0,0,.55);
+  --radius: 22px;
+  --focus: 0 0 0 4px rgba(75,108,255,.22);
+  --danger: rgba(239,68,68,.92);
+  --danger-bg: rgba(239,68,68,.10);
+
+  display:block;
+  color: var(--text);
+  font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+}
+
+/* ✅ Light theme si usas html[data-theme="light"] */
+:host-context(html[data-theme="light"]){
+  --bg0: #f5f7fb;
+  --bg1: #eef2ff;
+  --card: rgba(15,23,42,.04);
+  --card2: rgba(15,23,42,.03);
+  --border: rgba(15,23,42,.12);
+  --text: #0f172a;
+  --muted: rgba(15,23,42,.70);
+  --muted2: rgba(15,23,42,.55);
+  --shadow: 0 22px 70px rgba(2,6,23,.14);
+  --focus: 0 0 0 4px rgba(75,108,255,.18);
+}
+
+*{ box-sizing: border-box; }
+
+/* ✅ overlay real del modal (mejor UX/UI) */
+.tn-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+
+  background:
+    radial-gradient(900px 600px at 20% 20%, rgba(75,108,255,.18), transparent 60%),
+    radial-gradient(900px 600px at 80% 20%, rgba(124,92,255,.14), transparent 55%),
+    rgba(0,0,0,.62);
+
+  backdrop-filter: blur(10px);
+}
+
+.tn-wrap{
+  width: 100%;
+  display:flex;
+  justify-content:center;
+}
+
+/* ✅ card más sólido + elegante */
+.tn-card{
+  width: 640px;
+  max-width: 100%;
+  border: 1px solid var(--border);
+
+  /* 🔥 más sólido (menos transparente) */
+  background: linear-gradient(180deg, rgba(17, 24, 39, .92), rgba(15, 23, 42, .88));
+
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px 22px 18px;
+  position: relative;
+  overflow: hidden;
+
+  backdrop-filter: blur(10px);
+
+  animation: tnPop .18s ease-out;
+}
+
+:host-context(html[data-theme="light"]) .tn-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,250,252,.88));
+  box-shadow: 0 22px 70px rgba(2,6,23,.14);
+}
+
+.tn-card::before{
+  content:"";
+  position:absolute;
+  inset:-160px auto auto -160px;
+  width:380px;
+  height:380px;
+  background: radial-gradient(circle at 30% 30%, rgba(75,108,255,.28), transparent 65%);
+  filter: blur(6px);
+  pointer-events:none;
+}
+
+.tn-card::after{
+  content:"";
+  position:absolute;
+  inset:auto -180px -180px auto;
+  width:420px;
+  height:420px;
+  background: radial-gradient(circle at 30% 30%, rgba(124,92,255,.20), transparent 65%);
+  filter: blur(8px);
+  pointer-events:none;
+}
+
+.tn-topbar, .tn-body{ position:relative; z-index:2; }
+
+.tn-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.tn-brand-mini{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width: 0;
+}
+
+.tn-logo{
+  width:52px;
+  height:52px;
+  border-radius:14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+  overflow:hidden;
+  box-shadow: 0 14px 30px rgba(0,0,0,.18);
+}
+.tn-logo img{ width:100%; height:100%; object-fit:cover; }
+
+.tn-brand-txt{ line-height:1.05; }
+
+.tn-brand-name{
+  font-weight:1000;
+  letter-spacing:.9px;
+  text-transform:uppercase;
+  font-size:14px;
+}
+.tn-brand-name span{
+  font-size:.75em;
+  opacity:.85;
+  margin-left:4px;
+}
+
+.tn-brand-sub{
+  margin-top:4px;
+  font-size:12px;
+  color: var(--muted);
+  font-weight:700;
+}
+
+/* ✅ botón cerrar estilo pill (pro) */
+.tn-back{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-weight: 900;
+  cursor: pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+
+  transition: transform .12s ease, background .2s ease, border-color .2s ease;
+}
+.tn-back:hover{
+  background: rgba(255,255,255,.06);
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--border) 70%, rgba(255,255,255,.12));
+}
+.tn-back:active{ transform: translateY(0); }
+
+.tn-divider{
+  height:1px;
+  background: rgba(148,163,184,.20);
+  margin: 14px 0 18px;
+  position:relative;
+  z-index:2;
+}
+
+.tn-title{
+  margin:0 0 6px;
+  font-size:22px;
+  font-weight:1000;
+  letter-spacing: -0.2px;
+}
+
+.tn-desc{
+  margin:0 0 14px;
+  font-size:13px;
+  color: var(--muted);
+  font-weight:650;
+  line-height: 1.35;
+}
+
+/* ✅ INFO CALLOUT más elegante */
+.tn-hint{
+  display:flex;
+  align-items:flex-start;
+  gap: 12px;
+
+  border: 1px solid color-mix(in srgb, var(--border) 80%, rgba(75,108,255,.25));
+  background: linear-gradient(180deg, rgba(75,108,255,.10), rgba(255,255,255,.03));
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin: 10px 0 14px;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.tn-hint::before{
+  content:"";
+  position:absolute;
+  inset: -60px auto auto -60px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle at 30% 30%, rgba(75,108,255,.35), transparent 65%);
+  filter: blur(8px);
+  pointer-events:none;
+}
+
+.tn-hint i{
+  color: rgba(75,108,255,.95);
+  font-size: 18px;
+  margin-top: 1px;
+  flex: 0 0 auto;
+}
+
+.tn-hint span{
+  color: rgba(232,238,252,.86);
+  font-size: 12.5px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+:host-context(html[data-theme="light"]) .tn-hint span{
+  color: rgba(15,23,42,.80);
+}
+
+.tn-label{
+  display:block;
+  margin:0 0 6px;
+  font-size:12px;
+  color: var(--muted);
+  font-weight:800;
+}
+
+.tn-field{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.tn-ico{
+  position:absolute;
+  left:14px;
+  font-size:18px;
+  color: rgba(75,108,255,.72);
+  pointer-events:none;
+}
+
+.tn-input{
+  width:100%;
+  height:50px;
+  padding: 12px 12px 12px 44px;
+  border-radius:14px;
+  border: 1px solid var(--border);
+  background: rgba(2,6,23,.08);
+  color: var(--text);
+  outline:none;
+  font-size:15px;
+  font-weight:650;
+
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease, transform .12s ease;
+}
+
+.tn-input:hover{
+  border-color: color-mix(in srgb, var(--border) 60%, rgba(75,108,255,.25));
+  background: rgba(2,6,23,.10);
+}
+
+.tn-input:focus{
+  border-color: rgba(75,108,255,.55);
+  box-shadow: var(--focus);
+  transform: translateY(-1px);
+}
+
+.tn-actions{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+
+/* ✅ botón primary con micro-shine */
+.tn-btn{
+  width:100%;
+  border:0;
+  border-radius:14px;
+  padding: 12px 12px;
+  font-weight:1000;
+  cursor:pointer;
+  color:#fff;
+
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  box-shadow: 0 12px 28px rgba(75,108,255,.22);
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  transition: transform .15s ease, filter .2s ease;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.tn-btn::after{
+  content:"";
+  position:absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  transform: translateX(-120%);
+  transition: transform .6s ease;
+}
+
+.tn-btn:hover{
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.tn-btn:hover::after{
+  transform: translateX(120%);
+}
+
+.tn-btn:active{ transform: translateY(0); }
+.tn-btn:disabled{ opacity:.7; cursor:not-allowed; transform:none; }
+
+.tn-btn-ghost{
+  display:block;
+  text-align:center;
+  width:100%;
+  padding: 12px 12px;
+  border-radius:14px;
+  border: 1px solid var(--border);
+  cursor:pointer;
+  font-weight:1000;
+  color: var(--text);
+  background: rgba(255,255,255,.02);
+  text-decoration:none;
+
+  transition: background .2s ease, transform .12s ease, border-color .2s ease;
+}
+
+.tn-btn-ghost:hover{
+  background: rgba(255,255,255,.06);
+  transform: translateY(-1px);
+}
+
+.tn-btn-ghost:active{ transform: translateY(0); }
+.tn-btn-ghost:disabled{ opacity:.7; cursor:not-allowed; transform:none; }
+
+.tn-foot{
+  margin-top:14px;
+  text-align:center;
+  font-size:12px;
+  color: var(--muted2);
+}
+
+/* ✅ animación entrada */
+@keyframes tnPop{
+  from{ opacity: 0; transform: translateY(10px) scale(.98); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width:520px){
+  .tn-card{ padding: 18px 16px 16px; }
+  .tn-title{ font-size:20px; }
+}

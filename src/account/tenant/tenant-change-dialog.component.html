@@ -1,0 +1,64 @@
+﻿<!-- tenant-change-modal.component.html -->
+<div class="tn-overlay" (click)="close()">
+  <div class="tn-wrap" (click)="$event.stopPropagation()">
+    <section class="tn-card" aria-label="Cambiar tenant">
+      <div class="tn-topbar">
+        <div class="tn-brand-mini">
+          <div class="tn-logo">
+            <img src="assets/img/logo/logo-ibs.png" alt="IB Systems" />
+          </div>
+
+          <div class="tn-brand-txt">
+            <div class="tn-brand-name">IB SYSTEMS <span>SRL</span></div>
+            <div class="tn-brand-sub">Selecciona tu tenant para continuar</div>
+          </div>
+        </div>
+
+        <!-- ✅ cerrar -->
+        <button type="button" class="tn-back" (click)="close()">
+          <i class="bi bi-x"></i>
+          <span>Cerrar</span>
+        </button>
+      </div>
+
+      <div class="tn-divider"></div>
+
+      <div class="tn-body">
+        <h2 class="tn-title">Cambiar tenant</h2>
+        <p class="tn-desc">Escribe el <b>nombre del tenant</b> asignado a tu empresa.</p>
+
+        <div class="tn-hint">
+          <i class="bi bi-info-circle"></i>
+          <span>{{ 'LeaveEmptyToSwitchToHost'  }}</span>
+        </div>
+
+        <label class="tn-label" for="tenancyName">{{ 'TenancyName'  }}</label>
+
+        <div class="tn-field">
+          <i class="bi bi-building tn-ico" aria-hidden="true"></i>
+          <input
+            id="tenancyName"
+            name="tenancyName"
+            class="tn-input"
+            type="text"
+            [(ngModel)]="tenancyName"
+            maxlength="64"
+            [disabled]="saving"
+            placeholder="Ej: test, empresa01..." />
+        </div>
+
+        <div class="tn-actions">
+          <button type="button" class="tn-btn" (click)="save()" [disabled]="saving">
+            Continuar <i class="bi bi-arrow-right"></i>
+          </button>
+
+          <button type="button" class="tn-btn-ghost" (click)="close()" [disabled]="saving">
+            Cancelar
+          </button>
+        </div>
+
+        <div class="tn-foot">©  · iThotSystems</div>
+      </div>
+    </section>
+  </div>
+</div>

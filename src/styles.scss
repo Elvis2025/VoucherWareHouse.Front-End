@@ -1,0 +1,226 @@
+
+@use './ibs-theme.scss';
+/* Global reset base */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+/* ngx-bootstrap modal: asegurar que quede arriba de todo */
+.modal-backdrop {
+  z-index: 2050 !important;
+}
+
+.modal {
+  z-index: 2060 !important;
+}
+
+/* =========================================================
+   FIX: ABP alerts/toasts siempre por encima de overlays/modals
+   ========================================================= */
+
+/* SweetAlert2 (ABP usa esto en muchas partes) */
+.swal2-container{
+  z-index: 100000 !important;
+}
+
+/* Toastr (común en ABP) */
+#toast-container{
+  z-index: 100000 !important;
+}
+
+/* ngx-toastr (si aplica) */
+.toast-container{
+  z-index: 100000 !important;
+}
+
+/* Bootstrap alerts / dropdowns / tooltips si los usas */
+.modal, .tooltip, .popover{
+  z-index: 100000 !important;
+}
+
+/* =========================
+   FIX: SweetAlert2 no debe bloquear clicks luego de cerrar
+   ========================= */
+
+/* Cuando no está visible, no debe interceptar eventos */
+.swal2-container.swal2-backdrop-hide,
+.swal2-container.swal2-noanimation {
+  pointer-events: none !important;
+}
+
+/* Asegura que solo intercepte cuando está abierto */
+.swal2-container {
+  pointer-events: auto;
+}
+
+/* Si algún estilo raro deja body bloqueado */
+body.swal2-shown {
+  overflow: hidden; /* ok */
+}
+
+
+
+
+
+
+
+
+
+
+/* You can add global styles to this file, and also import other style files */
+
+
+/* ✅ login logo */
+.lpx-login-logo {
+  width: 120px !important;
+  height: 120px !important;
+
+  background: none !important;
+  mask: none !important;
+  -webkit-mask: none !important;
+
+  background-image: url('/assets/images/logo/logo-ibs.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  background-position: center !important;
+}
+
+.lpx-login-logo::before,
+.lpx-login-logo::after {
+  content: none !important;
+}
+
+
+
+/*General Buttom style*/
+.ibs-action-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--ibs-accent-border);
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--ibs-brand-a), var(--ibs-brand-b));
+  box-shadow: var(--ibs-accent-shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+  color: #fff;
+}
+
+.ibs-action-btn i {
+  color: #fff !important;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.ibs-action-btn:hover {
+  transform: translateY(-1px);
+  filter: saturate(.9) brightness(1.04);
+  box-shadow: var(--ibs-accent-shadow-hover);
+}
+
+.ibs-action-btn:active { transform: scale(.98); }
+
+.ibs-btn-save {
+  width: auto;
+  padding: 0 14px;
+  gap: 10px;
+  font-weight: 1000;
+  letter-spacing: .2px;
+  filter: saturate(.85);
+}
+
+
+.ibs-btn-close{
+  font-size: medium;
+    padding: 0 14px;
+  font-weight: 1000;
+}
+
+.ibs-btn-close:hover {
+  transform: translateY(-1px);
+  filter: saturate(.9) brightness(1.04);
+  box-shadow: var(--ibs-accent-shadow-hover);
+}
+
+
+
+.ibs-btn-close{
+  background: transparent;
+  border: 1px solid var(--ibs-border);
+  color: var(--ibs-text);
+  border-radius: 14px;
+  height: 40px;
+  padding: 0 14px;
+  font-weight: 800;
+}
+/*General Buttom style*/
+
+
+
+
+/*General Search input style*/
+.ibs-search {
+  position: relative;
+  width: min(520px, 52vw);
+  display: flex;
+  align-items: center;
+  isolation: isolate;
+}
+
+.ibs-search > i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .72;
+  color: var(--ibs-text-dim);
+  z-index: 1;
+}
+
+.ibs-search-input {
+  width: 100%;
+  height: 46px;
+  padding: 0 48px 0 46px;
+  border-radius: 999px;
+  border: 1px solid var(--ibs-border);
+  background: var(--ibs-control-bg);
+  color: var(--ibs-text);
+  outline: none;
+  box-shadow: 0 10px 26px var(--ibs-shadow);
+  backdrop-filter: blur(12px);
+  transition: box-shadow .2s ease, border-color .2s ease, transform .15s ease, filter .2s ease, background .2s ease;
+}
+
+.ibs-search-input:focus {
+  border-color: rgba(124,92,255,.55);
+  box-shadow: var(--ibs-focus);
+}
+
+.ibs-search-input:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.ibs-search-clear {
+  position: absolute;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--ibs-border);
+  background: var(--ibs-control-bg);
+  display: grid;
+  place-items: center;
+  color: var(--ibs-text);
+  cursor: pointer;
+  transition: transform .15s ease, background .2s ease;
+}
+
+.ibs-search-clear:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.10);
+}
+
+
+/*General Search input style*/

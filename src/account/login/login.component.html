@@ -1,0 +1,141 @@
+﻿<div  class="wrap">
+    <section class="card" aria-label="Inicio de sesión">
+        <div class="topbar">
+            <!-- Si tú no manejas tenant aquí en Angular, lo dejamos “Host” fijo por diseño.
+                 Si ya tienes tenant en algún service, luego lo conectas sin cambiar el layout. -->
+            <div class="tenant-pill">
+                <span class="badge" id="tenantBadge">{{ currentTenantText }}</span>
+
+                <!-- Si tienes vista de seleccionar tenant, cambia el routerLink -->
+                <button type="button" class="link-btn" (click)="openTenantModal()">
+                    Cambiar tenant
+                </button>
+            </div>
+        </div>
+
+        <div class="brand">
+            <div class="brand-logo">
+                <!-- Ajusta ruta del logo según tu proyecto -->
+                <img src="assets/img/logo/logo-ibs.png" alt="IB Systems" />
+            </div>
+
+            <h1 class="brand-name">IB SYSTEMS <span class="brand-suffix">SRL</span></h1>
+            <p class="brand-tag">Sistemas Inteligentes de Negocios</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="content">
+            <h2 class="title">{{ 'LogIn' | localize }}</h2>
+
+            <form novalidate autocomplete="off" #loginForm="ngForm" (ngSubmit)="login()" id="loginForm">
+                <!-- USER -->
+                <div class="row">
+                    <label for="user">{{ 'UserNameOrEmail' | localize }}</label>
+
+                    <div class="field">
+                        <i class="bi bi-person field-icon" aria-hidden="true"></i>
+
+                        <input
+                            id="user"
+                            class="input input-with-icons"
+                            type="text"
+                            name="userNameOrEmailAddress"
+                            [(ngModel)]="authService.authenticateModel.userNameOrEmailAddress"
+                            [placeholder]="'UserNameOrEmail' | localize"
+                            required
+                            maxlength="256"
+                            autocomplete="username"
+                            #userNameOrEmailAddressModel="ngModel"
+                            #userNameOrEmailAddressEl />
+
+                        <!-- ABP validation (se queda igual) -->
+                    </div>
+
+                    <abp-validation-summary
+                        [control]="userNameOrEmailAddressModel"
+                        [controlEl]="userNameOrEmailAddressEl"></abp-validation-summary>
+                </div>
+
+                <!-- PASS -->
+                <div class="row">
+                    <label for="pass">{{ 'Password' | localize }}</label>
+
+                    <div class="field">
+                        <i class="bi bi-lock field-icon" aria-hidden="true"></i>
+
+                        <input
+                            id="pass"
+                            class="input input-with-icons"
+                            [type]="showPassword ? 'text' : 'password'"
+                            name="password"
+                            [(ngModel)]="authService.authenticateModel.password"
+                            [placeholder]="'Password' | localize"
+                            required
+                            maxlength="32"
+                            autocomplete="current-password"
+                            #passwordModel="ngModel"
+                            #passwordEl />
+
+                        <button
+                            type="button"
+                            class="field-action"
+                            (click)="togglePassword()"
+                            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                            [attr.aria-pressed]="showPassword">
+                            <i class="bi" [ngClass]="showPassword ? 'bi-eye' : 'bi-eye-slash'" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <abp-validation-summary [control]="passwordModel" [controlEl]="passwordEl"></abp-validation-summary>
+                </div>
+
+                <!-- REMEMBER + FORGOT -->
+                <div class="row inline">
+                    <div class="check">
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                            name="rememberMe"
+                            [(ngModel)]="authService.rememberMe" />
+                        <label for="rememberMe" style="margin: 0;">{{ 'RememberMe' | localize }}</label>
+                    </div>
+
+                    <div class="forgot">
+                        <a [routerLink]="['/account/forgot-password']">{{ 'ForgotPassword' | localize }}</a>
+                    </div>
+                </div>
+
+                <!-- SUBMIT -->
+                <div class="row">
+                    <button
+                        type="submit"
+                        class="btn"
+                        id="loginSubmitBtn"
+                        [disabled]="!loginForm.form.valid || submitting">
+                        {{ 'LogIn' | localize }}
+                    </button>
+                </div>
+
+                <!-- REGISTER -->
+                <div class="row" *ngIf="isSelfRegistrationAllowed">
+                    <a class="btn-ghost btn" id="goRegisterBtn" [routerLink]="['../register']">
+                        {{ 'Register' | localize }}
+                    </a>
+                </div>
+
+                <div class="foot">
+                    <span>© {{ year }} · iThotSystems</span>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+
+@if (tenantOpen()) {
+  <app-tenant-change-dialog
+    [tenancyName]="tenantName()"
+    (cancelled)="onTenantCancel()"
+    (saved)="onTenantSaved()">
+  </app-tenant-change-dialog>
+}

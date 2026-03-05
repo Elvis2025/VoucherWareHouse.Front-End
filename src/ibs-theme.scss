@@ -1,0 +1,336 @@
+/* =========================
+   IB THEME TOKENS (GLOBAL)
+   ========================= */
+
+/* Defaults (dark base) */
+:root {
+  /* icon colors (como login) */
+  --ib-icon: rgba(124, 140, 255, .75);
+  --ib-icon-hover: rgba(124, 140, 255, .95);
+
+  /* theme tokens */
+  --bg0: #0b1220;
+  --bg1: #0f172a;
+  --card: rgba(255,255,255,.06);
+  --card2: rgba(255,255,255,.04);
+  --border: rgba(148,163,184,.22);
+  --text: #e8eefc;
+  --muted: rgba(232,238,252,.72);
+  --muted2: rgba(232,238,252,.55);
+
+  --primary: #4b6cff;
+  --primary2: #7c5cff;
+  --danger: #ff6b6b;
+
+  --shadow: 0 22px 70px rgba(0,0,0,.55);
+  --radius: 22px;
+  --radius2: 16px;
+  --focus: 0 0 0 4px rgba(75,108,255,.22);
+
+  /* inputs */
+  --txt-1: rgba(232,238,252,.92);
+  --txt-2: rgba(232,238,252,.72);
+  --txt-3: rgba(232,238,252,.55);
+
+  --inp-bg: rgba(2,6,23,.10);
+  --inp-border: rgba(148,163,184,.22);
+  --inp-border-focus: rgba(75,108,255,.55);
+
+  /* Accent buttons (ya lo tenías) */
+  --ibs-accent-1: rgba(75,108,255,.95);
+  --ibs-accent-2: rgba(124,92,255,.95);
+  --ibs-accent-border: rgba(255,255,255,.14);
+  --ibs-accent-text: #ffffff;
+  --ibs-accent-shadow: 0 14px 30px rgba(75,108,255,.22);
+  --ibs-accent-shadow-hover: 0 18px 40px rgba(75,108,255,.28);
+  --ibs-accent-hover-filter: brightness(1.05);
+
+  /* =========================
+     IBS UI TOKENS (GLOBAL)
+     =========================
+     -> los componentes SOLO consumen esto
+  */
+  --ibs-text: rgba(255,255,255,.92);
+  --ibs-text-dim: rgba(255,255,255,.70);
+
+  --ibs-border: rgba(148,163,184,.22);
+  --ibs-shadow: rgba(0,0,0,.40);
+
+  /* superficies (grid, dropdown, cards) */
+  --ibs-surface: rgba(17,24,39,.70);
+  --ibs-surface2: rgba(17,24,39,.55);
+
+  /* controles (inputs/pager) */
+  --ibs-control-bg: rgba(255,255,255,.06);
+
+  /* tabla */
+  --ibs-table-head-bg: rgba(15,23,42,.35);
+  --ibs-table-head-text: rgba(255,255,255,.80);
+  --ibs-row-hover-bg: rgba(255,255,255,.06);
+
+  /* focus */
+  --ibs-focus: 0 0 0 .25rem rgba(124,92,255,.25);
+
+  /* brand */
+  --ibs-brand-a: rgba(75,108,255,.90);
+  --ibs-brand-b: rgba(124,92,255,.90);
+
+   --ib-page-background:
+    radial-gradient(900px 600px at 15% 15%, rgba(75,108,255,.22), transparent 60%),
+    radial-gradient(900px 600px at 85% 20%, rgba(124,92,255,.18), transparent 55%),
+    radial-gradient(900px 600px at 70% 85%, rgba(56,189,248,.12), transparent 55%),
+    linear-gradient(135deg, var(--bg0), var(--bg1));
+
+     --ibs-modal-background-color:
+    radial-gradient(900px 600px at 15% 15%, rgba(75,108,255,.18), transparent 60%),
+    radial-gradient(900px 600px at 85% 20%, rgba(124,92,255,.14), transparent 55%),
+    radial-gradient(900px 600px at 70% 85%, rgba(56,189,248,.09), transparent 55%),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--bg0) 92%, #000 8%),
+      color-mix(in srgb, var(--bg1) 92%, #000 8%)
+    );
+
+     --ibs-item-rail: color-mix(in srgb, var(--ibs-primary) 28%, var(--ibs-border));
+
+  /* Fondo casi card (tinte mínimo) */
+  --ibs-item-bg: color-mix(in srgb, var(--ibs-card) 96%, var(--ibs-primary) 4%);
+
+  /* Grosor rail */
+  --ibs-rail-w: 5px;
+
+  /* línea sutil decorativa */
+  --ibs-rail-line: color-mix(in srgb, var(--ibs-border) 80%, transparent);
+}
+
+/* Fallback automático si NO hay data-theme seteado */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg0: #f5f7fb;
+    --bg1: #eef2ff;
+    --card: rgba(15,23,42,.04);
+    --card2: rgba(15,23,42,.03);
+    --border: rgba(15,23,42,.12);
+    --text: #0f172a;
+    --muted: rgba(15,23,42,.70);
+    --muted2: rgba(15,23,42,.55);
+    --shadow: 0 22px 70px rgba(2,6,23,.14);
+    --focus: 0 0 0 4px rgba(75,108,255,.18);
+
+    --txt-1: rgba(15,23,42,.88);
+    --txt-2: rgba(15,23,42,.70);
+    --txt-3: rgba(15,23,42,.55);
+    --inp-bg: rgba(255,255,255,.70);
+    --inp-border: rgba(15,23,42,.14);
+    --inp-border-focus: rgba(75,108,255,.55);
+
+    --ib-icon: rgba(75, 85, 160, .85);
+    --ib-icon-hover: rgba(75, 85, 160, 1);
+
+    /* IBS UI TOKENS light fallback */
+    --ibs-text: rgba(30,41,59,.86);
+    --ibs-text-dim: rgba(30,41,59,.60);
+
+    --ibs-border: rgba(30,41,59,.08);
+    --ibs-shadow: rgba(30,41,59,.08);
+
+    /* ✅ fondo tipo “mismo background” (no gris) */
+    --ibs-surface: rgba(248,250,255,.55);
+    --ibs-surface2: rgba(248,250,255,.55);
+    --ibs-control-bg: rgba(248,250,255,.60);
+
+    --ibs-table-head-bg: transparent;
+    --ibs-table-head-text: rgba(30,41,59,.65);
+    --ibs-row-hover-bg: rgba(124,92,255,.05);
+
+    --ibs-focus: 0 0 0 .25rem rgba(124,92,255,.18);
+  }
+}
+
+/* Override explícito por atributo (TU SISTEMA) */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ibs-accent-1: rgba(85, 98, 220, .68);
+  --ibs-accent-2: rgba(120, 104, 230, .62);
+  --ibs-accent-border: rgba(255,255,255,.10);
+  --ibs-accent-shadow: 0 12px 26px rgba(0,0,0,.28);
+  --ibs-accent-shadow-hover: 0 16px 34px rgba(0,0,0,.34);
+  --ibs-accent-hover-filter: brightness(1.015);
+    --ibs-card: #111827;
+  --ibs-surface: #0b1220;
+  --ibs-input: #0b1220;
+  --ibs-border: rgba(255, 255, 255, 0.10);
+  --ibs-text: rgba(255, 255, 255, 0.92);
+  --ibs-muted: rgba(255, 255, 255, 0.58);
+  --ibs-primary: #7c83ff;
+
+  /* (ya quedan por default en :root) */
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+
+  --bg0: #f6f7ff;
+  --bg1: #eef2ff;
+
+  --card: rgba(255,255,255,.55);
+  --card2: rgba(255,255,255,.45);
+  --border: rgba(30,41,59,.10);
+  --text: rgba(30,41,59,.90);
+  --muted: rgba(30,41,59,.68);
+  --muted2: rgba(30,41,59,.55);
+  --shadow: 0 22px 70px rgba(2,6,23,.10);
+  --focus: 0 0 0 4px rgba(75,108,255,.16);
+
+  --txt-1: rgba(30,41,59,.88);
+  --txt-2: rgba(30,41,59,.70);
+  --txt-3: rgba(30,41,59,.55);
+  --inp-bg: rgba(248,250,255,.65);
+  --inp-border: rgba(30,41,59,.14);
+  --inp-border-focus: rgba(75,108,255,.55);
+
+  --ib-icon: rgba(75, 85, 160, .85);
+  --ib-icon-hover: rgba(75, 85, 160, 1);
+
+  /* =========================
+     IBS UI TOKENS (LIGHT)
+     ========================= */
+  --ibs-text: rgba(30,41,59,.86);
+  --ibs-text-dim: rgba(30,41,59,.60);
+
+  --ibs-border: rgba(30,41,59,.08);
+  --ibs-shadow: rgba(30,41,59,.08);
+
+  /* ✅ misma “familia” del background, sin bloque gris */
+  --ibs-surface: rgba(248,250,255,.55);
+  --ibs-surface2: rgba(248,250,255,.55);
+  --ibs-control-bg: rgba(248,250,255,.62);
+
+  --ibs-table-head-bg: transparent;
+  --ibs-table-head-text: rgba(30,41,59,.65);
+  --ibs-row-hover-bg: rgba(124,92,255,.05);
+
+  --ibs-focus: 0 0 0 .25rem rgba(124,92,255,.18);
+
+   --ibs-card: #ffffff;
+  --ibs-surface: #f4f6fb;        /* más “azulado” para diferenciar */
+  --ibs-input: #ffffff;
+  --ibs-border: rgba(15, 23, 42, 0.14);
+  --ibs-text: #0f172a;
+  --ibs-muted: rgba(15, 23, 42, 0.60);
+  --ibs-primary: #6366f1;
+    --ib-page-background:
+    radial-gradient(900px 600px at 15% 15%, rgba(75,108,255,.10), transparent 62%),
+    radial-gradient(900px 600px at 85% 20%, rgba(124,92,255,.08), transparent 58%),
+    radial-gradient(900px 600px at 70% 85%, rgba(56,189,248,.06), transparent 60%),
+    linear-gradient(135deg, var(--bg0), var(--bg1));
+
+
+    --ibs-modal-background-color:
+    radial-gradient(900px 600px at 15% 15%, rgba(75,108,255,.08), transparent 62%),
+    radial-gradient(900px 600px at 85% 20%, rgba(124,92,255,.06), transparent 58%),
+    radial-gradient(900px 600px at 70% 85%, rgba(56,189,248,.04), transparent 60%),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--bg0) 94%, #000 6%),
+      color-mix(in srgb, var(--bg1) 94%, #000 6%)
+    );
+
+      --ibs-item-rail: color-mix(in srgb, var(--ibs-primary) 70%, var(--ibs-border));
+
+  --ibs-item-bg: color-mix(in srgb, var(--ibs-card) 88%, var(--ibs-primary) 12%);
+
+  --ibs-rail-w: 6px;
+
+  --ibs-rail-line: color-mix(in srgb, var(--ibs-border) 70%, transparent);
+}
+
+/* =========================
+   GLOBAL BASE
+   ========================= */
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* default (dark) background */
+ background: var(--ib-page-background);
+}
+
+/* ✅ Light: blanco + morado MUY sutil (casi imperceptible) */
+// html[data-theme="light"] body {
+//   background:
+//     radial-gradient(900px 600px at 15% 15%, rgba(75,108,255,.10), transparent 62%),
+//     radial-gradient(900px 600px at 85% 20%, rgba(124,92,255,.08), transparent 58%),
+//     radial-gradient(900px 600px at 70% 85%, rgba(56,189,248,.06), transparent 60%),
+//     linear-gradient(135deg, var(--bg0), var(--bg1));
+// }
+
+/* Inputs globales */
+.ib-input,
+input.form-control,
+select.form-select,
+textarea.form-control {
+  border-radius: 14px;
+  border: 1px solid var(--inp-border);
+  background: var(--inp-bg);
+  color: var(--text);
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+
+  &:focus {
+    border-color: var(--inp-border-focus);
+    box-shadow: var(--focus);
+    outline: none;
+  }
+}
+
+/* ✅ FIX: input + icon button siempre en 1 sola línea */
+.field .row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;   /* <- clave */
+  min-width: 0;        /* <- clave en flex */
+}
+
+.field .row .inp {
+  flex: 1 1 auto;      /* <- ocupa todo el espacio */
+  min-width: 0;        /* <- evita que el input fuerce salto */
+}
+
+.field .row .icon-btn {
+  flex: 0 0 44px;      /* <- tamaño fijo del ojo */
+}
+
+
+:root{
+  --ibs-scrollbar-thumb: color-mix(in srgb, var(--ibs-text) 28%, transparent);
+  --ibs-scrollbar-thumb-hover: color-mix(in srgb, var(--ibs-text) 40%, transparent);
+  --ibs-scrollbar-track: color-mix(in srgb, var(--ibs-surface) 65%, transparent);
+}
+
+/* Firefox */
+*{
+  scrollbar-width: thin;
+  scrollbar-color: var(--ibs-scrollbar-thumb) var(--ibs-scrollbar-track);
+}
+
+/* Chrome/Edge/Safari */
+*::-webkit-scrollbar{
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track{
+  background: var(--ibs-scrollbar-track);
+}
+*::-webkit-scrollbar-thumb{
+  background: var(--ibs-scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid var(--ibs-scrollbar-track);
+}
+*::-webkit-scrollbar-thumb:hover{
+  background: var(--ibs-scrollbar-thumb-hover);
+}
