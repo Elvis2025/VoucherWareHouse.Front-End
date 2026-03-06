@@ -851,42 +851,189 @@ html[data-theme="light"] .global-fab::after{
 }
 
 /* =========================
-   USER DROPDOWN (correcto)
+   USER MENU (Topbar)
    ========================= */
 
 .ibs-user{
-  margin-left: auto;        /* lo manda al final */
-  position: relative;       /* ✅ ancla del menú */
+  margin-left: auto;
+  position: relative;
   display: flex;
   align-items: center;
+  z-index: 50;
 }
 
-/* Menú: debajo del botón, ancho lógico */
-.ibs-user .dropdown-menu.ibs-user-menu{
-  position: absolute !important;
-  top: calc(100% + 10px) !important;
-  right: 0 !important;
-  left: auto !important;
+/* Botón */
+.ibs-user-btn{
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
-  width: 280px;             /* ✅ ancho lógico */
-  max-width: calc(100vw - 24px);
+  min-height: 44px;
+  padding: 6px 12px;
+
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  color: inherit;
+
+  transition:
+    transform .16s ease,
+    background .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease;
+}
+
+.ibs-user-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(124,140,255,.35);
+  background: linear-gradient(180deg, rgba(124,140,255,.10), rgba(255,255,255,.03));
+  box-shadow: 0 10px 28px rgba(0,0,0,.22);
+}
+
+.ibs-user-btn:focus{
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(75,108,255,.18);
+}
+
+.ibs-avatar{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(124,140,255,.35);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  flex: 0 0 32px;
+}
+
+.ibs-user-name{
+  font-weight: 800;
+  font-size: 13px;
+  opacity: .95;
+  white-space: nowrap;
+}
+
+.ibs-user-caret{
+  font-size: 12px;
+  opacity: .75;
+  transition: transform .16s ease, opacity .16s ease;
+}
+
+.ibs-user-caret.open{
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+/* =========================
+   Menú dropdown real controlado por Angular
+   ========================= */
+
+.ibs-user-menu{
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  left: auto;
+
+  width: 260px;
   min-width: 240px;
+  max-width: min(280px, calc(100vw - 24px));
 
-  /* por si bootstrap/poppe mete estilos */
-  transform: none !important;
-  inset: auto auto auto auto !important;
+  margin: 0;
+  padding: 10px;
+  list-style: none;
 
-  /* nunca full-width */
-  white-space: normal;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
 
-  /* sin scroll dentro */
-  max-height: none !important;
-  overflow: visible !important;
+  background: color-mix(in srgb, var(--bg1) 96%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 22px 70px rgba(0,0,0,.35);
 
   z-index: 2000;
+  transform-origin: top right;
+
+  /* oculto por defecto */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px) scale(.98);
+
+  transition:
+    opacity .16s ease,
+    transform .16s ease,
+    visibility .16s ease;
 }
 
-/* Evita que popper te lo estire o lo mueva */
-.ibs-user .dropdown-menu[data-popper-placement]{
-  transform: none !important;
+.ibs-user-menu.show{
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.ibs-user-menu li{
+  width: 100%;
+}
+
+.ibs-user-item{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+
+  font-weight: 800;
+  text-align: left;
+
+  transition:
+    transform .14s ease,
+    background .14s ease,
+    box-shadow .14s ease;
+}
+
+.ibs-user-item:focus,
+.ibs-user-item:focus-visible,
+.ibs-user-item:active{
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.ibs-user-item-left{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ibs-user-item-left i{
+  width: 18px;
+  text-align: center;
+  opacity: .92;
+  flex: 0 0 18px;
+}
+
+.ibs-user-item:hover{
+  background: rgba(124,140,255,.14);
+  transform: translateX(2px);
+}
+
+.ibs-user-item.danger{
+  color: #ff6b6b;
+}
+
+.ibs-user-item.danger:hover{
+  background: rgba(255, 107, 107, .12);
+}
+
+.ibs-user-sep{
+  height: 1px;
+  margin: 8px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--border) 55%, transparent);
 }

@@ -60,7 +60,7 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   // ✅ Dropdown Module Picker (Angular-controlled)
   readonly modulePickerOpen = signal<boolean>(false);
   @ViewChild('modulePickerRoot', { static: false }) modulePickerRoot?: ElementRef<HTMLElement>;
-
+  @ViewChild('userMenuRoot', { static: false }) userMenuRoot?: ElementRef<HTMLElement>;
   // ===== USER =====
   readonly currentUser = signal<any | null>(null);
 
@@ -198,30 +198,48 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   // Click afuera: cerrar
   @HostListener('document:click', ['$event'])
   onDocumentClick(ev: MouseEvent): void {
-    if (!this.modulePickerOpen()) return;
+     const target = ev.target as Node | null;
 
-    const root = this.modulePickerRoot?.nativeElement;
-    const target = ev.target as Node | null;
+  // ===== Module picker =====
+  if (this.modulePickerOpen()) {
+    const moduleRoot = this.modulePickerRoot?.nativeElement;
 
-    if (!root || !target) {
-      this.closeModulePicker();
-      return;
-    }
-
-    if (!root.contains(target)) {
+    if (!moduleRoot || !target || !moduleRoot.contains(target)) {
       this.closeModulePicker();
     }
+  }
+
+  // ===== User menu =====
+  if (this.userMenuOpen()) {
+    const userRoot = this.userMenuRoot?.nativeElement;
+
+    if (!userRoot || !target || !userRoot.contains(target)) {
+      this.closeUserMenu();
+    }
+  }
   }
 
   // ESC: cerrar
   @HostListener('document:keydown', ['$event'])
   onDocumentKeydown(ev: KeyboardEvent): void {
-    if (!this.modulePickerOpen()) return;
+     if (ev.key !== 'Escape') return;
 
-    if (ev.key === 'Escape') {
-      ev.preventDefault();
-      this.closeModulePicker();
-    }
+  let handled = false;
+
+  if (this.modulePickerOpen()) {
+    this.closeModulePicker();
+    handled = true;
+  }
+
+  if (this.userMenuOpen()) {
+    this.closeUserMenu();
+    handled = true;
+  }
+
+  if (handled) {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
   }
 
   // ===== Group helpers =====
@@ -358,7 +376,15 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
 
 readonly userMenuOpen = signal<boolean>(false);
 
-toggleUserMenu(): void {
+toggleUserMenu(ev: MouseEvent): void {
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  // si abre user menu, cerrar module picker
+  if (!this.userMenuOpen()) {
+    this.modulePickerOpen.set(false);
+  }
+
   this.userMenuOpen.update(v => !v);
 }
 

@@ -1,0 +1,191 @@
+<div class="ibs-grid-shell">
+
+  <!-- Header -->
+  <div class="ibs-grid-head">
+    <div class="ibs-grid-title">
+      <div class="h1">{{ title }}</div>
+      @if (subtitle) {
+        <div class="sub">{{ subtitle }}</div>
+      }
+    </div>
+
+    <div class="ibs-grid-tools">
+
+      @if (toolsTemplate) {
+        <ng-container [ngTemplateOutlet]="toolsTemplate"></ng-container>
+      }
+
+      @if (showSearch) {
+        <div class="ibs-search">
+          <i class="bi bi-search"></i>
+
+          <input
+            type="text"
+            class="ibs-search-input"
+            [placeholder]="placeholderSearch"
+            [value]="search()"
+            (input)="setSearch(($any($event.target).value))"
+          />
+
+          @if (search()) {
+            <button type="button" class="ibs-search-clear" (click)="setSearch('')" title="Limpiar">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          }
+        </div>
+      }
+
+      <button type="button" class="ibs-action-btn ibs-refresh" (click)="refresh()">
+        <i class="bi bi-arrow-clockwise"></i>
+        <span class="d-none d-sm-inline">Refrescar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Table + Scroll + Footer sticky -->
+  <div class="ibs-table-wrap" [class.loading]="loading()">
+
+    <!-- ✅ SOLO scroll aquí -->
+    <div class="ibs-table-scroll">
+      <table class="ibs-table">
+        <thead>
+          <tr>
+            @for (c of columns; track trackByIndex($index)) {
+              <th [style.width]="c.width" [class.center]="c.align==='center'" [class.right]="c.align==='right'">
+                {{ c.header }}
+              </th>
+            }
+            @if ((actions?.length ?? 0) > 0) {
+              <th class="actions-col">Acciones</th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (items().length === 0 && !loading()) {
+            <tr>
+              <td class="ibs-empty" [attr.colspan]="columns.length + ((actions?.length ?? 0) > 0 ? 1 : 0)">
+                <i class="bi bi-inbox"></i>
+                <span>No hay resultados.</span>
+              </td>
+            </tr>
+          }
+
+          @for (row of items(); track trackByIndex($index)) {
+            <tr>
+              @for (c of columns; track trackByIndex($index)) {
+                <td [class.center]="c.align==='center'" [class.right]="c.align==='right'">
+                  @if (c.template) {
+                    <ng-container
+                      [ngTemplateOutlet]="c.template"
+                      [ngTemplateOutletContext]="{ $implicit: row }">
+                    </ng-container>
+                  } @else {
+                    {{ cellValue(row, c) }}
+                  }
+                </td>
+              }
+
+              @if ((actions?.length ?? 0) > 0) {
+                <td class="actions-col">
+                  @if (visibleActions().length > 0) {
+                    <app-ibs-dropdown
+                      variant="icon"
+                      icon="bi bi-sliders"
+                      align="end"
+                      [items]="rowActionItems(row)">
+                    </app-ibs-dropdown>
+                  } @else {
+                    <span class="ibs-no-actions">—</span>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ✅ Pager DENTRO del card, pero fuera del scroll -->
+    <div class="ibs-pager">
+      <div class="left">
+        <span class="muted">Total:</span>
+        <strong>{{ totalCount() }}</strong>
+      </div>
+
+      <div class="mid">
+        <!-- Ir al inicio: SOLO si hay 2 páginas antes -->
+        <button
+          class="ibs-page-btn"
+          (click)="first()"
+          [disabled]="!canFirstJump()"
+          title="Primera">
+          <i class="bi bi-chevron-double-left"></i>
+        </button>
+
+        <!-- Anterior -->
+        <button class="ibs-page-btn" (click)="prev()" [disabled]="pageIndex()===0" title="Anterior">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+
+        <!-- Ruleta tipo scroll -->
+        <div class="page-wheel" aria-label="Paginación">
+          @for (it of pageWheel(); track trackByIndex($index)) {
+            @if (it.p) {
+              <button
+                type="button"
+                class="wheel-num"
+                [class.is-center]="it.dist===0"
+                [class.is-near]="it.dist!==0"
+                (click)="goToPage(it.p!)"
+                [disabled]="it.dist===0"
+                [attr.aria-current]="it.dist===0 ? 'page' : null">
+                {{ it.p }}
+              </button>
+            } @else {
+              <!-- ✅ ranura vacía: mantiene el centro fijo -->
+              <span class="wheel-slot wheel-empty" aria-hidden="true"></span>
+            }
+          }
+        </div>
+
+        <!-- Siguiente -->
+        <button class="ibs-page-btn" (click)="next()" [disabled]="pageIndex() >= pageCount()-1" title="Siguiente">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+
+        <!-- Ir al final: SOLO si hay 2 páginas después -->
+        <button
+          class="ibs-page-btn"
+          (click)="last()"
+          [disabled]="!canLastJump()"
+          title="Última">
+          <i class="bi bi-chevron-double-right"></i>
+        </button>
+      </div>
+
+      <div class="right">
+        <app-ibs-dropdown
+          variant="select"
+          align="end"
+          label="Por página"
+          [valueText]="pageSizeSig().toString()"
+          [items]="pageSizeItems()">
+        </app-ibs-dropdown>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="ibs-loading">
+        <div class="spinner-border" role="status"></div>
+        <span>Cargando...</span>
+      </div>
+    }
+  </div>
+
+  @if (canCreate()) {
+    <button type="button" class="ibs-fab" (click)="onCreate()" title="Nuevo">
+      <i class="bi bi-plus-lg"></i>
+    </button>
+  }
+</div>

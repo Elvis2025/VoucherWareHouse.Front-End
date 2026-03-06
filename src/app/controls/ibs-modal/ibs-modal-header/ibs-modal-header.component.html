@@ -1,0 +1,13 @@
+<div class="ibs-modal-head">
+  <div class="title">
+    {{ title }} <span class="accent">{{ accent }}</span>
+  </div>
+
+  <div class="header-extra">
+    <ng-content></ng-content>
+  </div>
+
+  <button class="x ibs-btn-close" type="button" (click)="onClose()" [title]="closeTitle">
+    <i class="bi bi-x-lg"></i>
+  </button>
+</div>

@@ -3324,6 +3324,25 @@ export interface ITenantLoginInfoDto {
     name: string | undefined;
 }
 
+
+export class UserColumnsDto {
+    id: number;
+    userName: string;
+    name: string;
+    surname: string;
+    emailAddress: string;
+    isActive: boolean;
+    fullName: string | undefined;
+    lastLoginTime: moment.Moment | undefined;
+    creationTime: moment.Moment;
+    roleNames: string[] | undefined;
+}
+
+
+
+
+
+
 export class UserDto implements IUserDto {
     id: number;
     userName: string;

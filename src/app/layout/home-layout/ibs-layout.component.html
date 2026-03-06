@@ -264,23 +264,26 @@
       </div>
 
       <!-- User dropdown -->
-    <div class="ibs-user ms-auto">
+      <div class="ibs-user ms-auto" #userMenuRoot>
   <button class="ibs-user-btn"
           type="button"
-          (click)="toggleUserMenu()"
-          [attr.aria-expanded]="userMenuOpen()">
+          (click)="toggleUserMenu($event)"
+          [attr.aria-expanded]="userMenuOpen()"
+          aria-haspopup="menu">
     <span class="ibs-avatar">{{ initials() }}</span>
     <span class="ibs-user-name d-none d-sm-inline">{{ displayName() }}</span>
     <i class="bi bi-chevron-down ibs-user-caret" [class.open]="userMenuOpen()"></i>
   </button>
 
-  <ul class="ibs-user-menu ibs-module-menu"
-      [class.show]="userMenuOpen()">
+  <ul class="ibs-user-menu"
+      [class.show]="userMenuOpen()"
+      role="menu">
     <li>
-      <button class="dropdown-item ibs-user-item" type="button"
+      <button class="ibs-user-item" type="button"
               (click)="goMyAccount(); closeUserMenu()">
         <span class="ibs-user-item-left">
-          <i class="bi bi-gear"></i><span>Mi cuenta</span>
+          <i class="bi bi-gear"></i>
+          <span>Mi cuenta</span>
         </span>
       </button>
     </li>
@@ -288,10 +291,11 @@
     <li class="ibs-user-sep"></li>
 
     <li>
-      <button class="dropdown-item ibs-user-item danger" type="button"
+      <button class="ibs-user-item danger" type="button"
               (click)="logout(); closeUserMenu()">
         <span class="ibs-user-item-left">
-          <i class="bi bi-box-arrow-right"></i><span>Cerrar sesión</span>
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Cerrar sesión</span>
         </span>
       </button>
     </li>

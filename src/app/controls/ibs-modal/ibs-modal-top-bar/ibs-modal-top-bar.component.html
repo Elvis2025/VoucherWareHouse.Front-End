@@ -1,0 +1,32 @@
+<div class="ibs-modal-topbar">
+  <div class="topbar-left">
+    @if (showSearch) {
+      <div class="ibs-search">
+        <i class="bi bi-search"></i>
+        <input
+          class="ibs-search-input"
+          [placeholder]="searchPlaceholder"
+          [value]="searchValue"
+          (input)="searchChanged.emit($any($event.target).value)"
+        />
+        @if (searchValue) {
+          <button type="button" class="ibs-search-clear" (click)="cleared.emit()" title="Limpiar">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- extras opcionales -->
+    <ng-content></ng-content>
+  </div>
+
+  @if (showRefresh) {
+    <button class="ibs-action-btn ibs-btn-save" type="button"
+            (click)="refreshed.emit()"
+            [disabled]="refreshDisabled">
+      <i class="bi bi-arrow-clockwise"></i>
+      <span class="d-none d-sm-inline">Refrescar</span>
+    </button>
+  }
+</div>

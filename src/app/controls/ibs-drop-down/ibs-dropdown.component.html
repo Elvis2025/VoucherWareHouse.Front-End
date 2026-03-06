@@ -1,0 +1,64 @@
+<div class="ibs-dd" [class.muted-on-dark]="mutedOnDark">
+  <button
+    type="button"
+    class="ibs-dd-trigger"
+    [class.is-icon]="variant==='icon'"
+    [class.is-select]="variant==='select'"
+    [class.is-button]="variant==='button'"
+    [disabled]="disabled"
+    (click)="onTriggerClick($event)"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="isOpen()">
+
+    @if (variant === 'icon') {
+      <i class="bi" [ngClass]="icon"></i>
+    }
+
+    @if (variant === 'button') {
+      @if (leftIcon) { <i class="bi" [ngClass]="leftIcon"></i> }
+      <span class="txt">{{ text }}</span>
+      <i class="bi bi-chevron-down chev"></i>
+    }
+
+    @if (variant === 'select') {
+      @if (label) { <span class="lbl">{{ label }}</span> }
+      <span class="val">{{ valueText }}</span>
+      <i class="bi bi-chevron-down chev"></i>
+    }
+  </button>
+
+  <!-- Anchor para devolver el panel aquí al cerrar -->
+  <span #anchor class="ibs-dd-anchor" aria-hidden="true"></span>
+
+  @if (isOpen()) {
+    <div
+      #panel
+      class="ibs-dd-panel"
+      role="menu"
+      (click)="$event.stopPropagation()">
+
+      <div class="ibs-dd-list">
+        @for (it of items; track trackItemKey($index, it)) {
+          @if (it.divider) {
+            <div class="ibs-dd-divider"></div>
+          } @else {
+            <button
+              type="button"
+              class="ibs-dd-item"
+              [class.danger]="it.danger"
+              [disabled]="it.disabled"
+              (click)="onItemClick(it)"
+              role="menuitem">
+
+              @if (it.icon) {
+                <i class="bi" [ngClass]="it.icon"></i>
+              }
+              <span class="txt">{{ it.text }}</span>
+            </button>
+          }
+        }
+      </div>
+
+    </div>
+  }
+</div>

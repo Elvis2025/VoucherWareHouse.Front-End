@@ -1,0 +1,417 @@
+:host {
+  display: block;
+}
+
+/* ===== Shell ===== */
+.ibs-grid-shell { position: relative; }
+
+.ibs-grid-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.ibs-grid-title .h1 {
+  font-size: 28px;
+  font-weight: 1000;
+  margin: 0 0 6px 0;
+  color: var(--ibs-text);
+}
+
+.ibs-grid-title .sub {
+  opacity: .78;
+  font-weight: 800;
+  color: var(--ibs-text-dim);
+}
+
+.ibs-grid-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ibs-refresh {
+  width: auto;
+  padding: 0 14px;
+  gap: 10px;
+  font-weight: 1000;
+  letter-spacing: .2px;
+  filter: saturate(.85);
+}
+
+/* ===== Table ===== */
+.ibs-table-wrap {
+  position: relative;
+  border-radius: 18px;
+  border: 2px solid var(--ibs-border);
+  border-color: var(--ibs-border);
+  background: linear-gradient(180deg, var(--ibs-surface), var(--ibs-surface2));
+
+  /* ✅ clave: que overlays no se corten */
+  overflow: visible;
+
+  box-shadow: 0 18px 44px var(--ibs-shadow);
+  backdrop-filter: blur(14px);
+}
+
+.ibs-table tbody {
+  display: block;
+  height: 360px; /* altura real del área de filas */
+  overflow-y: auto;
+}
+
+.ibs-table thead,
+.ibs-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+
+.ibs-table-scroll {
+  overflow: hidden;
+  border-radius: 18px 18px 0 0;
+  max-height: 420px;
+}
+
+.ibs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ibs-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  font-size: 12px;
+  font-weight: 1000;
+  padding: 14px 14px;
+
+  background: var(--ibs-table-head-bg);
+  border-bottom: 1px solid var(--ibs-border);
+  color: var(--ibs-table-head-text);
+}
+
+.ibs-table td {
+  padding: 14px 14px;
+  border-bottom: 1px solid rgba(148,163,184,.12);
+  color: var(--ibs-text);
+}
+
+
+.ibs-table tbody tr:hover td {
+  background: var(--ibs-row-hover-bg);
+}
+
+.center { text-align: center; }
+.right { text-align: right; }
+
+.actions-col {
+  width: 110px;
+  text-align: right;
+  padding-right: 10px !important;
+
+  /* ✅ ayuda a que el trigger y panel queden arriba */
+  position: relative;
+  z-index: 5;
+}
+
+.ibs-no-actions { opacity: .6; font-weight: 900; }
+
+.ibs-empty {
+  padding: 18px;
+  text-align: center;
+  opacity: .75;
+  color: var(--ibs-text-dim);
+}
+
+/* overlay loading */
+.ibs-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  background: rgba(0,0,0,.18);
+  color: var(--ibs-text);
+  backdrop-filter: blur(10px);
+}
+
+html[data-theme="light"] :host .ibs-loading {
+  background: rgba(248,250,255,.70);
+  color: rgba(30,41,59,.88);
+}
+
+/* ===== Pager ===== */
+.ibs-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  margin-top: 0px;
+  color: var(--ibs-text);
+  border-top: 1px solid var(--ibs-border);
+
+background: linear-gradient(
+    180deg,
+    rgba(124, 92, 255, 0.10),
+    rgba(124, 92, 255, 0.04)
+  );
+
+  backdrop-filter: blur(12px);
+
+}
+
+.ibs-pager .left,
+.ibs-pager .mid,
+.ibs-pager .right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ibs-pager .left { min-width: 140px; }
+.ibs-pager .mid { flex: 1; justify-content: center; }
+.ibs-pager .right { min-width: 190px; justify-content: flex-end; }
+
+.muted { opacity: .7; font-weight: 900; color: var(--ibs-text-dim); }
+.page-info { font-weight: 1000; }
+
+.ibs-page-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--ibs-border);
+  background: var(--ibs-control-bg);
+  color: var(--ibs-text);
+  display: grid;
+  place-items: center;
+  transition: transform .15s ease, background .2s ease;
+}
+
+.ibs-page-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.10);
+}
+
+.ibs-page-btn:disabled { opacity: .45; transform: none; }
+
+/* FAB */
+.ibs-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 0;
+  background: linear-gradient(135deg, var(--ibs-brand-a), var(--ibs-brand-b));
+  color: white;
+  box-shadow: 0 18px 55px rgba(0,0,0,.22);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  filter: saturate(.9);
+}
+
+.ibs-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  font-size: 12px;
+  font-weight: 900;
+
+  padding: 16px 14px;
+
+  /* 🎨 NUEVO DISEÑO */
+  background: linear-gradient(
+    180deg,
+    rgba(124, 92, 255, 0.10),
+    rgba(124, 92, 255, 0.04)
+  );
+
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--ibs-border);
+}
+
+html[data-theme="light"] .ibs-table thead th {
+  color: rgba(60, 65, 90, 0.85);
+}
+
+
+html[data-theme="dark"] .ibs-table thead th {
+
+  color: rgba(235, 238, 255, 0.95);
+  border-bottom: 1px solid rgba(124, 92, 255, 0.35);
+}
+
+
+
+
+.ibs-page-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+
+  border: 1px solid rgba(124, 92, 255, 0.35);
+  background: rgba(124, 92, 255, 0.10);
+
+  color: rgba(124, 92, 255, 0.95);
+
+  display: grid;
+  place-items: center;
+
+  transition: 
+    background .2s ease,
+    transform .15s ease,
+    box-shadow .2s ease;
+}
+
+.ibs-page-btn:hover:not(:disabled) {
+  background: rgba(124, 92, 255, 0.22);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(124, 92, 255, 0.25);
+  
+}
+
+.ibs-page-btn:active:not(:disabled) {
+  transform: scale(.95);
+}
+
+.ibs-page-btn:disabled {
+  opacity: .35;
+  border-color: rgba(148,163,184,.25);
+  background: transparent;
+  color: rgba(148,163,184,.6);
+  cursor: not-allowed;
+}
+
+/* ===== Page wheel (ruleta) ===== */
+.page-wheel {
+ position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 14px;
+
+  /* contenedor minimalista */
+
+background: transparent; 
+  backdrop-filter: blur(10px);
+
+  /* efecto “scroll”: bordes se desvanecen */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+}
+
+.wheel-num{
+appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+
+  color: var(--ibs-text);
+  font-weight: 700;
+
+  font-size: 14px;
+  opacity: .45;
+  transform: scale(.9);
+  transition:
+    transform .18s ease,
+    opacity .18s ease,
+    font-size .18s ease;
+}
+
+.wheel-num.is-near{
+   opacity: .7;
+  transform: scale(.97);
+  font-size: 15px;
+}
+
+/* extremos */
+.wheel-num.is-far{
+  opacity: .35;
+  transform: scale(.85);
+}
+
+/* centro (actual) */
+.wheel-num.is-center{
+   opacity: 1;
+  transform: scale(1.05);   /* 👈 suave, no brusco */
+  font-size: 16px;
+  font-weight: 900;
+
+  /* realce sin círculo: glow + subrayado sutil */
+  filter: drop-shadow(0 6px 16px rgba(124, 92, 255, .35));
+}
+
+.wheel-num.is-center::after{
+  content: '';
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  margin-top: 4px;
+  background: rgba(124, 92, 255, .55);
+}
+.wheel-num::after{
+  display: none;
+}
+.wheel-num:disabled{
+  cursor: default;
+}
+.wheel-slot{
+  width: 22px;     /* ajusta si quieres 20-26 */
+  height: 18px;
+  display: inline-block;
+}
+
+.wheel-empty{
+  opacity: 0;      /* invisible pero ocupa espacio */
+}
+
+.ibs-page-num {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ibs-text);
+  font-weight: 1000;
+  letter-spacing: .2px;
+
+  display: grid;
+  place-items: center;
+
+  opacity: .70;
+  transform: scale(.92);
+  transition: transform .16s ease, opacity .16s ease, background .2s ease, border-color .2s ease;
+}
+
+.ibs-page-num:hover {
+  opacity: .95;
+  transform: scale(1.0);
+  background: rgba(255,255,255,.08);
+}
+
+.ibs-page-num.active {
+  opacity: 1;
+  transform: scale(1.12);
+  background: linear-gradient(135deg, rgba(124, 92, 255, .22), rgba(124, 92, 255, .10));
+  border-color: rgba(124, 92, 255, .45);
+}
+
+.ibs-page-num:disabled {
+  cursor: default;
+}

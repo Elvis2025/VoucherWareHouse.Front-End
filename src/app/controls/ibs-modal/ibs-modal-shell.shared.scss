@@ -1,0 +1,88 @@
+/* =========================================================
+   IBS MODAL — COLOR UNIFICADO
+   - Todo el modal es un solo plano de color
+   - Chrome NO tiene fondo propio
+   ========================================================= */
+
+.ibs-modal{
+  background: var(--ibs-modal-background-color);
+}
+
+/* Quitar fondos de capas internas */
+.ibs-modal-head,
+.ibs-modal-topbar,
+.ibs-modal-body,
+.ibs-modal-foot{
+  background: transparent !important;
+}
+
+/* HEADER */
+.ibs-modal-head{
+  padding: 14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom: 1px solid color-mix(in srgb, var(--ibs-border) 65%, transparent);
+}
+
+.ibs-modal-head .title{
+  font-weight:900;
+  color:var(--ibs-text);
+  font-size:16px;
+}
+
+.ibs-modal-head .accent{
+  color:var(--ibs-primary);
+  font-weight:800;
+}
+
+/* TOPBAR */
+.ibs-modal-topbar{
+  padding: 10px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.ibs-modal-topbar .topbar-left{
+  flex:1;
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
+
+
+/* BODY */
+.ibs-modal-body{
+  padding: 12px 16px;
+  overflow:auto;
+}
+
+/* FOOTER */
+.ibs-modal-foot{
+  padding:12px 16px;
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  border-top:1px solid color-mix(in srgb, var(--ibs-border) 65%, transparent);
+}
+
+
+/* =========================================================
+   FIX SCROLL + BODY HEIGHT (sin tocar estética)
+   ========================================================= */
+
+/* el componente body debe ocupar el 100% del slot */
+.ibs-slot-body > app-ibs-modal-body{
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+/* el div real del body debe ser flexible y scrollear */
+.ibs-modal-body{
+  height: 100%;
+  min-height: 0;
+  overflow: auto; /* ✅ aquí sí hace scroll */
+}

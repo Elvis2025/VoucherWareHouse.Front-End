@@ -1,34 +1,82 @@
-import { ChangeDetectorRef, Component, Injector, ViewChild } from '@angular/core';
-import { finalize } from 'rxjs/operators';
+import { ChangeDetectorRef, Component, Injector, OnInit, TemplateRef, ViewChild, signal } from '@angular/core';
+import { map, finalize } from 'rxjs/operators';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase } from 'shared/paged-listing-component-base';
-import { UserServiceProxy, UserDto, UserDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import { UserServiceProxy, UserDto, RoleDto } from '@shared/service-proxies/service-proxies';
 import { CreateUserDialogComponent } from './create-user/create-user-dialog.component';
 import { EditUserDialogComponent } from './edit-user/edit-user-dialog.component';
 import { ResetPasswordDialogComponent } from './reset-password/reset-password.component';
-import { Table, TableModule } from 'primeng/table';
-import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
 import { ActivatedRoute } from '@angular/router';
-import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
-import { LocalizePipe } from '@shared/pipes/localize.pipe';
+import { IbsGridAction, IbsGridColumn, IbsGridComponent, IbsGridQuery } from '../../controls/ibs-grid/ibs-grid.component';
 
 @Component({
     templateUrl: './users.component.html',
     animations: [appModuleAnimation()],
     standalone: true,
-    imports: [FormsModule, TableModule, PrimeTemplate, NgIf, PaginatorModule, LocalizePipe],
+    imports: [FormsModule, IbsGridComponent],
 })
-export class UsersComponent extends PagedListingComponentBase<UserDto> {
-    @ViewChild('dataTable', { static: true }) dataTable: Table;
-    @ViewChild('paginator', { static: true }) paginator: Paginator;
+export class UsersComponent extends PagedListingComponentBase<UserDto> implements OnInit {
+    @ViewChild('activeTpl', { static: true }) activeTpl!: TemplateRef<any>;
+    @ViewChild('nameTpl', { static: true }) nameTpl!: TemplateRef<any>;
+    @ViewChild(IbsGridComponent) grid?: IbsGridComponent<UserDto>;
 
     users: UserDto[] = [];
     keyword = '';
-    isActive: boolean | null;
+    isActive: boolean | null | undefined;
     advancedFiltersVisible = false;
+
+    readonly loading = signal(false);
+    readonly error = signal<string | null>(null);
+
+    readonly columns = signal<IbsGridColumn<UserDto>[]>([]);
+    readonly actions = signal<IbsGridAction<UserDto>[]>([]);
+
+    readonly createPolicy = 'Pages.Users';
+    readonly updatePolicy = 'Pages.Users';
+    readonly deletePolicy = 'Pages.Users';
+    readonly manageRolesPolicy = 'Pages.Users';
+    readonly managePermissionsPolicy = 'Pages.Users';
+
+    readonly editOpen = signal(false);
+    readonly editMode = signal<'create' | 'edit'>('create');
+    readonly editModel = signal<UserDto | null>(null);
+
+    readonly rolesOpen = signal(false);
+    readonly rolesModel = signal<RoleDto | null>(null);
+
+    readonly permsOpen = signal(false);
+    readonly permsUserId = signal<string | null>(null);
+    readonly permsUserName = signal<string | null>(null);
+
+    readonly assignOpen = signal(false);
+    readonly assignUserId = signal<string | null>(null);
+    readonly assignUserName = signal<string | null>(null);
+
+    readonly loadUsers = (q: IbsGridQuery) => {
+        this.error.set(null);
+        this.loading.set(true);
+
+        return this._userService
+            .getAll(
+                q.filter ?? this.keyword,
+                this.isActive,
+                q.sorting ?? '',
+                q.skipCount ?? 0,
+                q.maxResultCount ?? 10
+            )
+            .pipe(
+                map(result => ({
+                    items: result.items ?? [],
+                    totalCount: result.totalCount ?? 0,
+                })),
+                finalize(() => {
+                    this.loading.set(false);
+                    this.cd.detectChanges();
+                })
+            );
+    };
 
     constructor(
         injector: Injector,
@@ -41,6 +89,69 @@ export class UsersComponent extends PagedListingComponentBase<UserDto> {
         this.keyword = this._activatedRoute.snapshot.queryParams['filterText'] || '';
     }
 
+    ngOnInit(): void {
+        this.columns.set([
+            {
+                key: 'userName',
+                header: 'Usuario',
+                field: 'userName',
+                width: '23%'
+            },
+            {
+                key: 'fullName',
+                header: 'Nombre',
+                template: this.nameTpl,
+                sortable: true,
+                field: 'name',
+                width: '23.5%'
+            },
+            {
+                key: 'emailAddress',
+                header: 'Correo',
+                sortable: true,
+                field: 'emailAddress',
+                width: '28.5%'
+            },
+            {
+                key: 'isActive',
+                header: 'Activo',
+                sortable: false,
+                template: this.activeTpl,
+                align: 'center',
+                width: '110px'
+            },
+        ]);
+
+        this.actions.set([
+            {
+                id: 'edit',
+                text: 'Editar',
+                icon: 'bi bi-pencil-square',
+                requiredPolicy: this.updatePolicy,
+                run: (row) => this.editUser(row),
+            },
+            {
+                id: 'resetPass',
+                text: 'Reset Password',
+                icon: 'bi bi-shield-lock',
+                requiredPolicy: this.updatePolicy,
+                run: (row) => this.resetPassword(row),
+            },
+            {
+                id: 'delete',
+                text: 'Eliminar',
+                icon: 'bi bi-trash',
+                danger: true,
+                requiredPolicy: this.deletePolicy,
+                run: (row) => this.delete(row),
+            },
+        ]);
+    }
+
+    onCreate(): void {
+        this.createUser();
+    }
+
     createUser(): void {
         this.showCreateOrEditUserDialog();
     }
@@ -49,45 +160,22 @@ export class UsersComponent extends PagedListingComponentBase<UserDto> {
         this.showCreateOrEditUserDialog(user.id);
     }
 
-    public resetPassword(user: UserDto): void {
+    resetPassword(user: UserDto): void {
         this.showResetPasswordUserDialog(user.id);
     }
 
     clearFilters(): void {
         this.keyword = '';
         this.isActive = undefined;
+        this.grid?.reloadFirstPage();
     }
 
-    list(event?: LazyLoadEvent): void {
-        if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.changePage(0);
+    list(): void {
+        this.grid?.reloadFirstPage();
+    }
 
-            if (this.primengTableHelper.records && this.primengTableHelper.records.length > 0) {
-                return;
-            }
-        }
-
-        this.primengTableHelper.showLoadingIndicator();
-
-        this._userService
-            .getAll(
-                this.keyword,
-                this.isActive,
-                this.primengTableHelper.getSorting(this.dataTable),
-                this.primengTableHelper.getSkipCount(this.paginator, event),
-                this.primengTableHelper.getMaxResultCount(this.paginator, event)
-            )
-            .pipe(
-                finalize(() => {
-                    this.primengTableHelper.hideLoadingIndicator();
-                })
-            )
-            .subscribe((result: UserDtoPagedResultDto) => {
-                this.primengTableHelper.records = result.items;
-                this.primengTableHelper.totalRecordsCount = result.totalCount;
-                this.primengTableHelper.hideLoadingIndicator();
-                this.cd.detectChanges();
-            });
+    refresh(): void {
+        this.grid?.reload();
     }
 
     delete(user: UserDto): void {
@@ -112,6 +200,7 @@ export class UsersComponent extends PagedListingComponentBase<UserDto> {
 
     private showCreateOrEditUserDialog(id?: number): void {
         let createOrEditUserDialog: BsModalRef;
+
         if (!id) {
             createOrEditUserDialog = this._modalService.show(CreateUserDialogComponent, {
                 class: 'modal-lg',

@@ -1,0 +1,27 @@
+<div class="ibs-modal-backdrop" [style.z-index]="zIndex" (click)="cancelled.emit()"></div>
+
+<div
+  class="ibs-modal"
+  [class.wide]="wide"
+  role="dialog"
+  aria-modal="true"
+  [style.z-index]="zIndex + 1"
+  (click)="$event.stopPropagation()"
+>
+  <!-- ORDEN FIJO -->
+  <div class="ibs-slot ibs-slot-header">
+    <ng-content select="app-ibs-modal-header"></ng-content>
+  </div>
+
+  <div class="ibs-slot ibs-slot-topbar">
+    <ng-content select="app-ibs-modal-top-bar"></ng-content>
+  </div>
+
+  <div class="ibs-slot ibs-slot-body">
+    <ng-content select="app-ibs-modal-body"></ng-content>
+  </div>
+
+  <div class="ibs-slot ibs-slot-footer">
+    <ng-content select="app-ibs-modal-footer"></ng-content>
+  </div>
+</div>
