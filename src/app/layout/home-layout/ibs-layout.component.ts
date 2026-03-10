@@ -28,6 +28,7 @@ import {
 } from './ibs-navigation';
 import { AppComponentBase } from '../../../shared/app-component-base';
 import { AppAuthService } from '../../../shared/auth/app-auth.service';
+import { AppTenantBrandingService } from '@shared/TenantBranding/app-tenant-branding.service';
 
 @Component({
   selector: 'app-ibs-layout',
@@ -39,13 +40,21 @@ import { AppAuthService } from '../../../shared/auth/app-auth.service';
 })
 export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDestroy {
   private sub = new Subscription();
+  logoUrl$ = this._appTenantBrandingService.logoUrl$;
+
+  companyDescription$ = this._appTenantBrandingService.companyDescription$;
+  companyName$ = this._appTenantBrandingService.companyName$;
+  companyType$ = this._appTenantBrandingService.companyType$;
 
   constructor(
     injector: Injector,
     private router: Router,
-    private auth: AppAuthService
+    private auth: AppAuthService,
+    private _appTenantBrandingService: AppTenantBrandingService
   ) {
     super(injector);
+    this.loadCurrentTenantLogo();
+    console.log(this.logoUrl$, 'este es el logo');
   }
 
   // ===== UI =====
@@ -61,6 +70,7 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   readonly modulePickerOpen = signal<boolean>(false);
   @ViewChild('modulePickerRoot', { static: false }) modulePickerRoot?: ElementRef<HTMLElement>;
   @ViewChild('userMenuRoot', { static: false }) userMenuRoot?: ElementRef<HTMLElement>;
+
   // ===== USER =====
   readonly currentUser = signal<any | null>(null);
 
@@ -69,6 +79,9 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
 
   // ===== THEME =====
   readonly theme = signal<'dark' | 'light'>(this.readTheme());
+
+  // ===== USER MENU =====
+  readonly userMenuOpen = signal<boolean>(false);
 
   ngOnInit(): void {
     this.currentUser.set(this.appSession.user);
@@ -171,13 +184,11 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     this.search.set(v ?? '');
   }
 
-  // ===== ✅ Module Picker Dropdown handlers (NO Bootstrap JS needed) =====
+  // ===== Module Picker Dropdown handlers =====
   toggleModulePicker(ev: MouseEvent): void {
-    // IMPORTANT: evita que el click burbujee al document y lo cierre al instante
     ev.preventDefault();
     ev.stopPropagation();
 
-    // Si sidebar está colapsado por hover, al abrir el picker asegúrate que se vea
     if (this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
 
     this.modulePickerOpen.update(v => !v);
@@ -188,58 +199,55 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   }
 
   onModulePick(key: IbsModuleKey): void {
-    // Selecciona usando tu método actual
     this.selectModule(key);
-
-    // Cierra el dropdown
     this.closeModulePicker();
   }
 
   // Click afuera: cerrar
   @HostListener('document:click', ['$event'])
   onDocumentClick(ev: MouseEvent): void {
-     const target = ev.target as Node | null;
+    const target = ev.target as Node | null;
 
-  // ===== Module picker =====
-  if (this.modulePickerOpen()) {
-    const moduleRoot = this.modulePickerRoot?.nativeElement;
+    // ===== Module picker =====
+    if (this.modulePickerOpen()) {
+      const moduleRoot = this.modulePickerRoot?.nativeElement;
 
-    if (!moduleRoot || !target || !moduleRoot.contains(target)) {
-      this.closeModulePicker();
+      if (!moduleRoot || !target || !moduleRoot.contains(target)) {
+        this.closeModulePicker();
+      }
     }
-  }
 
-  // ===== User menu =====
-  if (this.userMenuOpen()) {
-    const userRoot = this.userMenuRoot?.nativeElement;
+    // ===== User menu =====
+    if (this.userMenuOpen()) {
+      const userRoot = this.userMenuRoot?.nativeElement;
 
-    if (!userRoot || !target || !userRoot.contains(target)) {
-      this.closeUserMenu();
+      if (!userRoot || !target || !userRoot.contains(target)) {
+        this.closeUserMenu();
+      }
     }
-  }
   }
 
   // ESC: cerrar
   @HostListener('document:keydown', ['$event'])
   onDocumentKeydown(ev: KeyboardEvent): void {
-     if (ev.key !== 'Escape') return;
+    if (ev.key !== 'Escape') return;
 
-  let handled = false;
+    let handled = false;
 
-  if (this.modulePickerOpen()) {
-    this.closeModulePicker();
-    handled = true;
-  }
+    if (this.modulePickerOpen()) {
+      this.closeModulePicker();
+      handled = true;
+    }
 
-  if (this.userMenuOpen()) {
-    this.closeUserMenu();
-    handled = true;
-  }
+    if (this.userMenuOpen()) {
+      this.closeUserMenu();
+      handled = true;
+    }
 
-  if (handled) {
-    ev.preventDefault();
-    ev.stopPropagation();
-  }
+    if (handled) {
+      ev.preventDefault();
+      ev.stopPropagation();
+    }
   }
 
   // ===== Group helpers =====
@@ -280,7 +288,7 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     this.auth.logout();
   }
 
-  // ===== Theme API (HTML usa esto) =====
+  // ===== Theme API =====
   isLightTheme(): boolean {
     return this.theme() === 'light';
   }
@@ -340,6 +348,32 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     return { ...item, children };
   }
 
+  private normalizeTenantName(value: string | null | undefined): string {
+    return (value ?? '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .toUpperCase();
+  }
+
+  private loadCurrentTenantLogo(): void {
+    const savedTenantName = localStorage.getItem('ibs_tenancy_name');
+    const normalized = this.normalizeTenantName(savedTenantName);
+
+    if (!normalized) {
+      this._appTenantBrandingService.clear();
+      return;
+    }
+
+    this._appTenantBrandingService.loadCurrentTenantLogo().subscribe({
+      next: () => {
+        // Estado global actualizado
+      },
+      error: () => {
+        this._appTenantBrandingService.clear();
+      }
+    });
+  }
+
   private filterItemBySearch(item: IbsNavItem, q: string): IbsNavItem | null {
     const selfMatch = (item.text ?? '').toLowerCase().includes(q);
 
@@ -374,23 +408,20 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     }
   }
 
-readonly userMenuOpen = signal<boolean>(false);
+  toggleUserMenu(ev: MouseEvent): void {
+    ev.preventDefault();
+    ev.stopPropagation();
 
-toggleUserMenu(ev: MouseEvent): void {
-  ev.preventDefault();
-  ev.stopPropagation();
+    if (!this.userMenuOpen()) {
+      this.modulePickerOpen.set(false);
+    }
 
-  // si abre user menu, cerrar module picker
-  if (!this.userMenuOpen()) {
-    this.modulePickerOpen.set(false);
+    this.userMenuOpen.update(v => !v);
   }
 
-  this.userMenuOpen.update(v => !v);
-}
-
-closeUserMenu(): void {
-  this.userMenuOpen.set(false);
-}
+  closeUserMenu(): void {
+    this.userMenuOpen.set(false);
+  }
 
   private findGroupContainingRoute(items: IbsNavItem[], url: string): IbsNavItem | null {
     for (const item of items) {

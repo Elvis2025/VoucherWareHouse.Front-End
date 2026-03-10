@@ -1,0 +1,137 @@
+<app-ibs-modal-shell [wide]="true" (cancelled)="onCancel()">
+  <app-ibs-modal-header
+    title="Asignar roles al usuario"
+    [accent]="modalAccent()"
+    (closed)="onCancel()">
+  </app-ibs-modal-header>
+  <app-ibs-modal-top-bar
+    [showSearch]="false"
+    [showRefresh]="true"
+    [refreshDisabled]="loading()"
+    (refreshed)="load()">
+
+    </app-ibs-modal-top-bar>
+  <app-ibs-modal-body>
+    @if (error()) {
+      <div class="ra-empty">{{ error() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="ra-empty">Cargando roles del sistema...</div>
+    } @else {
+      <div class="ra-layout">
+
+        <!-- IZQUIERDA: Roles no asignados -->
+        <section class="ra-panel">
+          <div class="ra-head">
+            <div class="ra-title">
+              <div class="h">Roles no asignados</div>
+              <div class="sub">{{ leftCount() }} rol(es)</div>
+            </div>
+
+            <div class="ra-search">
+              <i class="bi bi-search"></i>
+              <input
+                type="text"
+                [ngModel]="leftQ()"
+                (ngModelChange)="leftQ.set($event)"
+                placeholder="Buscar..."
+              />
+            </div>
+          </div>
+
+          <div
+            class="ra-list"
+            cdkDropList
+            id="uaLeft"
+            [cdkDropListData]="left()"
+            [cdkDropListConnectedTo]="['uaRight']"
+            (cdkDropListDropped)="onDrop($event, 'left')">
+
+            @if (leftFiltered().length === 0) {
+              <div class="ra-empty">No hay roles disponibles.</div>
+            } @else {
+              @for (r of leftFiltered(); track trackById($index, r)) {
+                <div class="ra-row" cdkDrag [cdkDragData]="r">
+                  <button type="button" class="ra-move" (click)="moveToRight(r)" title="Asignar">
+                    <i class="bi bi-arrow-right-circle"></i>
+                  </button>
+
+                  <div class="ra-meta">
+                    <div class="name">{{ r.name }}</div>
+                    <!-- <div class="sub">
+                      <span>{{ r.id }}</span>
+                    </div> -->
+                  </div>
+
+                  <div class="ra-grip" title="Arrastrar">
+                    <i class="bi bi-grip-vertical"></i>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </section>
+
+        <!-- DERECHA: Roles asignados -->
+        <section class="ra-panel">
+          <div class="ra-head">
+            <div class="ra-title">
+              <div class="h">Roles asignados</div>
+              <div class="sub">{{ rightCount() }} rol(es)</div>
+            </div>
+
+            <div class="ra-search">
+              <i class="bi bi-search"></i>
+              <input
+                type="text"
+                [ngModel]="rightQ()"
+                (ngModelChange)="rightQ.set($event)"
+                placeholder="Buscar..."
+              />
+            </div>
+          </div>
+
+          <div
+            class="ra-list"
+            cdkDropList
+            id="uaRight"
+            [cdkDropListData]="right()"
+            [cdkDropListConnectedTo]="['uaLeft']"
+            (cdkDropListDropped)="onDrop($event, 'right')">
+
+            @if (rightFiltered().length === 0) {
+              <div class="ra-empty">Aún no hay roles asignados.</div>
+            } @else {
+              @for (r of rightFiltered(); track trackById($index, r)) {
+                <div class="ra-row" cdkDrag [cdkDragData]="r">
+                  <button type="button" class="ra-move danger" (click)="moveToLeft(r)" title="Quitar">
+                    <i class="bi bi-arrow-left-circle"></i>
+                  </button>
+
+                  <div class="ra-meta">
+                    <div class="name">{{ r.name }}</div>
+                    <!-- <div class="sub">
+                      <span>{{ r.id }}</span>
+                    </div> -->
+                  </div>
+
+                  <div class="ra-grip" title="Arrastrar">
+                    <i class="bi bi-grip-vertical"></i>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </section>
+
+      </div>
+    }
+  </app-ibs-modal-body>
+
+  <app-ibs-modal-footer
+    [saveDisabled]="loading() || saving()"
+    (closed)="onCancel()"
+    (saved)="onSaved()">
+  </app-ibs-modal-footer>
+</app-ibs-modal-shell>

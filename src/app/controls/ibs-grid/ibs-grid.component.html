@@ -18,7 +18,6 @@
       @if (showSearch) {
         <div class="ibs-search">
           <i class="bi bi-search"></i>
-
           <input
             type="text"
             class="ibs-search-input"
@@ -26,7 +25,6 @@
             [value]="search()"
             (input)="setSearch(($any($event.target).value))"
           />
-
           @if (search()) {
             <button type="button" class="ibs-search-clear" (click)="setSearch('')" title="Limpiar">
               <i class="bi bi-x-lg"></i>
@@ -42,21 +40,29 @@
     </div>
   </div>
 
-  <!-- Table + Scroll + Footer sticky -->
+  <!-- Card -->
   <div class="ibs-table-wrap" [class.loading]="loading()">
 
-    <!-- ✅ SOLO scroll aquí -->
+    <!--
+      SCROLL en este div, NO en tbody.
+      thead usa position:sticky y funciona dentro del scroll
+      porque el navegador detecta el ancestor scrollable.
+      tbody es display:table-row-group (nativo) → alineación perfecta.
+    -->
     <div class="ibs-table-scroll">
       <table class="ibs-table">
         <thead>
           <tr>
-            @for (c of columns; track trackByIndex($index)) {
-              <th [style.width]="c.width" [class.center]="c.align==='center'" [class.right]="c.align==='right'">
+            @for (c of columns; track c.key) {
+              <th
+                [style.width]="c.width ?? null"
+                [class.center]="c.align === 'center'"
+                [class.right]="c.align === 'right'">
                 {{ c.header }}
               </th>
             }
             @if ((actions?.length ?? 0) > 0) {
-              <th class="actions-col">Acciones</th>
+              <th class="actions-col" style="text-align:right">Acciones</th>
             }
           </tr>
         </thead>
@@ -64,7 +70,9 @@
         <tbody>
           @if (items().length === 0 && !loading()) {
             <tr>
-              <td class="ibs-empty" [attr.colspan]="columns.length + ((actions?.length ?? 0) > 0 ? 1 : 0)">
+              <td
+                class="ibs-empty"
+                [attr.colspan]="columns.length + ((actions?.length ?? 0) > 0 ? 1 : 0)">
                 <i class="bi bi-inbox"></i>
                 <span>No hay resultados.</span>
               </td>
@@ -73,13 +81,20 @@
 
           @for (row of items(); track trackByIndex($index)) {
             <tr>
-              @for (c of columns; track trackByIndex($index)) {
-                <td [class.center]="c.align==='center'" [class.right]="c.align==='right'">
+              @for (c of columns; track c.key) {
+                <td
+                  [class.center]="c.align === 'center'"
+                  [class.right]="c.align === 'right'"
+                >
                   @if (c.template) {
                     <ng-container
                       [ngTemplateOutlet]="c.template"
                       [ngTemplateOutletContext]="{ $implicit: row }">
                     </ng-container>
+                  } @else if (isBooleanValue(cellValue(row, c))) {
+                    <span [class]="cellValue(row, c) ? 'ibs-badge ibs-badge--yes' : 'ibs-badge ibs-badge--no'">
+                      {{ cellValue(row, c) ? 'Sí' : 'No' }}
+                    </span>
                   } @else {
                     {{ cellValue(row, c) }}
                   }
@@ -106,7 +121,7 @@
       </table>
     </div>
 
-    <!-- ✅ Pager DENTRO del card, pero fuera del scroll -->
+    <!-- Pager -->
     <div class="ibs-pager">
       <div class="left">
         <span class="muted">Total:</span>
@@ -114,7 +129,6 @@
       </div>
 
       <div class="mid">
-        <!-- Ir al inicio: SOLO si hay 2 páginas antes -->
         <button
           class="ibs-page-btn"
           (click)="first()"
@@ -123,12 +137,10 @@
           <i class="bi bi-chevron-double-left"></i>
         </button>
 
-        <!-- Anterior -->
         <button class="ibs-page-btn" (click)="prev()" [disabled]="pageIndex()===0" title="Anterior">
           <i class="bi bi-chevron-left"></i>
         </button>
 
-        <!-- Ruleta tipo scroll -->
         <div class="page-wheel" aria-label="Paginación">
           @for (it of pageWheel(); track trackByIndex($index)) {
             @if (it.p) {
@@ -143,18 +155,15 @@
                 {{ it.p }}
               </button>
             } @else {
-              <!-- ✅ ranura vacía: mantiene el centro fijo -->
               <span class="wheel-slot wheel-empty" aria-hidden="true"></span>
             }
           }
         </div>
 
-        <!-- Siguiente -->
         <button class="ibs-page-btn" (click)="next()" [disabled]="pageIndex() >= pageCount()-1" title="Siguiente">
           <i class="bi bi-chevron-right"></i>
         </button>
 
-        <!-- Ir al final: SOLO si hay 2 páginas después -->
         <button
           class="ibs-page-btn"
           (click)="last()"
@@ -184,7 +193,7 @@
   </div>
 
   @if (canCreate()) {
-    <button type="button" class="ibs-fab" (click)="onCreate()" title="Nuevo">
+    <button type="button" class="ibs-fab" (click)="onCreate()" title="Crear nuevo registro">
       <i class="bi bi-plus-lg"></i>
     </button>
   }

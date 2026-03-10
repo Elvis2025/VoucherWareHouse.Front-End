@@ -1,0 +1,59 @@
+<div
+  class="ibs-field"
+  [class.is-focused]="focused"
+  [class.is-disabled]="disabled"
+>
+  <div class="ibs-control" (click)="focus()">
+    <input
+      #inp
+      class="ibs-input"
+      [id]="id"
+      [attr.name]="name || null"
+      [type]="type"
+      [placeholder]="placeholder"
+      [required]="required || null"
+      [disabled]="disabled || null"
+      [readonly]="readonly || null"
+      [attr.autocomplete]="autocomplete || 'off'"
+      [attr.inputmode]="inputMode || null"
+      [attr.maxlength]="maxLength ?? null"
+      [attr.minlength]="minLength ?? null"
+      [attr.min]="min ?? null"
+      [attr.max]="max ?? null"
+      [attr.step]="step ?? null"
+      [attr.pattern]="nativePattern"
+      [attr.aria-label]="ariaLabel || label || null"
+      (input)="onInput($event)"
+      (change)="onChangeNative($event)"
+      (focus)="onFocus($event)"
+      (blur)="onBlur($event)"
+      (keydown)="onKeydown($event)"
+      (keyup)="onKeyup($event)"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+    />
+
+    <label class="ibs-label" [for]="id">
+      {{ label }}
+      @if (required) {
+        <span class="ibs-required">*</span>
+      }
+    </label>
+
+    <div class="ibs-actions" aria-hidden="true">
+      @if (showClear) {
+        <button
+          type="button"
+          class="ibs-clear"
+          (mousedown)="$event.preventDefault()"
+          (click)="clear()"
+          [attr.aria-label]="'Limpiar ' + label"
+        >
+          <i class="bi bi-x"></i>
+        </button>
+      }
+    </div>
+  </div>
+</div>

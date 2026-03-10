@@ -1,0 +1,27 @@
+<div class="ibs-tabs" role="tablist">
+  @for (tab of tabs; track tab.label; let i = $index) {
+    <button
+      type="button"
+      class="ibs-tab-btn"
+      role="tab"
+      [class.active]="activeIndex() === i"
+      [class.is-disabled]="tab.disabled"
+      [disabled]="tab.disabled"
+      [attr.aria-selected]="activeIndex() === i"
+      (click)="select(i)">
+      @if (tab.icon) {
+        <i [class]="tab.icon"></i>
+      }
+      {{ tab.label }}
+    </button>
+  }
+</div>
+
+<!-- Contenido del tab activo -->
+<div class="ibs-tab-panel">
+  @for (tab of tabs; track tab.label; let i = $index) {
+    @if (activeIndex() === i) {
+      <ng-container *ngTemplateOutlet="getTemplate(i)" />
+    }
+  }
+</div>

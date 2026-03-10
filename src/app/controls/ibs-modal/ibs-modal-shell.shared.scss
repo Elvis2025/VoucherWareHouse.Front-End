@@ -4,7 +4,7 @@
    - Chrome NO tiene fondo propio
    ========================================================= */
 
-.ibs-modal{
+.ibs-modal {
   background: var(--ibs-modal-background-color);
 }
 
@@ -12,77 +12,160 @@
 .ibs-modal-head,
 .ibs-modal-topbar,
 .ibs-modal-body,
-.ibs-modal-foot{
+.ibs-modal-foot {
   background: transparent !important;
 }
 
 /* HEADER */
-.ibs-modal-head{
+.ibs-modal-head {
   padding: 14px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid color-mix(in srgb, var(--ibs-border) 65%, transparent);
 }
 
-.ibs-modal-head .title{
-  font-weight:900;
-  color:var(--ibs-text);
-  font-size:16px;
+.ibs-modal-head .title {
+  font-weight: 900;
+  color: var(--ibs-text);
+  font-size: 16px;
 }
 
-.ibs-modal-head .accent{
-  color:var(--ibs-primary);
-  font-weight:800;
+.ibs-modal-head .accent {
+  color: var(--ibs-primary);
+  font-weight: 800;
 }
 
 /* TOPBAR */
-.ibs-modal-topbar{
+.ibs-modal-topbar {
   padding: 10px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.ibs-modal-topbar .topbar-left{
-  flex:1;
-  display:flex;
-  align-items:center;
-  min-width:0;
+.ibs-modal-topbar .topbar-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
-
-
-/* BODY */
-.ibs-modal-body{
-  padding: 12px 16px;
-  overflow:auto;
-}
-
-/* FOOTER */
-.ibs-modal-foot{
-  padding:12px 16px;
-  display:flex;
-  justify-content:flex-end;
-  gap:12px;
-  border-top:1px solid color-mix(in srgb, var(--ibs-border) 65%, transparent);
-}
-
 
 /* =========================================================
-   FIX SCROLL + BODY HEIGHT (sin tocar estética)
+   BODY
+   - El host ocupa todo el alto disponible del slot
+   - El div interno es el que hace scroll
    ========================================================= */
 
-/* el componente body debe ocupar el 100% del slot */
-.ibs-slot-body > app-ibs-modal-body{
+:host.ibs-modal-body-host {
   display: block;
   height: 100%;
   min-height: 0;
 }
 
-/* el div real del body debe ser flexible y scrollear */
-.ibs-modal-body{
+.ibs-modal-body {
   height: 100%;
   min-height: 0;
-  overflow: auto; /* ✅ aquí sí hace scroll */
+  padding: 12px 16px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+
+/* FOOTER */
+.ibs-modal-foot {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--ibs-border) 65%, transparent);
+}
+
+/* =========================================================
+   BOTONES — cursor + hover
+   ========================================================= */
+
+.ibs-modal button,
+.ibs-modal .btn {
+  cursor: pointer;
+}
+
+/* ── Botón X (cerrar header) ── */
+.ibs-btn-close.x {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--ibs-text-dim);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+
+  flex-shrink: 0;
+  cursor: pointer;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    box-shadow .18s ease;
+}
+
+.ibs-btn-close.x i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  width: 14px;
+  height: 14px;
+}
+
+.ibs-btn-close.x:hover {
+  background: rgba(239, 68, 68, .12);
+  border-color: rgba(239, 68, 68, .35);
+  color: #ef4444;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, .18);
+}
+
+.ibs-btn-close.x:active {
+  background: rgba(239, 68, 68, .22);
+  transition-duration: .08s;
+}
+
+/* ── Botón Cancel ── */
+.btn.ghost {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 12px;
+  border: 1.5px solid color-mix(in srgb, var(--ibs-border) 80%, transparent);
+  background: transparent;
+  color: var(--ibs-text-dim);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    box-shadow .18s ease;
+}
+
+.btn.ghost:hover {
+  background: color-mix(in srgb, var(--ibs-border) 25%, transparent);
+  border-color: color-mix(in srgb, var(--ibs-border) 100%, transparent);
+  color: var(--ibs-text);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .10);
+}
+
+.btn.ghost:active {
+  background: color-mix(in srgb, var(--ibs-border) 35%, transparent);
+  transition-duration: .08s;
 }

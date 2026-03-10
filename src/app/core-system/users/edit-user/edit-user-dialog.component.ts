@@ -1,96 +1,149 @@
-import { Component, Injector, OnInit, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
-import { BsModalRef } from 'ngx-bootstrap/modal';
-import { forEach as _forEach, includes as _includes, map as _map } from 'lodash-es';
-import { AppComponentBase } from '@shared/app-component-base';
-import { UserServiceProxy, UserDto, RoleDto } from '@shared/service-proxies/service-proxies';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Injector,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AbpModalHeaderComponent } from '../../../../shared/components/modal/abp-modal-header.component';
-import { TabsetComponent, TabDirective } from 'ngx-bootstrap/tabs';
-import { AbpValidationSummaryComponent } from '../../../../shared/components/validation/abp-validation.summary.component';
-import { AbpModalFooterComponent } from '../../../../shared/components/modal/abp-modal-footer.component';
+import { BsModalRef } from 'ngx-bootstrap/modal';
+import { finalize } from 'rxjs/operators';
+
+import { AppComponentBase } from '@shared/app-component-base';
+import {
+  RoleDto,
+  UserDto,
+  UserServiceProxy,
+} from '@shared/service-proxies/service-proxies';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
 
+import { IbsInputComponent } from '../../../controls/ibs-input/ibs-input.component';
+import { IbsCheckBoxComponent } from '../../../controls/ibs-check-box/ibs-check-box.component';
+
+import { IbsModalShellComponent } from '../../../controls/ibs-modal/ibs-modal-shell.component';
+import { IbsModalHeaderComponent } from '../../../controls/ibs-modal/ibs-modal-header/ibs-modal-header.component';
+import { IbsModalBodyComponent } from '../../../controls/ibs-modal/ibs-modal-body/ibs-modal-body.component';
+import { IbsModalFooterComponent } from '../../../controls/ibs-modal/ibs-modal-footer/ibs-modal-footer.component';
+import { IbsModalTabComponent } from '../../../controls/ibs-modal/ibs-modal-tab/ibs-modal-tab.component';
+import { IbsModalTabsComponent } from '../../../controls/ibs-modal/ibs-modal-tab/ibs-modal-tabs.component';
+
 @Component({
-    templateUrl: './edit-user-dialog.component.html',
-    standalone: true,
-    imports: [
-        FormsModule,
-        AbpModalHeaderComponent,
-        TabsetComponent,
-        TabDirective,
-        AbpValidationSummaryComponent,
-        AbpModalFooterComponent,
-        LocalizePipe,
-    ],
+  templateUrl: './edit-user-dialog.component.html',
+  styleUrls: ['./edit-user-dialog.component.scss'],
+  standalone: true,
+  imports: [
+    FormsModule,
+    LocalizePipe,
+    IbsInputComponent,
+    IbsCheckBoxComponent,
+    IbsModalShellComponent,
+    IbsModalHeaderComponent,
+    IbsModalBodyComponent,
+    IbsModalFooterComponent,
+    IbsModalTabsComponent,
+    IbsModalTabComponent,
+  ],
 })
 export class EditUserDialogComponent extends AppComponentBase implements OnInit {
-    @Output() onSave = new EventEmitter<any>();
+  @Output() onSave = new EventEmitter<void>();
 
-    saving = false;
-    user = new UserDto();
-    roles: RoleDto[] = [];
-    checkedRolesMap: { [key: string]: boolean } = {};
-    id: number;
+  id!: number;
 
-    constructor(
-        injector: Injector,
-        public _userService: UserServiceProxy,
-        public bsModalRef: BsModalRef,
-        private cd: ChangeDetectorRef
-    ) {
-        super(injector);
+  saving = false;
+  user = new UserDto();
+
+  roles: RoleDto[] = [];
+  checkedRolesMap: Record<string, boolean> = {};
+
+  constructor(
+    injector: Injector,
+    public userService: UserServiceProxy,
+    public bsModalRef: BsModalRef,
+    private cd: ChangeDetectorRef
+  ) {
+    super(injector);
+  }
+
+  ngOnInit(): void {
+    this.loadUserAndRoles();
+  }
+
+  get canSubmit(): boolean {
+    return (
+      this.isNotEmpty(this.user.name) &&
+      this.isNotEmpty(this.user.surname) &&
+      this.isNotEmpty(this.user.userName) &&
+      this.isNotEmpty(this.user.emailAddress)
+    );
+  }
+
+  close(): void {
+    this.bsModalRef.hide();
+  }
+
+  save(): void {
+    if (this.saving || !this.canSubmit) {
+      return;
     }
 
-    ngOnInit(): void {
-        this._userService.get(this.id).subscribe((result) => {
-            this.user = result;
+    this.user.roleNames = this.getCheckedRoles();
+    this.saving = true;
 
-            this._userService.getRoles().subscribe((result2) => {
-                this.roles = result2.items;
-                this.setInitialRolesStatus();
-                this.cd.detectChanges();
-            });
+    this.userService
+      .update(this.user)
+      .pipe(
+        finalize(() => {
+          this.saving = false;
+          this.cd.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.notify.info(this.l('SavedSuccessfully'));
+          this.close();
+          this.onSave.emit();
+        },
+      });
+  }
+
+  private loadUserAndRoles(): void {
+    this.userService.get(this.id).subscribe({
+      next: (userResult) => {
+        this.user = userResult;
+
+        this.userService.getRoles().subscribe({
+          next: (rolesResult) => {
+            this.roles = rolesResult.items;
+            this.initializeCheckedRoles();
+            this.cd.detectChanges();
+          },
         });
+      },
+    });
+  }
+
+  private initializeCheckedRoles(): void {
+    this.checkedRolesMap = {};
+
+    const assignedRoles = new Set(
+      (this.user.roleNames ?? []).map(x => (x ?? '').trim().toUpperCase())
+    );
+
+    for (const role of this.roles) {
+      this.checkedRolesMap[role.normalizedName] =
+        assignedRoles.has((role.normalizedName ?? '').trim().toUpperCase()) ||
+        assignedRoles.has((role.name ?? '').trim().toUpperCase());
     }
+  }
 
-    setInitialRolesStatus(): void {
-        _map(this.roles, (item) => {
-            this.checkedRolesMap[item.normalizedName] = this.isRoleChecked(item.normalizedName);
-        });
-    }
+  private getCheckedRoles(): string[] {
+    return this.roles
+      .filter(role => this.checkedRolesMap[role.normalizedName])
+      .map(role => role.normalizedName);
+  }
 
-    isRoleChecked(normalizedName: string): boolean {
-        return _includes(this.user.roleNames, normalizedName);
-    }
-
-    onRoleChange(role: RoleDto, $event) {
-        this.checkedRolesMap[role.normalizedName] = $event.target.checked;
-    }
-
-    getCheckedRoles(): string[] {
-        const roles: string[] = [];
-        _forEach(this.checkedRolesMap, function (value, key) {
-            if (value) {
-                roles.push(key);
-            }
-        });
-        return roles;
-    }
-
-    save(): void {
-        this.saving = true;
-
-        this.user.roleNames = this.getCheckedRoles();
-
-        this._userService.update(this.user).subscribe(
-            () => {
-                this.notify.info(this.l('SavedSuccessfully'));
-                this.bsModalRef.hide();
-                this.onSave.emit();
-            },
-            () => {
-                this.saving = false;
-            }
-        );
-    }
+  private isNotEmpty(value: string | null | undefined): boolean {
+    return !!value && value.trim().length > 0;
+  }
 }

@@ -5,7 +5,13 @@
       <div class="tn-topbar">
         <div class="tn-brand-mini">
           <div class="tn-logo">
-            <img src="assets/img/logo/logo-ibs.png" alt="IB Systems" />
+
+             @if (logoUrl$ | async; as logoUrl) {
+              <img [src]="logoUrl" alt="iThotSystem" />
+            }
+            @else {
+              <img src="assets/img/logo/logo-ibs.png" alt="IB Systems" />
+            }       
           </div>
 
           <div class="tn-brand-txt">

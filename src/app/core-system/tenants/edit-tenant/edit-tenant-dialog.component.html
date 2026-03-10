@@ -1,64 +1,225 @@
-<form class="form-horizontal" autocomplete="off" #editTenantForm="ngForm" (ngSubmit)="save()">
-    <abp-modal-header [title]="'EditTenant' | localize" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
-    <div class="modal-body">
-        <div class="form-group row required">
-            <label class="col-md-3 col-form-label" for="tenancyName">
-                {{ 'TenancyName' | localize }}
-            </label>
-            <div class="col-md-9">
-                <input
-                    type="text"
-                    class="form-control"
-                    name="tenancyName"
-                    id="tenancyName"
-                    minlength="2"
-                    maxlength="64"
-                    required
-                    [(ngModel)]="tenant.tenancyName"
-                    #tenancyNameModel="ngModel"
-                    #tenancyNameEl />
-                <abp-validation-summary
-                    [control]="tenancyNameModel"
-                    [controlEl]="tenancyNameEl"></abp-validation-summary>
+<form
+  class="form-horizontal ibs-edit-tenant-form"
+  autocomplete="off"
+  #editTenantForm="ngForm"
+  (ngSubmit)="submit()">
+
+  <app-ibs-modal-shell [wide]="false" (cancelled)="close()">
+
+    <app-ibs-modal-header
+      [title]="'EditTenant' | localize"
+      (closed)="close()">
+    </app-ibs-modal-header>
+
+    <app-ibs-modal-body>
+
+      <app-ibs-modal-tabs>
+
+        <!-- TAB DETAILS -->
+        <app-ibs-modal-tab
+          [label]="'Details' | localize"
+          icon="bi bi-building">
+
+          <div class="ibs-edit-user-section">
+
+            <div class="ibs-fields-stack">
+
+              <div class="ibs-field">
+                <app-ibs-input
+                  [label]="'TenancyName' | localize"
+                  name="tenancyName"
+                  [required]="true"
+                  [minLength]="2"
+                  [maxLength]="64"
+                  [ngModel]="formState().tenancyName"
+                  (ngModelChange)="updateTenancyName($event)">
+                </app-ibs-input>
+              </div>
+
+              <div class="ibs-field">
+                <app-ibs-input
+                  [label]="'Name' | localize"
+                  name="name"
+                  [required]="true"
+                  [maxLength]="128"
+                  [ngModel]="formState().name"
+                  (ngModelChange)="updateName($event)">
+                </app-ibs-input>
+              </div>
+
             </div>
-        </div>
-        <div class="form-group row required">
-            <label class="col-md-3 col-form-label" for="name">
-                {{ 'Name' | localize }}
-            </label>
-            <div class="col-md-9">
-                <input
-                    type="text"
-                    class="form-control"
-                    name="name"
-                    id="name"
-                    maxlength="128"
-                    required
-                    [(ngModel)]="tenant.name"
-                    #nameModel="ngModel"
-                    #nameEl />
-                <abp-validation-summary [control]="nameModel" [controlEl]="nameEl"></abp-validation-summary>
+
+            <div class="ibs-toggle-row">
+              <app-ibs-check-box
+                [text]="'IsActive' | localize"
+                name="isActive"
+                [ngModel]="formState().isActive"
+                (ngModelChange)="updateIsActive($event)">
+              </app-ibs-check-box>
             </div>
-        </div>
-        <div class="form-group row mb-0">
-            <label class="col-md-3 col-form-label">
-                {{ 'IsActive' | localize }}
-            </label>
-            <div class="col-md-9">
-                <div class="custom-control custom-checkbox">
-                    <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        name="isActive"
-                        id="isActive"
-                        [(ngModel)]="tenant.isActive" />
-                    <label class="custom-control-label mt-2" for="isActive"></label>
+
+          </div>
+
+        </app-ibs-modal-tab>
+
+        <!-- TAB LOGO / BRANDING -->
+        <app-ibs-modal-tab
+          [label]="'Logo'"
+          icon="bi bi-image">
+
+          <div class="ibs-edit-user-section">
+
+            <div class="ibs-fields-stack">
+
+              <div class="ibs-field">
+                <app-ibs-input
+                  [label]="'CompanyName' | localize"
+                  name="companyName"
+                  [required]="true"
+                  [maxLength]="500"
+                  [ngModel]="brandingCompanyName()"
+                  (ngModelChange)="updateBrandingCompanyName($event)">
+                </app-ibs-input>
+              </div>
+
+              <div class="ibs-field">
+                <app-ibs-input
+                  [label]="'CompanyDescription' | localize"
+                  name="companyDescription"
+                  [required]="true"
+                  [maxLength]="500"
+                  [ngModel]="brandingCompanyDescription()"
+                  (ngModelChange)="updateBrandingCompanyDescription($event)">
+                </app-ibs-input>
+              </div>
+
+              <div class="ibs-field">
+                <app-ibs-input
+                  [label]="'CompanyType' | localize"
+                  name="companyType"
+                  [required]="true"
+                  [maxLength]="500"
+                  [ngModel]="brandingCompanyType()"
+                  (ngModelChange)="updateBrandingCompanyType($event)">
+                </app-ibs-input>
+              </div>
+
+              <!-- LOGO OPCIONAL -->
+              <div class="ibs-field">
+                <label class="ibs-logo-label" for="tenantLogoFile">
+                  Seleccionar archivo
+                </label>
+
+                <input
+                  #tenantLogoFileInput
+                  id="tenantLogoFile"
+                  type="file"
+                  class="ibs-logo-file-input-hidden"
+                  accept=".png,.jpg,.jpeg,.webp,.svg,image/*"
+                  (change)="onLogoSelected($event)"
+                  [disabled]="saving()" />
+
+                @if (!(logoPreviewUrl() || currentLogoUrl())) {
+                  <div
+                    class="ibs-logo-dropzone"
+                    [class.is-dragging]="isDraggingLogo()"
+                    [class.has-file]="!!selectedLogoFileName() || !!currentLogoUrl()"
+                    (dragover)="onLogoDragOver($event)"
+                    (dragleave)="onLogoDragLeave($event)"
+                    (drop)="onLogoDrop($event)"
+                    (click)="tenantLogoFileInput.click()">
+
+                    <div class="ibs-logo-dropzone-content">
+                      <div class="ibs-logo-dropzone-icon">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                      </div>
+
+                      <div class="ibs-logo-dropzone-texts">
+                        <div class="ibs-logo-dropzone-title">
+                          Arrastra tu logo aquí
+                        </div>
+
+                        <div class="ibs-logo-dropzone-subtitle">
+                          o haz clic para seleccionarlo desde tu equipo
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                } @else {
+                  <div
+                    class="ibs-logo-preview-box"
+                    (click)="tenantLogoFileInput.click()"
+                    (dragover)="onLogoDragOver($event)"
+                    (dragleave)="onLogoDragLeave($event)"
+                    (drop)="onLogoDrop($event)">
+
+                    <img
+                      [src]="logoPreviewUrl() || currentLogoUrl() || ''"
+                      alt="Vista previa del logo"
+                      class="ibs-logo-preview-img" />
+                  </div>
+                }
+              </div>
+
+              @if (selectedLogoFileName()) {
+                <div class="ibs-logo-file-row">
+                  <div class="ibs-logo-file-name">
+                    <i class="bi bi-paperclip"></i>
+                    <span>{{ selectedLogoFileName() }}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="ibs-logo-remove-btn"
+                    (click)="clearSelectedLogo(); $event.stopPropagation()"
+                    [disabled]="saving()">
+                    <i class="bi bi-trash"></i>
+                    <span>Quitar selección</span>
+                  </button>
                 </div>
+              }
+
+              @if (!selectedLogoFileName() && currentLogoUrl()) {
+                <div class="ibs-logo-file-row">
+                  <div class="ibs-logo-file-name">
+                    <i class="bi bi-image"></i>
+                    <span>Logo actual del tenant</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="ibs-logo-remove-btn"
+                    (click)="removeCurrentLogo(); $event.stopPropagation()"
+                    [disabled]="saving()">
+                    <i class="bi bi-trash"></i>
+                    <span>Eliminar logo actual</span>
+                  </button>
+                </div>
+              }
+
+              <div class="ibs-info-block">
+                <p class="ibs-info-text">
+                  Formatos permitidos: PNG, JPG, JPEG, WEBP y SVG. Tamaño máximo: 2 MB.
+                </p>
+              </div>
+
             </div>
-        </div>
-    </div>
-    <abp-modal-footer
-        [cancelDisabled]="saving"
-        [saveDisabled]="!editTenantForm.form.valid || saving"
-        (onCancelClick)="bsModalRef.hide()"></abp-modal-footer>
+
+          </div>
+
+        </app-ibs-modal-tab>
+
+      </app-ibs-modal-tabs>
+
+    </app-ibs-modal-body>
+
+    <app-ibs-modal-footer
+      [closeText]="'Cancel' | localize"
+      [saveText]="'Save' | localize"
+      [saveDisabled]="!canSubmit() || saving()"
+      (closed)="close()"
+      (saved)="submit()">
+    </app-ibs-modal-footer>
+
+  </app-ibs-modal-shell>
 </form>

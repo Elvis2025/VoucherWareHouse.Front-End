@@ -1,0 +1,144 @@
+:host{
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Root */
+.ibs-check{
+  --_size: 22px;
+  --_r: 10px;
+
+  --_border: var(--ibs-border);
+  --_bg: color-mix(in srgb, var(--ibs-control-bg, var(--ibs-card)) 92%, transparent);
+  --_text: var(--ibs-text);
+  --_muted: var(--ibs-text-dim, color-mix(in srgb, var(--ibs-text) 55%, transparent));
+  --_primary: var(--ibs-primary);
+  --_danger: var(--ibs-danger, #ef4444);
+
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* Disabled */
+.ibs-check.is-disabled{
+  opacity: .65;
+  pointer-events: none;
+}
+
+/* Button box */
+.ibs-check__box{
+  flex: 0 0 var(--_size);  /* ✅ evita que colapse */
+  width: var(--_size);
+  height: var(--_size);
+
+  border-radius: var(--_r);
+  border: 1px solid var(--_border);
+  background: var(--_bg);
+
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* reset botón */
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  box-shadow: none;
+  line-height: 1;
+
+  transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+.ibs-check__box:hover{
+  transform: scale(1.03);
+  border-color: color-mix(in srgb, var(--_primary) 45%, var(--_border));
+}
+
+/* focus accesible */
+.ibs-check__box:focus-visible{
+  box-shadow: var(--ibs-focus);
+  border-color: color-mix(in srgb, var(--_primary) 55%, var(--_border));
+}
+
+/* Invalid state */
+.ibs-check.is-invalid .ibs-check__box{
+  border-color: color-mix(in srgb, var(--_danger) 80%, var(--_border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--_danger) 16%, transparent);
+}
+
+/* Dot */
+.ibs-check__dot{
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: transparent;
+  transition: background .14s ease, color .14s ease;
+}
+
+.ibs-check__dot.is-on{
+  background: color-mix(in srgb, var(--_primary) 92%, transparent);
+  color: var(--ibs-on-primary, #fff);
+}
+
+.ibs-check__dot i{
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Content */
+.ibs-check__content{
+  flex: 1 1 auto;   /* ✅ ocupa el resto del ancho */
+  min-width: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Text */
+.ibs-check__text{
+  color: var(--_text);
+  font-weight: 800;
+  line-height: 1.25;
+
+  /* ✅ asegura altura mínima visible aunque el texto sea corto */
+  min-height: var(--_size);
+  display: flex;
+  align-items: center;
+}
+
+/* Required star */
+.ibs-check__req{
+  margin-left: 4px;
+  color: color-mix(in srgb, var(--_danger) 85%, transparent);
+  font-weight: 900;
+}
+
+/* Hint error */
+.ibs-check__hint{
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-weight: 800;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--_danger) 85%, var(--_text));
+
+  i{
+    font-size: 14px;
+    line-height: 1;
+  }
+}

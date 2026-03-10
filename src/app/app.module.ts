@@ -12,15 +12,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from '@shared/shared.module';
 import { ServiceProxyModule } from '@shared/service-proxies/service-proxy.module';
-// layout
-import { HeaderComponent } from './layout/header.component';
-import { HeaderLeftNavbarComponent } from './layout/header-left-navbar.component';
-import { HeaderLanguageMenuComponent } from './layout/header-language-menu.component';
-import { FooterComponent } from './layout/footer.component';
-import { SidebarComponent } from './layout/sidebar.component';
-import { SidebarLogoComponent } from './layout/sidebar-logo.component';
-import { SidebarUserPanelComponent } from './layout/sidebar-user-panel.component';
-import { SidebarMenuComponent } from './layout/sidebar-menu.component';
 
 @NgModule({
     imports: [

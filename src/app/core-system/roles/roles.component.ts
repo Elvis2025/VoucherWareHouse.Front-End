@@ -1,115 +1,175 @@
-import { Component, Injector, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { finalize } from 'rxjs/operators';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Injector,
+  OnInit,
+  ViewChild,
+  signal,
+} from '@angular/core';
+import { map, finalize } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ActivatedRoute } from '@angular/router';
+
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase } from '@shared/paged-listing-component-base';
-import { RoleServiceProxy, RoleDto, RoleDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
+import {
+  RoleDto,
+  RoleServiceProxy,
+} from '@shared/service-proxies/service-proxies';
+
 import { CreateRoleDialogComponent } from './create-role/create-role-dialog.component';
 import { EditRoleDialogComponent } from './edit-role/edit-role-dialog.component';
-import { Table, TableModule } from 'primeng/table';
-import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
-import { ActivatedRoute } from '@angular/router';
-import { Paginator, PaginatorModule } from 'primeng/paginator';
-import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+
+import {
+  IbsGridAction,
+  IbsGridColumn,
+  IbsGridComponent,
+  IbsGridQuery,
+} from '../../controls/ibs-grid/ibs-grid.component';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
 
 @Component({
-    templateUrl: './roles.component.html',
-    animations: [appModuleAnimation()],
-    standalone: true,
-    imports: [FormsModule, TableModule, PrimeTemplate, NgIf, PaginatorModule, LocalizePipe],
+  templateUrl: './roles.component.html',
+  animations: [appModuleAnimation()],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IbsGridComponent, LocalizePipe],
 })
-export class RolesComponent extends PagedListingComponentBase<RoleDto> {
-    @ViewChild('dataTable', { static: true }) dataTable: Table;
-    @ViewChild('paginator', { static: true }) paginator: Paginator;
+export class RolesComponent
+  extends PagedListingComponentBase<RoleDto>
+  implements OnInit
+{
+  @ViewChild(IbsGridComponent) grid?: IbsGridComponent<RoleDto>;
 
-    roles: RoleDto[] = [];
-    keyword = '';
+  readonly createPolicy = 'Pages.Roles';
+  readonly updatePolicy = 'Pages.Roles';
+  readonly deletePolicy = 'Pages.Roles';
 
-    constructor(
-        injector: Injector,
-        private _rolesService: RoleServiceProxy,
-        private _modalService: BsModalService,
-        private _activatedRoute: ActivatedRoute,
-        cd: ChangeDetectorRef
-    ) {
-        super(injector, cd);
-        this.keyword = this._activatedRoute.snapshot.queryParams['keyword'] || '';
-    }
+  readonly columns = signal<IbsGridColumn<RoleDto>[]>([]);
+  readonly actions = signal<IbsGridAction<RoleDto>[]>([]);
+  readonly keyword = signal('');
 
-    list(event?: LazyLoadEvent): void {
-        if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.changePage(0);
+  readonly loadRoles = (q: IbsGridQuery) =>
+    this.rolesService
+      .getAll(
+        (q.filter ?? this.keyword()).trim(),
+        q.sorting ?? '',
+        q.skipCount ?? 0,
+        q.maxResultCount ?? 10
+      )
+      .pipe(
+        map((result) => ({
+          items: result.items ?? [],
+          totalCount: result.totalCount ?? 0,
+        })),
+        finalize(() => this.cd.detectChanges())
+      );
 
-            if (this.primengTableHelper.records && this.primengTableHelper.records.length > 0) {
-                return;
-            }
+  constructor(
+    injector: Injector,
+    private readonly rolesService: RoleServiceProxy,
+    private readonly modalService: BsModalService,
+    private readonly activatedRoute: ActivatedRoute,
+    cd: ChangeDetectorRef
+  ) {
+    super(injector, cd);
+    this.keyword.set(this.activatedRoute.snapshot.queryParams['keyword'] ?? '');
+  }
+
+  ngOnInit(): void {
+    this.configureColumns();
+    this.configureActions();
+  }
+
+  onCreate(): void {
+    this.createRole();
+  }
+
+  refresh(): void {
+    this.grid?.reload();
+  }
+
+  list(): void {
+    this.grid?.reloadFirstPage();
+  }
+
+  createRole(): void {
+    this.showCreateOrEditRoleDialog();
+  }
+
+  editRole(role: RoleDto): void {
+    this.showCreateOrEditRoleDialog(role.id);
+  }
+
+  delete(role: RoleDto): void {
+    abp.message.confirm(
+      this.l('RoleDeleteWarningMessage', role.displayName),
+      undefined,
+      (result: boolean) => {
+        if (!result) {
+          return;
         }
 
-        this.primengTableHelper.showLoadingIndicator();
-
-        this._rolesService
-            .getAll(
-                this.keyword,
-                this.primengTableHelper.getSorting(this.dataTable),
-                this.primengTableHelper.getSkipCount(this.paginator, event),
-                this.primengTableHelper.getMaxResultCount(this.paginator, event)
-            )
-            .pipe(
-                finalize(() => {
-                    this.primengTableHelper.hideLoadingIndicator();
-                })
-            )
-            .subscribe((result: RoleDtoPagedResultDto) => {
-                this.primengTableHelper.records = result.items;
-                this.primengTableHelper.totalRecordsCount = result.totalCount;
-                this.primengTableHelper.hideLoadingIndicator();
-                this.cd.detectChanges();
-            });
-    }
-
-    delete(role: RoleDto): void {
-        abp.message.confirm(this.l('RoleDeleteWarningMessage', role.displayName), undefined, (result: boolean) => {
-            if (result) {
-                this._rolesService
-                    .delete(role.id)
-                    .pipe(
-                        finalize(() => {
-                            abp.notify.success(this.l('SuccessfullyDeleted'));
-                            this.refresh();
-                        })
-                    )
-                    .subscribe(() => {});
-            }
+        this.rolesService.delete(role.id).subscribe(() => {
+          abp.notify.success(this.l('SuccessfullyDeleted'));
+          this.refresh();
         });
-    }
+      }
+    );
+  }
 
-    createRole(): void {
-        this.showCreateOrEditRoleDialog();
-    }
+  protected listFilteredItems(): void {}
 
-    editRole(role: RoleDto): void {
-        this.showCreateOrEditRoleDialog(role.id);
-    }
+  private configureColumns(): void {
+    this.columns.set([
+      {
+        key: 'name',
+        header: 'RoleName',
+        field: 'name',
+        width: '40%',
+      },
+      {
+        key: 'displayName',
+        header: 'DisplayName',
+        field: 'displayName',
+        width: '45%',
+      },
+    ]);
+  }
 
-    showCreateOrEditRoleDialog(id?: number): void {
-        let createOrEditRoleDialog: BsModalRef;
-        if (!id) {
-            createOrEditRoleDialog = this._modalService.show(CreateRoleDialogComponent, {
-                class: 'modal-lg',
-            });
-        } else {
-            createOrEditRoleDialog = this._modalService.show(EditRoleDialogComponent, {
-                class: 'modal-lg',
-                initialState: {
-                    id: id,
-                },
-            });
-        }
+  private configureActions(): void {
+    this.actions.set([
+      {
+        id: 'edit',
+        text: 'Edit',
+        icon: 'bi bi-pencil-square',
+        requiredPolicy: this.updatePolicy,
+        run: (row) => this.editRole(row),
+      },
+      {
+        id: 'delete',
+        text: 'Delete',
+        icon: 'bi bi-trash',
+        danger: true,
+        requiredPolicy: this.deletePolicy,
+        run: (row) => this.delete(row),
+      },
+    ]);
+  }
 
-        createOrEditRoleDialog.content.onSave.subscribe(() => {
-            this.refresh();
+  private showCreateOrEditRoleDialog(id?: number): void {
+    const ref: BsModalRef = id
+      ? this.modalService.show(EditRoleDialogComponent, {
+          class: 'modal-lg',
+          initialState: { id },
+        })
+      : this.modalService.show(CreateRoleDialogComponent, {
+          class: 'modal-lg',
         });
-    }
+
+    ref.content?.onSave?.subscribe(() => {
+      this.refresh();
+    });
+  }
 }

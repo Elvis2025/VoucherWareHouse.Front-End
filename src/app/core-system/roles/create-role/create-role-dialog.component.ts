@@ -1,103 +1,186 @@
-import { Component, Injector, OnInit, EventEmitter, output, ChangeDetectorRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Injector,
+  OnInit,
+  Output,
+  computed,
+  signal,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BsModalRef } from 'ngx-bootstrap/modal';
+import { finalize } from 'rxjs/operators';
+
 import { AppComponentBase } from '@shared/app-component-base';
 import {
-    RoleServiceProxy,
-    RoleDto,
-    PermissionDto,
-    CreateRoleDto,
-    PermissionDtoListResultDto,
+  CreateRoleDto,
+  PermissionDto,
+  PermissionDtoListResultDto,
+  RoleServiceProxy,
 } from '@shared/service-proxies/service-proxies';
-import { forEach as _forEach, map as _map } from 'lodash-es';
-import { FormsModule } from '@angular/forms';
-import { AbpModalHeaderComponent } from '../../../../shared/components/modal/abp-modal-header.component';
-import { TabsetComponent, TabDirective } from 'ngx-bootstrap/tabs';
-import { AbpValidationSummaryComponent } from '../../../../shared/components/validation/abp-validation.summary.component';
-import { AbpModalFooterComponent } from '../../../../shared/components/modal/abp-modal-footer.component';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
 
+import { IbsInputComponent } from '../../../controls/ibs-input/ibs-input.component';
+import { IbsCheckBoxComponent } from '../../../controls/ibs-check-box/ibs-check-box.component';
+import { IbsModalShellComponent } from '../../../controls/ibs-modal/ibs-modal-shell.component';
+import { IbsModalHeaderComponent } from '../../../controls/ibs-modal/ibs-modal-header/ibs-modal-header.component';
+import { IbsModalBodyComponent } from '../../../controls/ibs-modal/ibs-modal-body/ibs-modal-body.component';
+import { IbsModalFooterComponent } from '../../../controls/ibs-modal/ibs-modal-footer/ibs-modal-footer.component';
+import { IbsModalTabComponent } from '../../../controls/ibs-modal/ibs-modal-tab/ibs-modal-tab.component';
+import { IbsModalTabsComponent } from '../../../controls/ibs-modal/ibs-modal-tab/ibs-modal-tabs.component';
+
+interface CreateRoleFormState {
+  name: string;
+  displayName: string;
+  description: string;
+}
+
 @Component({
-    templateUrl: 'create-role-dialog.component.html',
-    standalone: true,
-    imports: [
-        FormsModule,
-        AbpModalHeaderComponent,
-        TabsetComponent,
-        TabDirective,
-        AbpValidationSummaryComponent,
-        AbpModalFooterComponent,
-        LocalizePipe,
-    ],
+  templateUrl: './create-role-dialog.component.html',
+  styleUrls: ['./create-role-dialog.component.scss'],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    FormsModule,
+    LocalizePipe,
+    IbsInputComponent,
+    IbsCheckBoxComponent,
+    IbsModalShellComponent,
+    IbsModalHeaderComponent,
+    IbsModalBodyComponent,
+    IbsModalFooterComponent,
+    IbsModalTabsComponent,
+    IbsModalTabComponent,
+  ],
 })
 export class CreateRoleDialogComponent extends AppComponentBase implements OnInit {
-    saving = false;
-    role = new RoleDto();
-    permissions: PermissionDto[] = [];
-    checkedPermissionsMap: { [key: string]: boolean } = {};
-    defaultPermissionCheckedStatus = true;
+  @Output() onSave = new EventEmitter<void>();
 
-    onSave = output<EventEmitter<any>>();
+  readonly saving = signal(false);
+  readonly defaultPermissionCheckedStatus = true;
 
-    constructor(
-        injector: Injector,
-        private _roleService: RoleServiceProxy,
-        public bsModalRef: BsModalRef,
-        private cd: ChangeDetectorRef
-    ) {
-        super(injector);
+  readonly formState = signal<CreateRoleFormState>({
+    name: '',
+    displayName: '',
+    description: '',
+  });
+
+  readonly permissions = signal<PermissionDto[]>([]);
+  readonly checkedPermissionsMap = signal<Record<string, boolean>>({});
+
+  readonly canSubmit = computed(() => {
+    const form = this.formState();
+
+    return (
+      form.name.trim().length >= 2 &&
+      form.displayName.trim().length >= 2
+    );
+  });
+
+  constructor(
+    injector: Injector,
+    private readonly roleService: RoleServiceProxy,
+    public bsModalRef: BsModalRef
+  ) {
+    super(injector);
+  }
+
+  ngOnInit(): void {
+    this.loadPermissions();
+  }
+
+  close(): void {
+    this.bsModalRef.hide();
+  }
+
+  updateName(value: string): void {
+    this.formState.update((state) => ({
+      ...state,
+      name: value ?? '',
+    }));
+  }
+
+  updateDisplayName(value: string): void {
+    this.formState.update((state) => ({
+      ...state,
+      displayName: value ?? '',
+    }));
+  }
+
+  updateDescription(value: string): void {
+    this.formState.update((state) => ({
+      ...state,
+      description: value ?? '',
+    }));
+  }
+
+  updatePermission(permissionName: string, checked: boolean): void {
+    this.checkedPermissionsMap.update((map) => ({
+      ...map,
+      [permissionName]: !!checked,
+    }));
+  }
+
+  submit(): void {
+    if (this.saving() || !this.canSubmit()) {
+      return;
     }
 
-    ngOnInit(): void {
-        this._roleService.getAllPermissions().subscribe((result: PermissionDtoListResultDto) => {
-            this.permissions = result.items;
-            this.setInitialPermissionsStatus();
-            this.cd.detectChanges();
-        });
+    this.saving.set(true);
+
+    const payload = this.buildPayload();
+
+    this.roleService
+      .create(payload)
+      .pipe(
+        finalize(() => {
+          this.saving.set(false);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.notify.info(this.l('SavedSuccessfully'));
+          this.close();
+          this.onSave.emit();
+        },
+      });
+  }
+
+  private loadPermissions(): void {
+    this.roleService.getAllPermissions().subscribe({
+      next: (result: PermissionDtoListResultDto) => {
+        this.permissions.set(result.items ?? []);
+        this.initializePermissions(result.items ?? []);
+      },
+    });
+  }
+
+  private initializePermissions(items: PermissionDto[]): void {
+    const map: Record<string, boolean> = {};
+
+    for (const permission of items) {
+      map[permission.name] = this.defaultPermissionCheckedStatus;
     }
 
-    setInitialPermissionsStatus(): void {
-        _map(this.permissions, (item) => {
-            this.checkedPermissionsMap[item.name] = this.isPermissionChecked(item.name);
-        });
-    }
+    this.checkedPermissionsMap.set(map);
+  }
 
-    isPermissionChecked(permissionName: string): boolean {
-        // just return default permission checked status
-        // it's better to use a setting
-        return this.defaultPermissionCheckedStatus;
-    }
+  private buildPayload(): CreateRoleDto {
+    const form = this.formState();
+    const dto = new CreateRoleDto();
 
-    onPermissionChange(permission: PermissionDto, $event) {
-        this.checkedPermissionsMap[permission.name] = $event.target.checked;
-    }
+    dto.name = form.name.trim();
+    dto.displayName = form.displayName.trim();
+    dto.description = form.description?.trim() ?? '';
+    dto.grantedPermissions = this.getCheckedPermissions();
 
-    getCheckedPermissions(): string[] {
-        const permissions: string[] = [];
-        _forEach(this.checkedPermissionsMap, function (value, key) {
-            if (value) {
-                permissions.push(key);
-            }
-        });
-        return permissions;
-    }
+    return dto;
+  }
 
-    save(): void {
-        this.saving = true;
+  private getCheckedPermissions(): string[] {
+    const map = this.checkedPermissionsMap();
 
-        const role = new CreateRoleDto();
-        role.init(this.role);
-        role.grantedPermissions = this.getCheckedPermissions();
-
-        this._roleService.create(role).subscribe(
-            () => {
-                this.notify.info(this.l('SavedSuccessfully'));
-                this.bsModalRef.hide();
-                this.onSave.emit(null);
-            },
-            () => {
-                this.saving = false;
-                this.cd.detectChanges();
-            }
-        );
-    }
+    return Object.keys(map).filter((key) => map[key]);
+  }
 }

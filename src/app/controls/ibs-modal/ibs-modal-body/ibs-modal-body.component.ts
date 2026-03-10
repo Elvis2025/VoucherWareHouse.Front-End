@@ -7,9 +7,8 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   templateUrl: './ibs-modal-body.component.html',
   styleUrls: ['../ibs-modal-shell.shared.scss'],
-  host: { class: 'ibs-modal-body-host' }, // ✅ clave
+  host: { class: 'ibs-modal-body-host' },
 })
 export class IbsModalBodyComponent {
-  // por defecto: scroll interno
   @Input() overflow: 'hidden' | 'auto' | 'visible' = 'auto';
 }

@@ -1043,6 +1043,251 @@ export class TenantServiceProxy {
 }
 
 @Injectable()
+export class TenantBrandingServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @param companyName (optional) 
+     * @param companyDescription (optional) 
+     * @param companyType (optional) 
+     * @param file (optional) 
+     * @return OK
+     */
+    uploadLogo(tenantId: number | undefined, companyName: string | undefined, companyDescription: string | undefined, companyType: string | undefined, file: FileParameter | undefined): Observable<TenantBrandingDto> {
+        let url_ = this.baseUrl + "/api/services/app/TenantBranding/UploadLogo";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (tenantId === null || tenantId === undefined)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else
+            content_.append("TenantId", tenantId.toString());
+        if (companyName === null || companyName === undefined)
+            throw new Error("The parameter 'companyName' cannot be null.");
+        else
+            content_.append("CompanyName", companyName.toString());
+        if (companyDescription === null || companyDescription === undefined)
+            throw new Error("The parameter 'companyDescription' cannot be null.");
+        else
+            content_.append("CompanyDescription", companyDescription.toString());
+        if (companyType === null || companyType === undefined)
+            throw new Error("The parameter 'companyType' cannot be null.");
+        else
+            content_.append("CompanyType", companyType.toString());
+        if (file === null || file === undefined)
+            throw new Error("The parameter 'file' cannot be null.");
+        else
+            content_.append("File", file.data, file.fileName ? file.fileName : "File");
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUploadLogo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUploadLogo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TenantBrandingDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TenantBrandingDto>;
+        }));
+    }
+
+    protected processUploadLogo(response: HttpResponseBase): Observable<TenantBrandingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TenantBrandingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getCurrentTenantLogo(): Observable<TenantBrandingDto> {
+        let url_ = this.baseUrl + "/api/services/app/TenantBranding/GetCurrentTenantLogo";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCurrentTenantLogo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCurrentTenantLogo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TenantBrandingDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TenantBrandingDto>;
+        }));
+    }
+
+    protected processGetCurrentTenantLogo(response: HttpResponseBase): Observable<TenantBrandingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TenantBrandingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @return OK
+     */
+    getCurrentTenantBrandingLogoByTenantId(tenantId: number | undefined): Observable<TenantBrandingDto> {
+        let url_ = this.baseUrl + "/api/services/app/TenantBranding/GetCurrentTenantBrandingLogoByTenantId?";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCurrentTenantBrandingLogoByTenantId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCurrentTenantBrandingLogoByTenantId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TenantBrandingDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TenantBrandingDto>;
+        }));
+    }
+
+    protected processGetCurrentTenantBrandingLogoByTenantId(response: HttpResponseBase): Observable<TenantBrandingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TenantBrandingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    removeCurrentTenantLogo(): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/TenantBranding/RemoveCurrentTenantLogo";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveCurrentTenantLogo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveCurrentTenantLogo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processRemoveCurrentTenantLogo(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class TokenAuthServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -3163,6 +3408,81 @@ export enum TenantAvailabilityState {
     _3 = 3,
 }
 
+export class TenantBrandingDto implements ITenantBrandingDto {
+    tenantId: number;
+    logoPath: string | undefined;
+    logoFileName: string | undefined;
+    logoContentType: string | undefined;
+    logoSize: number | undefined;
+    fullLogoUrl: string | undefined;
+    companyName: string | undefined;
+    companyDescription: string | undefined;
+    companyType: string | undefined;
+
+    constructor(data?: ITenantBrandingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tenantId = _data["tenantId"];
+            this.logoPath = _data["logoPath"];
+            this.logoFileName = _data["logoFileName"];
+            this.logoContentType = _data["logoContentType"];
+            this.logoSize = _data["logoSize"];
+            this.fullLogoUrl = _data["fullLogoUrl"];
+            this.companyName = _data["companyName"];
+            this.companyDescription = _data["companyDescription"];
+            this.companyType = _data["companyType"];
+        }
+    }
+
+    static fromJS(data: any): TenantBrandingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TenantBrandingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tenantId"] = this.tenantId;
+        data["logoPath"] = this.logoPath;
+        data["logoFileName"] = this.logoFileName;
+        data["logoContentType"] = this.logoContentType;
+        data["logoSize"] = this.logoSize;
+        data["fullLogoUrl"] = this.fullLogoUrl;
+        data["companyName"] = this.companyName;
+        data["companyDescription"] = this.companyDescription;
+        data["companyType"] = this.companyType;
+        return data;
+    }
+
+    clone(): TenantBrandingDto {
+        const json = this.toJSON();
+        let result = new TenantBrandingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITenantBrandingDto {
+    tenantId: number;
+    logoPath: string | undefined;
+    logoFileName: string | undefined;
+    logoContentType: string | undefined;
+    logoSize: number | undefined;
+    fullLogoUrl: string | undefined;
+    companyName: string | undefined;
+    companyDescription: string | undefined;
+    companyType: string | undefined;
+}
+
 export class TenantDto implements ITenantDto {
     id: number;
     tenancyName: string;
@@ -3323,25 +3643,6 @@ export interface ITenantLoginInfoDto {
     tenancyName: string | undefined;
     name: string | undefined;
 }
-
-
-export class UserColumnsDto {
-    id: number;
-    userName: string;
-    name: string;
-    surname: string;
-    emailAddress: string;
-    isActive: boolean;
-    fullName: string | undefined;
-    lastLoginTime: moment.Moment | undefined;
-    creationTime: moment.Moment;
-    roleNames: string[] | undefined;
-}
-
-
-
-
-
 
 export class UserDto implements IUserDto {
     id: number;
@@ -3542,6 +3843,11 @@ export interface IUserLoginInfoDto {
     surname: string | undefined;
     userName: string | undefined;
     emailAddress: string | undefined;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
 }
 
 export class ApiException extends Error {

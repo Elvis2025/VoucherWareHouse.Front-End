@@ -2,13 +2,20 @@
   <ng-content></ng-content>
 
   @if (showClose) {
-    <button class="btn ghost ibs-btn-close" type="button" (click)="closed.emit()">
+    <button
+      class="btn ghost ibs-btn-close"
+      type="button"
+      (click)="onCloseClick($event)">
       {{ closeText }}
     </button>
   }
 
   @if (showSave) {
-    <button class="ibs-action-btn ibs-btn-save" type="button" (click)="saved.emit()" [disabled]="saveDisabled">
+    <button
+      class="ibs-action-btn ibs-btn-save"
+      type="button"
+      [disabled]="saveDisabled"
+      (click)="onSaveClick($event)">
       <i class="bi bi-floppy"></i>
       <span class="d-none d-sm-inline">{{ saveText }}</span>
     </button>

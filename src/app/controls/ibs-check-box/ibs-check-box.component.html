@@ -1,0 +1,29 @@
+<div class="ibs-check" [class.is-disabled]="disabled()" [class.is-invalid]="invalid()">
+  <button
+    type="button"
+    class="ibs-check__box"
+    (click)="toggle()"
+    (blur)="onBlur()"
+    [disabled]="disabled()"
+    [attr.aria-checked]="value()"
+    role="checkbox"
+  >
+    <span class="ibs-check__dot" [class.is-on]="value()">
+      <i class="bi bi-check-lg"></i>
+    </span>
+  </button>
+
+  <div class="ibs-check__content" (click)="toggle()">
+    <div class="ibs-check__text">
+      {{ text }}
+      @if (required) { <span class="ibs-check__req">*</span> }
+    </div>
+
+    @if (invalid()) {
+      <div class="ibs-check__hint">
+        <i class="bi bi-exclamation-circle"></i>
+        <span>{{ errorText() }}</span>
+      </div>
+    }
+  </div>
+</div>

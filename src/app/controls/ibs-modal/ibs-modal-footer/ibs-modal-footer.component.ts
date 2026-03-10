@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   templateUrl: './ibs-modal-footer.component.html',
   styleUrls: ['../ibs-modal-shell.shared.scss'],
-  host: { class: 'ibs-modal-footer-host' }, // ✅ clave
+  host: { class: 'ibs-modal-footer-host' },
 })
 export class IbsModalFooterComponent {
   @Input() showClose = true;
@@ -20,4 +20,21 @@ export class IbsModalFooterComponent {
 
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
+
+  onCloseClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.closed.emit();
+  }
+
+  onSaveClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (this.saveDisabled) {
+      return;
+    }
+
+    this.saved.emit();
+  }
 }

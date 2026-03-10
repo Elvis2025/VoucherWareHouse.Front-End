@@ -15,12 +15,22 @@
 
         <div class="brand">
             <div class="brand-logo">
-                <!-- Ajusta ruta del logo según tu proyecto -->
-                <img src="assets/img/logo/logo-ibs.png" alt="IB Systems" />
+                @if (logoUrl$ | async; as logoUrl) {
+                    <img [src]="logoUrl" alt="iThotSystem" />
+                }
+                @else {
+                    <img src="../../../assets/img/logo/logo-ibs.png" alt="IB Systems" />
+                }       
             </div>
 
-            <h1 class="brand-name">IB SYSTEMS <span class="brand-suffix">SRL</span></h1>
-            <p class="brand-tag">Sistemas Inteligentes de Negocios</p>
+            @if(companyName$| async; as companyName){
+               <h1 class="brand-name">{{companyName}} <span class="brand-suffix">{{companyType$ | async}}</span></h1>
+               <p class="brand-tag">{{companyDescription$ | async}}</p>
+            }
+            @else {
+                <h1 class="brand-name">IB SYSTEMS <span class="brand-suffix">SRL</span></h1>
+                <p class="brand-tag">Sistemas Inteligentes de Negocios</p>
+            }      
         </div>
 
         <div class="divider"></div>

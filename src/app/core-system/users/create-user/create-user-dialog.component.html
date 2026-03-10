@@ -1,175 +1,127 @@
-<form class="form-horizontal" autocomplete="off" #createUserModal="ngForm" (ngSubmit)="save()">
-    <abp-modal-header [title]="'CreateNewUser' | localize" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
-    <div class="modal-body">
-        <tabset>
-            <tab [heading]="'UserDetails' | localize" class="pt-3 px-2">
-                <div class="form-group row required">
-                    <label class="col-md-3 col-form-label" for="name">
-                        {{ 'Name' | localize }}
-                    </label>
-                    <div class="col-md-9">
-                        <input
-                            type="text"
-                            class="form-control"
-                            name="name"
-                            id="name"
-                            required
-                            maxlength="64"
-                            [(ngModel)]="user.name"
-                            #nameModel="ngModel"
-                            #nameEl />
-                        <abp-validation-summary [control]="nameModel" [controlEl]="nameEl"></abp-validation-summary>
-                    </div>
-                </div>
-                <div class="form-group row required">
-                    <label class="col-md-3 col-form-label" for="surname">
-                        {{ 'Surname' | localize }}
-                    </label>
-                    <div class="col-md-9">
-                        <input
-                            type="text"
-                            class="form-control"
-                            name="surname"
-                            id="surname"
-                            required
-                            maxlength="64"
-                            [(ngModel)]="user.surname"
-                            #surnameModel="ngModel"
-                            #surnameEl />
-                        <abp-validation-summary
-                            [control]="surnameModel"
-                            [controlEl]="surnameEl"></abp-validation-summary>
-                    </div>
-                </div>
-                <div class="form-group row required">
-                    <label class="col-md-3 col-form-label" for="userName">
-                        {{ 'UserName' | localize }}
-                    </label>
-                    <div class="col-md-9">
-                        <input
-                            type="text"
-                            class="form-control"
-                            name="userName"
-                            id="userName"
-                            required
-                            minlength="2"
-                            maxlength="256"
-                            [(ngModel)]="user.userName"
-                            #userNameModel="ngModel"
-                            #userNameEl />
-                        <abp-validation-summary
-                            [control]="userNameModel"
-                            [controlEl]="userNameEl"></abp-validation-summary>
-                    </div>
-                </div>
-                <div class="form-group row required">
-                    <label class="col-md-3 col-form-label" for="password">
-                        {{ 'Password' | localize }}
-                    </label>
-                    <div class="col-md-9">
-                        <input
-                            type="password"
-                            class="form-control"
-                            name="password"
-                            id="password"
-                            required
-                            maxlength="32"
-                            validateEqual="confirmPassword"
-                            reverse="true"
-                            pattern="(?=^.{8,}$)(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s)[0-9a-zA-Z!@#$%^&*()]*$"
-                            [(ngModel)]="user.password"
-                            #passwordModel="ngModel"
-                            #passwordEl />
-                        <abp-validation-summary
-                            [control]="passwordModel"
-                            [controlEl]="passwordEl"
-                            [customValidationErrors]="passwordValidationErrors"></abp-validation-summary>
-                    </div>
-                </div>
-                <div class="form-group row required">
-                    <label class="col-md-3 col-form-label" for="confirmPassword">
-                        {{ 'ConfirmPassword' | localize }}
-                    </label>
-                    <div class="col-md-9">
-                        <input
-                            type="password"
-                            class="form-control"
-                            name="confirmPassword"
-                            id="confirmPassword"
-                            required
-                            maxlength="32"
-                            validateEqual="password"
-                            reverse="false"
-                            ngModel
-                            #confirmPasswordModel="ngModel"
-                            #confirmPasswordEl />
-                        <abp-validation-summary
-                            [control]="confirmPasswordModel"
-                            [controlEl]="confirmPasswordEl"
-                            [customValidationErrors]="confirmPasswordValidationErrors"></abp-validation-summary>
-                    </div>
-                </div>
-                <div class="form-group row required">
-                    <label class="col-md-3 col-form-label" for="emailAddress">
-                        {{ 'EmailAddress' | localize }}
-                    </label>
-                    <div class="col-md-9">
-                        <input
-                            type="email"
-                            class="form-control"
-                            name="emailAddress"
-                            id="emailAddress"
-                            required
-                            maxlength="256"
-                            pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{1,})+$"
-                            [(ngModel)]="user.emailAddress"
-                            #emailAddressModel="ngModel"
-                            #emailAddressEl />
-                        <abp-validation-summary
-                            [control]="emailAddressModel"
-                            [controlEl]="emailAddressEl"></abp-validation-summary>
-                    </div>
-                </div>
-                <div class="form-group row mb-0">
-                    <label class="col-md-3 col-form-label">
-                        {{ 'IsActive' | localize }}
-                    </label>
-                    <div class="col-md-9">
-                        <div class="custom-control custom-checkbox">
-                            <input
-                                type="checkbox"
-                                class="custom-control-input"
-                                name="isActive"
-                                id="isActive"
-                                [(ngModel)]="user.isActive" />
-                            <label class="custom-control-label mt-2" for="isActive"></label>
-                        </div>
-                    </div>
-                </div>
-            </tab>
-            <tab [heading]="'UserRoles' | localize" class="pt-3 px-2">
-                <div class="form-group row mb-0">
-                    @for (role of roles; track role; let i = $index) {
-                        <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                                <input
-                                    type="checkbox"
-                                    class="custom-control-input"
-                                    [id]="'role_' + i"
-                                    [checked]="isRoleChecked(role.normalizedName)"
-                                    (change)="onRoleChange(role, $event)" />
-                                <label class="custom-control-label" [for]="'role_' + i">
-                                    {{ role.name }}
-                                </label>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </tab>
-        </tabset>
-    </div>
-    <abp-modal-footer
-        [cancelDisabled]="saving"
-        [saveDisabled]="!createUserModal.form.valid || saving"
-        (onCancelClick)="bsModalRef.hide()"></abp-modal-footer>
-</form>
+<app-ibs-modal-shell [wide]="false" (cancelled)="bsModalRef.hide()">
+
+  <app-ibs-modal-header
+    [title]="'CreateNewUser' | localize"
+    (closed)="bsModalRef.hide()">
+  </app-ibs-modal-header>
+
+  <app-ibs-modal-body>
+
+    <app-ibs-modal-tabs>
+
+      <app-ibs-modal-tab
+        [label]="'UserDetails' | localize"
+        icon="bi bi-person">
+
+        <div class="ibs-edit-user-section">
+
+          <div class="ibs-fields-stack">
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'Name' | localize"
+                name="name"
+                [required]="true"
+                [maxLength]="64"
+                [(ngModel)]="user.name">
+              </app-ibs-input>
+            </div>
+
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'Surname' | localize"
+                name="surname"
+                [required]="true"
+                [maxLength]="64"
+                [(ngModel)]="user.surname">
+              </app-ibs-input>
+            </div>
+
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'UserName' | localize"
+                name="userName"
+                [required]="true"
+                [minLength]="2"
+                [maxLength]="256"
+                [(ngModel)]="user.userName">
+              </app-ibs-input>
+            </div>
+
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'Password' | localize"
+                type="password"
+                name="password"
+                [required]="true"
+                [maxLength]="32"
+                [(ngModel)]="user.password">
+              </app-ibs-input>
+            </div>
+
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'ConfirmPassword' | localize"
+                type="password"
+                name="confirmPassword"
+                [required]="true"
+                [maxLength]="32"
+                [(ngModel)]="confirmPassword">
+              </app-ibs-input>
+            </div>
+
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'EmailAddress' | localize"
+                type="email"
+                name="emailAddress"
+                [required]="true"
+                [maxLength]="256"
+                [(ngModel)]="user.emailAddress">
+              </app-ibs-input>
+            </div>
+          </div>
+
+          <div class="ibs-toggle-row">
+            <app-ibs-check-box
+              [text]="'IsActive' | localize"
+              name="isActive"
+              [(ngModel)]="user.isActive">
+            </app-ibs-check-box>
+          </div>
+
+        </div>
+
+      </app-ibs-modal-tab>
+
+      <app-ibs-modal-tab
+        [label]="'UserRoles' | localize"
+        icon="bi bi-shield-check">
+
+        <div>
+          <div class="ibs-roles-grid">
+            @for (role of roles; track role; let i = $index) {
+              <div class="ibs-role-item">
+                <app-ibs-check-box
+                  [text]="role.name"
+                  [checked]="isRoleChecked(role.normalizedName)"
+                  (changed)="onRoleChange(role, $event)">
+                </app-ibs-check-box>
+              </div>
+            }
+          </div>
+        </div>
+
+      </app-ibs-modal-tab>
+
+    </app-ibs-modal-tabs>
+
+  </app-ibs-modal-body>
+
+  <app-ibs-modal-footer
+    [closeText]="'Cancel' | localize"
+    [saveText]="'Save' | localize"
+    (closed)="bsModalRef.hide()"
+    (saved)="save()">
+  </app-ibs-modal-footer>
+
+</app-ibs-modal-shell>

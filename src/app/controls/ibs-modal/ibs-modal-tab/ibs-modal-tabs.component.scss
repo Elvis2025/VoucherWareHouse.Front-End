@@ -1,0 +1,80 @@
+/* =========================================================
+   IBS MODAL TABS
+   - Los tabs permanecen visibles
+   - Solo el body del modal scrollea
+   ========================================================= */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+/* ── Barra de tabs ── */
+.ibs-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+
+  /* ✅ sticky dentro del body scrolleable */
+  position: sticky;
+  top: -12px;
+  z-index: 3;
+
+  /* ✅ compensamos el padding del modal body para que se vea integrado */
+  margin: -12px -16px 20px -16px;
+  padding: 12px 16px 14px 16px;
+
+  background: var(--ibs-modal-background-color);
+  border-bottom: 1px solid color-mix(in srgb, var(--ibs-border) 55%, transparent);
+
+  box-sizing: border-box;
+}
+
+.ibs-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 7px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ibs-text-dim);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background .16s ease,
+    border-color .16s ease,
+    color .16s ease;
+}
+
+.ibs-tab-btn i {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.ibs-tab-btn:hover:not(.is-disabled) {
+  background: rgba(124, 92, 255, .08);
+  color: var(--ibs-text);
+}
+
+.ibs-tab-btn.active {
+  background: rgba(124, 92, 255, .14);
+  border-color: rgba(124, 92, 255, .30);
+  color: var(--ibs-primary, #7c5cff);
+  font-weight: 800;
+}
+
+.ibs-tab-btn.is-disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* ── Panel de contenido ── */
+.ibs-tab-panel {
+  display: block;
+  min-width: 0;
+}

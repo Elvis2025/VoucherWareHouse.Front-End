@@ -16,77 +16,72 @@ import { CommonModule } from '@angular/common';
         font-size: 14px;
       }
 
-      .ibs-modal-backdrop{
+      .ibs-modal-backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,.55);
+        background: rgba(0, 0, 0, 0.55);
       }
 
-      .ibs-modal{
+      .ibs-modal {
         position: fixed;
         left: 50%;
-    top: 2%;
-  transform: translateX(-50%);
+        top: 2%;
+        transform: translateX(-50%);
 
-        // width: min(1200px, calc(100vw - 24px));
         width: auto;
         min-width: min(600px, calc(100vw - 24px));
-        max-height: min(780px, calc(100vh - 24px));
-        height: auto;
+        max-width: calc(100vw - 24px);
+        max-height: calc(100dvh - 24px);
 
-
-        /* ✅ OPACO: elimina “ver la pantalla detrás” */
         background: var(--ibs-modal-background-color);
         color: var(--ibs-text);
 
         border: 1px solid color-mix(in srgb, var(--ibs-border) 70%, transparent);
         border-radius: 18px;
-        box-shadow: 0 24px 90px rgba(0,0,0,.45);
+        box-shadow: 0 24px 90px rgba(0, 0, 0, 0.45);
         overflow: hidden;
 
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
 
         min-height: 0;
       }
 
-      .ibs-slot{
+      .ibs-slot {
         display: block;
         min-height: 0;
       }
 
-      .ibs-slot-header{ flex: 0 0 auto; }
-      .ibs-slot-topbar{ flex: 0 0 auto; }
-      .ibs-slot-footer{ flex: 0 0 auto; }
-
-      .ibs-slot-body{
-        flex: 1 1 auto;
-        min-height: 0;
-        overflow: hidden; /* scroll va dentro del body */
+      .ibs-slot-header {
+        min-height: fit-content;
       }
 
-      .ibs-modal{
-  display: flex;
-  flex-direction: column;
-  min-height: 0;      /* ✅ clave */
-}
+      .ibs-slot-topbar {
+        min-height: fit-content;
+      }
 
-.ibs-slot{ 
-  display:block; 
-  min-height:0;       /* ✅ clave */
-}
+      .ibs-slot-body {
+        min-height: 0;
+        overflow: hidden;
+      }
 
-.ibs-slot-header{ flex: 0 0 auto; }
-.ibs-slot-topbar{ flex: 0 0 auto; }
-.ibs-slot-footer{ flex: 0 0 auto; }
+      .ibs-slot-footer {
+        min-height: fit-content;
+      }
 
-.ibs-slot-body{
-  flex: 1 1 auto;     /* ✅ body toma el espacio restante */
-  min-height: 0;      /* ✅ permite que el overflow funcione */
-  overflow: hidden;   /* ✅ el scroll va adentro del body */
-}
+      @media (max-width: 767.98px) {
+        .ibs-modal {
+          top: 12px;
+          left: 12px;
+          right: 12px;
+          transform: none;
 
-
+          min-width: unset;
+          width: auto;
+          max-width: unset;
+          max-height: calc(100dvh - 24px);
+        }
+      }
     `,
   ],
 })

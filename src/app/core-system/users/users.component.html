@@ -1,20 +1,29 @@
+<!--
+  Template para columna "Activo"
+  $implicit = la row completa (UserDto)
+  NO uses cellValue aquí — tienes la fila entera disponible
+-->
 <ng-template #activeTpl let-u>
-  <span class="badge" [class.bg-success]="u.isActive" [class.bg-secondary]="!u.isActive">
+  <span [class]="u.isActive ? 'ibs-badge ibs-badge--yes' : 'ibs-badge ibs-badge--no'">
     {{ u.isActive ? 'Sí' : 'No' }}
   </span>
 </ng-template>
 
+<!--
+  Template para columna "Nombre"
+  Concatena name + surname de UserDto
+-->
 <ng-template #nameTpl let-u>
   {{ u.name }} {{ u.surname }}
 </ng-template>
 
-<app-ibs-grid 
-    [title]="'Usuarios'"
-    [subtitle]="'Mantenimientos de usuarios del sistema'"
-    [placeholderSearch]="'Buescar...'"
-    [columns]="columns()"
-    [actions]="actions()"
-    [createPolicy]="createPolicy"
-    [load]="loadUsers"
-    (create)="onCreate()">
+<app-ibs-grid
+  [title]="'Usuarios'"
+  [subtitle]="'Mantenimientos de usuarios del sistema'"
+  [placeholderSearch]="'Buscar...'"
+  [columns]="columns()"
+  [actions]="actions()"
+  [createPolicy]="createPolicy"
+  [load]="loadUsers"
+  (create)="onCreate()">
 </app-ibs-grid>

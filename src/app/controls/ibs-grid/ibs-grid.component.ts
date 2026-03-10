@@ -246,6 +246,11 @@ export class IbsGridComponent<T> extends AppComponentBase implements OnInit {
 
   trackByIndex = (i: number) => i;
 
+  /** Detecta si el valor de una celda es boolean para renderizar badge Sí/No */
+  isBooleanValue(v: any): boolean {
+    return typeof v === 'boolean';
+  }
+
   cellValue(row: any, c: IbsGridColumn<T>): any {
     const key = (c.field ?? c.key) as string;
     if (!key) return '';

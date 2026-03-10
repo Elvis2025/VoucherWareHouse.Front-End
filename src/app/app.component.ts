@@ -1,11 +1,10 @@
+import { AppTenantBrandingService } from '../shared/TenantBranding/app-tenant-branding.service';
+import { IbsLayoutComponent } from './layout/home-layout/ibs-layout.component';
 import { Component, Injector, OnInit, Renderer2 } from '@angular/core';
 import { AppComponentBase } from '@shared/app-component-base';
 import { SignalRAspNetCoreHelper } from '@shared/helpers/SignalRAspNetCoreHelper';
 import { LayoutStoreService } from '@shared/layout/layout-store.service';
-import { HeaderComponent } from './layout/header.component';
-import { IbsLayoutComponent } from './layout/home-layout/ibs-layout.component';
-import { RouterOutlet } from '@angular/router';
-import { FooterComponent } from './layout/footer.component';
+
 
 @Component({
     templateUrl: './app.component.html',
@@ -14,11 +13,13 @@ import { FooterComponent } from './layout/footer.component';
 })
 export class AppComponent extends AppComponentBase implements OnInit {
     sidebarExpanded: boolean;
-
+    logoUrl$ = this._appTenantBrandingService.logoUrl$;
+    
     constructor(
         injector: Injector,
         private renderer: Renderer2,
-        private _layoutStore: LayoutStoreService
+        private _layoutStore: LayoutStoreService,
+        private _appTenantBrandingService: AppTenantBrandingService 
     ) {
         super(injector);
     }
@@ -46,6 +47,16 @@ export class AppComponent extends AppComponentBase implements OnInit {
         this._layoutStore.sidebarExpanded.subscribe((value) => {
             this.sidebarExpanded = value;
         });
+        
+        this._appTenantBrandingService.loadCurrentTenantLogo().subscribe({
+                next: (result) => {
+                    console.log('Branding cargado:', result);
+                },
+                error: (error) => {
+                    console.error('Error cargando branding:', error);
+                }
+            });
+        console.log('AppComponent initialized',this.logoUrl$);
     }
 
     toggleSidebar(): void {

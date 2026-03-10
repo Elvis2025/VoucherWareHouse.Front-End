@@ -1,4 +1,4 @@
-import { Injector, ElementRef, Directive } from '@angular/core';
+import { Injector, ElementRef } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import {
     LocalizationService,
@@ -13,7 +13,6 @@ import {
 import { AppSessionService } from '@shared/session/app-session.service';
 import { PrimengTableHelper } from 'shared/helpers/PrimengTableHelper';
 
-@Directive()
 export abstract class AppComponentBase {
     localizationSourceName = AppConsts.localization.defaultLocalizationSourceName;
 

@@ -223,4 +223,124 @@ body.swal2-shown {
 }
 
 
+/* ===== Boolean badges (Sí / No) ===== */
+.ibs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  line-height: 1;
+}
+
+.ibs-badge--yes {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.30);
+}
+
+.ibs-badge--yes::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, .55);
+}
+
+.ibs-badge--no {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+.ibs-badge--no::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, .45);
+}
+
+
+
 /*General Search input style*/
+
+
+
+
+:host {
+  display: block;
+}
+
+/* Sección general del tab */
+.ibs-edit-user-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 0.35rem;
+}
+
+/* Stack principal de campos */
+.ibs-fields-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cada campo queda en su propio bloque */
+.ibs-field {
+  display: block;
+  width: 100%;
+  padding-top: 0.2rem;
+  margin-bottom: 2.15rem;
+}
+
+.ibs-field:last-child {
+  margin-bottom: 0;
+}
+
+/* Asegura que el componente ocupe el ancho correcto */
+.ibs-field app-ibs-input {
+  display: block;
+  width: 100%;
+}
+
+/* Fila del checkbox activo */
+.ibs-toggle-row {
+  padding-top: 0.85rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid var(--ibs-border, rgba(120, 130, 160, 0.18));
+}
+
+/* Grid de roles */
+.ibs-roles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem 1.1rem;
+  align-items: start;
+}
+
+/* Cada rol en su bloque */
+.ibs-role-item {
+  min-width: 0;
+  padding: 0.15rem 0;
+}
+
+@media (max-width: 767.98px) {
+  .ibs-edit-user-section {
+    gap: 1rem;
+  }
+
+  .ibs-field {
+    margin-bottom: 1rem;
+  }
+
+  .ibs-roles-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}

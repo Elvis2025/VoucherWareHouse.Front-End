@@ -1,123 +1,191 @@
-import { ChangeDetectorRef, Component, Injector, ViewChild } from '@angular/core';
-import { finalize } from 'rxjs/operators';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Injector,
+  OnInit,
+  ViewChild,
+  signal,
+} from '@angular/core';
+import { map, finalize } from 'rxjs/operators';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ActivatedRoute } from '@angular/router';
+
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase } from '@shared/paged-listing-component-base';
-import { TenantServiceProxy, TenantDto, TenantDtoPagedResultDto } from '@shared/service-proxies/service-proxies';
-import { CreateTenantDialogComponent } from './create-tenant/create-tenant-dialog.component';
-import { EditTenantDialogComponent } from './edit-tenant/edit-tenant-dialog.component';
-import { Table, TableModule } from 'primeng/table';
-import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
-import { ActivatedRoute } from '@angular/router';
-import { Paginator, PaginatorModule } from 'primeng/paginator';
-import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+import {
+  TenantDto,
+  TenantServiceProxy,
+} from '@shared/service-proxies/service-proxies';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
 
+import { CreateTenantDialogComponent } from './create-tenant/create-tenant-dialog.component';
+import { EditTenantDialogComponent } from './edit-tenant/edit-tenant-dialog.component';
+
+import {
+  IbsGridAction,
+  IbsGridColumn,
+  IbsGridComponent,
+  IbsGridQuery,
+} from '../../controls/ibs-grid/ibs-grid.component';
+
 @Component({
-    templateUrl: './tenants.component.html',
-    animations: [appModuleAnimation()],
-    standalone: true,
-    imports: [FormsModule, TableModule, PrimeTemplate, NgIf, PaginatorModule, LocalizePipe],
+  templateUrl: './tenants.component.html',
+  animations: [appModuleAnimation()],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IbsGridComponent, LocalizePipe],
 })
-export class TenantsComponent extends PagedListingComponentBase<TenantDto> {
-    @ViewChild('dataTable', { static: true }) dataTable: Table;
-    @ViewChild('paginator', { static: true }) paginator: Paginator;
+export class TenantsComponent
+  extends PagedListingComponentBase<TenantDto>
+  implements OnInit
+{
+  @ViewChild(IbsGridComponent) grid?: IbsGridComponent<TenantDto>;
 
-    tenants: TenantDto[] = [];
-    keyword = '';
-    isActive: boolean | null;
-    advancedFiltersVisible = false;
+  readonly createPolicy = 'Pages.Tenants';
+  readonly updatePolicy = 'Pages.Tenants';
+  readonly deletePolicy = 'Pages.Tenants';
 
-    constructor(
-        injector: Injector,
-        private _tenantService: TenantServiceProxy,
-        private _modalService: BsModalService,
-        private _activatedRoute: ActivatedRoute,
-        cd: ChangeDetectorRef
-    ) {
-        super(injector, cd);
-        this.keyword = this._activatedRoute.snapshot.queryParams['keyword'] || '';
-    }
+  readonly columns = signal<IbsGridColumn<TenantDto>[]>([]);
+  readonly actions = signal<IbsGridAction<TenantDto>[]>([]);
 
-    list(event?: LazyLoadEvent): void {
-        if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.changePage(0);
+  readonly keyword = signal('');
+  readonly isActive = signal<boolean | undefined>(undefined);
 
-            if (this.primengTableHelper.records && this.primengTableHelper.records.length > 0) {
-                return;
-            }
+  readonly loadTenants = (q: IbsGridQuery) =>
+    this.tenantService
+      .getAll(
+        (q.filter ?? this.keyword()).trim(),
+        this.isActive(),
+        q.sorting ?? '',
+        q.skipCount ?? 0,
+        q.maxResultCount ?? 10
+      )
+      .pipe(
+        map((result) => ({
+          items: result.items ?? [],
+          totalCount: result.totalCount ?? 0,
+        })),
+        finalize(() => this.cd.detectChanges())
+      );
+
+  constructor(
+    injector: Injector,
+    private readonly tenantService: TenantServiceProxy,
+    private readonly modalService: BsModalService,
+    private readonly activatedRoute: ActivatedRoute,
+    cd: ChangeDetectorRef
+  ) {
+    super(injector, cd);
+    this.keyword.set(this.activatedRoute.snapshot.queryParams['keyword'] ?? '');
+  }
+
+  ngOnInit(): void {
+    this.configureColumns();
+    this.configureActions();
+  }
+
+  onCreate(): void {
+    this.createTenant();
+  }
+
+  refresh(): void {
+    this.grid?.reload();
+  }
+
+  list(): void {
+    this.grid?.reloadFirstPage();
+  }
+
+  clearFilters(): void {
+    this.keyword.set('');
+    this.isActive.set(undefined);
+    this.grid?.reloadFirstPage();
+  }
+
+  createTenant(): void {
+    this.showCreateOrEditTenantDialog();
+  }
+
+  editTenant(tenant: TenantDto): void {
+    this.showCreateOrEditTenantDialog(tenant.id);
+  }
+
+  delete(tenant: TenantDto): void {
+    abp.message.confirm(
+      this.l('TenantDeleteWarningMessage', tenant.name),
+      undefined,
+      (result: boolean) => {
+        if (!result) {
+          return;
         }
 
-        this.primengTableHelper.showLoadingIndicator();
-
-        this._tenantService
-            .getAll(
-                this.keyword,
-                this.isActive,
-                this.primengTableHelper.getSorting(this.dataTable),
-                this.primengTableHelper.getSkipCount(this.paginator, event),
-                this.primengTableHelper.getMaxResultCount(this.paginator, event)
-            )
-            .pipe(
-                finalize(() => {
-                    this.primengTableHelper.hideLoadingIndicator();
-                })
-            )
-            .subscribe((result: TenantDtoPagedResultDto) => {
-                this.primengTableHelper.records = result.items;
-                this.primengTableHelper.totalRecordsCount = result.totalCount;
-                this.primengTableHelper.hideLoadingIndicator();
-                this.cd.detectChanges();
-            });
-    }
-
-    delete(tenant: TenantDto): void {
-        abp.message.confirm(this.l('TenantDeleteWarningMessage', tenant.name), undefined, (result: boolean) => {
-            if (result) {
-                this._tenantService
-                    .delete(tenant.id)
-                    .pipe(
-                        finalize(() => {
-                            abp.notify.success(this.l('SuccessfullyDeleted'));
-                            this.refresh();
-                        })
-                    )
-                    .subscribe(() => {});
-            }
+        this.tenantService.delete(tenant.id).subscribe(() => {
+          abp.notify.success(this.l('SuccessfullyDeleted'));
+          this.refresh();
         });
-    }
+      }
+    );
+  }
 
-    createTenant(): void {
-        this.showCreateOrEditTenantDialog();
-    }
+  protected listFilteredItems(): void {}
 
-    editTenant(tenant: TenantDto): void {
-        this.showCreateOrEditTenantDialog(tenant.id);
-    }
+  private configureColumns(): void {
+    this.columns.set([
+      {
+        key: 'tenancyName',
+        header: 'Nombre',
+        field: 'tenancyName',
+        width: '30%',
+      },
+      {
+        key: 'name',
+        header: 'Name',
+        field: 'name',
+        width: '35%',
+      },
+      {
+        key: 'isActive',
+        header: 'Activo',
+        field: 'isActive',
+        align: 'center',
+        width: '15%',
+      },
+    ]);
+  }
 
-    showCreateOrEditTenantDialog(id?: number): void {
-        let createOrEditTenantDialog: BsModalRef;
-        if (!id) {
-            createOrEditTenantDialog = this._modalService.show(CreateTenantDialogComponent, {
-                class: 'modal-lg',
-            });
-        } else {
-            createOrEditTenantDialog = this._modalService.show(EditTenantDialogComponent, {
-                class: 'modal-lg',
-                initialState: {
-                    id: id,
-                },
-            });
-        }
+  private configureActions(): void {
+    this.actions.set([
+      {
+        id: 'edit',
+        text: 'Edit',
+        icon: 'bi bi-pencil-square',
+        requiredPolicy: this.updatePolicy,
+        run: (row) => this.editTenant(row),
+      },
+      {
+        id: 'delete',
+        text: 'Delete',
+        icon: 'bi bi-trash',
+        danger: true,
+        requiredPolicy: this.deletePolicy,
+        run: (row) => this.delete(row),
+      },
+    ]);
+  }
 
-        createOrEditTenantDialog.content.onSave.subscribe(() => {
-            this.refresh();
+  private showCreateOrEditTenantDialog(id?: number): void {
+    const ref: BsModalRef = id
+      ? this.modalService.show(EditTenantDialogComponent, {
+          class: 'modal-lg',
+          initialState: { id },
+        })
+      : this.modalService.show(CreateTenantDialogComponent, {
+          class: 'modal-lg',
         });
-    }
 
-    clearFilters(): void {
-        this.keyword = '';
-        this.isActive = undefined;
-    }
+    ref.content?.onSave?.subscribe(() => {
+      this.refresh();
+    });
+  }
 }
