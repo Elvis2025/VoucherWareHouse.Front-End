@@ -1,34 +1,42 @@
 /* =========================================================
-   IBS MODAL — COLOR UNIFICADO
-   - Todo el modal es un solo plano de color
-   - Chrome NO tiene fondo propio
+   IBS MODAL — BASE FLEXIBLE
    ========================================================= */
 
 .ibs-modal {
   background: var(--ibs-modal-background-color);
 }
 
-/* Quitar fondos de capas internas */
+/* Capas internas */
 .ibs-modal-head,
 .ibs-modal-topbar,
 .ibs-modal-body,
 .ibs-modal-foot {
   background: transparent !important;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
-/* HEADER */
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .ibs-modal-head {
-  padding: 14px 16px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   border-bottom: 1px solid color-mix(in srgb, var(--ibs-border) 65%, transparent);
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ibs-modal-head .title {
   font-weight: 900;
   color: var(--ibs-text);
   font-size: 16px;
+  min-width: 0;
 }
 
 .ibs-modal-head .accent {
@@ -36,55 +44,102 @@
   font-weight: 800;
 }
 
-/* TOPBAR */
+.header-extra {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+:host.ibs-modal-topbar-host {
+  display: block;
+  min-width: 0;
+}
+
 .ibs-modal-topbar {
-  padding: 10px 16px;
+  padding: 12px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ibs-modal-topbar .topbar-left {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   align-items: center;
-  min-width: 0;
+  gap: 12px;
 }
 
 /* =========================================================
    BODY
-   - El host ocupa todo el alto disponible del slot
-   - El div interno es el que hace scroll
+   - outer: maneja scroll real
+   - inner: conserva padding y deja que el contenido defina ancho
    ========================================================= */
 
 :host.ibs-modal-body-host {
   display: block;
   height: 100%;
   min-height: 0;
+  min-width: 0;
 }
 
 .ibs-modal-body {
+  display: block;
   height: 100%;
   min-height: 0;
-  padding: 12px 16px;
-  overflow: auto;
+  min-width: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: var(--ibs-modal-body-overflow-x, auto);
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
 }
 
-/* FOOTER */
-.ibs-modal-foot {
-  padding: 12px 16px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  border-top: 1px solid color-mix(in srgb, var(--ibs-border) 65%, transparent);
+.ibs-modal-body-inner {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  padding: 12px 18px;
+  box-sizing: border-box;
+}
+
+.ibs-modal-body-inner > * {
+  min-width: 0;
 }
 
 /* =========================================================
-   BOTONES — cursor + hover
+   FOOTER
+   ========================================================= */
+
+:host.ibs-modal-footer-host {
+  display: block;
+  min-width: 0;
+}
+
+.ibs-modal-foot {
+  padding: 14px 18px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--ibs-border) 65%, transparent);
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   BOTONES
    ========================================================= */
 
 .ibs-modal button,
@@ -92,7 +147,6 @@
   cursor: pointer;
 }
 
-/* ── Botón X (cerrar header) ── */
 .ibs-btn-close.x {
   width: 34px;
   height: 34px;
@@ -100,16 +154,12 @@
   border: 1.5px solid transparent;
   background: transparent;
   color: var(--ibs-text-dim);
-
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   line-height: 1;
-
   flex-shrink: 0;
-  cursor: pointer;
-
   transition:
     background .18s ease,
     border-color .18s ease,
@@ -139,7 +189,6 @@
   transition-duration: .08s;
 }
 
-/* ── Botón Cancel ── */
 .btn.ghost {
   height: 40px;
   padding: 0 20px;
@@ -149,8 +198,6 @@
   color: var(--ibs-text-dim);
   font-size: 13.5px;
   font-weight: 700;
-  cursor: pointer;
-
   transition:
     background .18s ease,
     border-color .18s ease,

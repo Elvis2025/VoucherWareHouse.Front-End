@@ -23,63 +23,71 @@ import { CommonModule } from '@angular/common';
       }
 
       .ibs-modal {
+        --ibs-modal-viewport-gap: 32px;
+        --ibs-modal-min-width: 920px;
+        --ibs-modal-wide-min-width: 1280px;
+
         position: fixed;
         left: 50%;
-        top: 2%;
+        top: 16px;
         transform: translateX(-50%);
 
+        display: inline-grid;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+
         width: auto;
-        min-width: min(600px, calc(100vw - 24px));
-        max-width: calc(100vw - 24px);
-        max-height: calc(100dvh - 24px);
+        min-width: min(var(--ibs-modal-min-width), calc(100vw - var(--ibs-modal-viewport-gap)));
+        max-width: calc(100vw - var(--ibs-modal-viewport-gap));
+        max-height: calc(100dvh - 32px);
+        min-height: 0;
 
         background: var(--ibs-modal-background-color);
         color: var(--ibs-text);
-
         border: 1px solid color-mix(in srgb, var(--ibs-border) 70%, transparent);
         border-radius: 18px;
         box-shadow: 0 24px 90px rgba(0, 0, 0, 0.45);
         overflow: hidden;
+      }
 
-        display: grid;
-        grid-template-rows: auto auto minmax(0, 1fr) auto;
-
-        min-height: 0;
+      .ibs-modal.wide {
+        min-width: min(var(--ibs-modal-wide-min-width), calc(100vw - var(--ibs-modal-viewport-gap)));
       }
 
       .ibs-slot {
         display: block;
         min-height: 0;
+        min-width: 0;
       }
 
-      .ibs-slot-header {
-        min-height: fit-content;
-      }
-
-      .ibs-slot-topbar {
-        min-height: fit-content;
+      .ibs-slot-header,
+      .ibs-slot-topbar,
+      .ibs-slot-footer {
+        width: 100%;
       }
 
       .ibs-slot-body {
         min-height: 0;
+        min-width: 0;
         overflow: hidden;
-      }
-
-      .ibs-slot-footer {
-        min-height: fit-content;
       }
 
       @media (max-width: 767.98px) {
         .ibs-modal {
-          top: 12px;
-          left: 12px;
-          right: 12px;
+          --ibs-modal-viewport-gap: 20px;
+
+          top: 10px;
+          left: 10px;
+          right: 10px;
           transform: none;
 
-          min-width: unset;
           width: auto;
+          min-width: unset;
           max-width: unset;
-          max-height: calc(100dvh - 24px);
+          max-height: calc(100dvh - 20px);
+        }
+
+        .ibs-modal.wide {
+          min-width: unset;
         }
       }
     `,

@@ -1,3 +1,9 @@
-<div class="ibs-modal-body" [style.overflow]="overflow">
-  <ng-content></ng-content>
+<div
+  class="ibs-modal-body"
+  [style.overflow-y]="overflowY"
+  [style.--ibs-modal-body-overflow-x]="overflowX"
+>
+  <div class="ibs-modal-body-inner">
+    <ng-content></ng-content>
+  </div>
 </div>

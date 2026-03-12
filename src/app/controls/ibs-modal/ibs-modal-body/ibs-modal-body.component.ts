@@ -10,5 +10,6 @@ import { CommonModule } from '@angular/common';
   host: { class: 'ibs-modal-body-host' },
 })
 export class IbsModalBodyComponent {
-  @Input() overflow: 'hidden' | 'auto' | 'visible' = 'auto';
+  @Input() overflowY: 'hidden' | 'auto' | 'visible' = 'auto';
+  @Input() overflowX: 'hidden' | 'auto' | 'visible' = 'auto';
 }

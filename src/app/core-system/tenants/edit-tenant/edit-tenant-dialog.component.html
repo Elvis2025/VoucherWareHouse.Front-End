@@ -4,7 +4,7 @@
   #editTenantForm="ngForm"
   (ngSubmit)="submit()">
 
-  <app-ibs-modal-shell [wide]="false" (cancelled)="close()">
+  <app-ibs-modal-shell [wide]="true" (cancelled)="close()">
 
     <app-ibs-modal-header
       [title]="'EditTenant' | localize"
@@ -21,9 +21,7 @@
           icon="bi bi-building">
 
           <div class="ibs-edit-user-section">
-
             <div class="ibs-fields-stack">
-
               <div class="ibs-field">
                 <app-ibs-input
                   [label]="'TenancyName' | localize"
@@ -46,7 +44,6 @@
                   (ngModelChange)="updateName($event)">
                 </app-ibs-input>
               </div>
-
             </div>
 
             <div class="ibs-toggle-row">
@@ -57,7 +54,163 @@
                 (ngModelChange)="updateIsActive($event)">
               </app-ibs-check-box>
             </div>
+          </div>
 
+        </app-ibs-modal-tab>
+
+        <!-- TAB FEATURES -->
+        <app-ibs-modal-tab
+          [label]="'Features'"
+          icon="bi bi-sliders2">
+
+          <div class="ibs-features-section">
+
+            <div class="ibs-features-topbar">
+              <div class="ibs-features-search">
+                <i class="bi bi-search"></i>
+                <input
+                  type="text"
+                  [ngModel]="featureSearch()"
+                  (ngModelChange)="onFeatureSearch($event)"
+                  placeholder="Buscar features..." />
+              </div>
+
+              <div class="ibs-features-toolbar">
+                <button
+                  type="button"
+                  class="ibs-features-tool-btn"
+                  (click)="toggleExpandAllFeatures()"
+                  [disabled]="(selectedFeatureTree()?.length ?? 0) === 0">
+                  <i class="bi"
+                     [class.bi-plus-lg]="!allFeaturesExpanded()"
+                     [class.bi-dash-lg]="allFeaturesExpanded()"></i>
+                  <span>{{ allFeaturesExpanded() ? 'Reducir todos' : 'Expandir todos' }}</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="ibs-features-tool-btn"
+                  (click)="toggleSelectAllFeatures()"
+                  [disabled]="(selectedFeatureTree()?.length ?? 0) === 0">
+                  <i class="bi"
+                     [class.bi-plus-lg]="!allFeaturesSelected()"
+                     [class.bi-dash-lg]="allFeaturesSelected()"></i>
+                  <span>{{ allFeaturesSelected() ? 'Quitar todos' : 'Seleccionar todos' }}</span>
+                </button>
+              </div>
+            </div>
+
+            @if (featuresError()) {
+              <div class="err">{{ featuresError() }}</div>
+            }
+
+            @if (featuresLoading()) {
+              <div class="loading">Cargando features...</div>
+            } @else {
+              <div class="perm-layout">
+                <!-- IZQUIERDA -->
+                <aside class="modules">
+                  <div class="modules-title">Grupo</div>
+
+                  <div class="modules-list">
+                    @for (m of featureModules(); track m.key) {
+                      <button
+                        type="button"
+                        class="module-item"
+                        [class.active]="featureModules().length > 1 && selectedFeatureModuleKey() === m.key"
+                        (click)="selectFeatureModule(m.key)">
+
+                        <span class="module-name">
+                          {{ m.title }}
+                        </span>
+
+                        <span class="module-right">
+                          @if (featureModules().length > 1 && selectedFeatureModuleKey() === m.key) {
+                            <i class="bi bi-check-lg module-check"></i>
+                          }
+                          <span class="module-count">{{ m.count }}</span>
+                        </span>
+                      </button>
+                    }
+
+                    @if ((featureModules()?.length ?? 0) === 0) {
+                      <div class="empty">No hay features que coincidan con la búsqueda.</div>
+                    }
+                  </div>
+                </aside>
+
+                <!-- DERECHA -->
+                <section class="perms">
+                  @if (!selectedFeatureModule()) {
+                    <div class="empty">Selecciona un módulo para ver sus features.</div>
+                  } @else {
+                    <div class="perms-title">
+                      <span>Features</span>
+                    </div>
+
+                    <div class="perm-tree">
+                      @for (n of selectedFeatureTree(); track n.key) {
+                        <div class="perm-node" [class.is-open]="n.open">
+                          <div class="node-head">
+                            <label class="node-main">
+                              <input
+                                type="checkbox"
+                                [checked]="n.feature.enabled"
+                                (change)="toggleFeature(n.feature, $any($event.target).checked)"
+                              />
+                              <div class="meta">
+                                <div class="pname">{{ n.title }}</div>
+                                <div class="pkey">{{ n.key }}</div>
+                              </div>
+                            </label>
+
+                            <div class="node-actions">
+                              @if ((n.children?.length ?? 0) > 0) {
+                                <button
+                                  class="hamb"
+                                  type="button"
+                                  title="Ver features derivados"
+                                  (click)="toggleFeatureNodeOpen(n)">
+                                  <i class="bi"
+                                     [class.bi-list]="!n.open"
+                                     [class.bi-x-lg]="n.open"></i>
+                                </button>
+                              }
+                            </div>
+                          </div>
+
+                          @if (n.open && (n.children?.length ?? 0) > 0) {
+                            <div class="node-children">
+                              <div class="children-grid">
+                                @for (c of n.children; track c.name) {
+                                  <label class="child">
+                                    <input
+                                      type="checkbox"
+                                      [checked]="c.enabled"
+                                      (change)="toggleFeature(c, $any($event.target).checked)"
+                                    />
+                                    <div class="meta">
+                                      <div class="pname">{{ c.displayName || c.name }}</div>
+                                      <div class="pkey">{{ c.name }}</div>
+                                    </div>
+                                  </label>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+
+                      @if ((selectedFeatureTree()?.length ?? 0) === 0) {
+                        <div class="empty">
+                          No hay features para este módulo (o el filtro no coincide).
+                        </div>
+                      }
+                    </div>
+                  }
+                </section>
+              </div>
+            }
           </div>
 
         </app-ibs-modal-tab>
@@ -68,7 +221,6 @@
           icon="bi bi-image">
 
           <div class="ibs-edit-user-section">
-
             <div class="ibs-fields-stack">
 
               <div class="ibs-field">
@@ -104,61 +256,45 @@
                 </app-ibs-input>
               </div>
 
-              <!-- LOGO OPCIONAL -->
               <div class="ibs-field">
                 <label class="ibs-logo-label" for="tenantLogoFile">
                   Seleccionar archivo
                 </label>
 
-                <input
-                  #tenantLogoFileInput
-                  id="tenantLogoFile"
-                  type="file"
-                  class="ibs-logo-file-input-hidden"
-                  accept=".png,.jpg,.jpeg,.webp,.svg,image/*"
-                  (change)="onLogoSelected($event)"
-                  [disabled]="saving()" />
+                <div
+                  class="ibs-logo-dropzone"
+                  [class.is-dragging]="isDraggingLogo()"
+                  [class.has-file]="!!selectedLogoFileName() || !!currentLogoUrl()"
+                  (dragover)="onLogoDragOver($event)"
+                  (dragleave)="onLogoDragLeave($event)"
+                  (drop)="onLogoDrop($event)"
+                  (click)="tenantLogoFileInput.click()">
 
-                @if (!(logoPreviewUrl() || currentLogoUrl())) {
-                  <div
-                    class="ibs-logo-dropzone"
-                    [class.is-dragging]="isDraggingLogo()"
-                    [class.has-file]="!!selectedLogoFileName() || !!currentLogoUrl()"
-                    (dragover)="onLogoDragOver($event)"
-                    (dragleave)="onLogoDragLeave($event)"
-                    (drop)="onLogoDrop($event)"
-                    (click)="tenantLogoFileInput.click()">
+                  <input
+                    #tenantLogoFileInput
+                    id="tenantLogoFile"
+                    type="file"
+                    class="ibs-logo-file-input-hidden"
+                    accept=".png,.jpg,.jpeg,.webp,.svg,image/*"
+                    (change)="onLogoSelected($event)"
+                    [disabled]="saving()" />
 
-                    <div class="ibs-logo-dropzone-content">
-                      <div class="ibs-logo-dropzone-icon">
-                        <i class="bi bi-cloud-arrow-up"></i>
+                  <div class="ibs-logo-dropzone-content">
+                    <div class="ibs-logo-dropzone-icon">
+                      <i class="bi bi-cloud-arrow-up"></i>
+                    </div>
+
+                    <div class="ibs-logo-dropzone-texts">
+                      <div class="ibs-logo-dropzone-title">
+                        Arrastra tu logo aquí
                       </div>
 
-                      <div class="ibs-logo-dropzone-texts">
-                        <div class="ibs-logo-dropzone-title">
-                          Arrastra tu logo aquí
-                        </div>
-
-                        <div class="ibs-logo-dropzone-subtitle">
-                          o haz clic para seleccionarlo desde tu equipo
-                        </div>
+                      <div class="ibs-logo-dropzone-subtitle">
+                        o haz clic para seleccionarlo desde tu equipo
                       </div>
                     </div>
                   </div>
-                } @else {
-                  <div
-                    class="ibs-logo-preview-box"
-                    (click)="tenantLogoFileInput.click()"
-                    (dragover)="onLogoDragOver($event)"
-                    (dragleave)="onLogoDragLeave($event)"
-                    (drop)="onLogoDrop($event)">
-
-                    <img
-                      [src]="logoPreviewUrl() || currentLogoUrl() || ''"
-                      alt="Vista previa del logo"
-                      class="ibs-logo-preview-img" />
-                  </div>
-                }
+                </div>
               </div>
 
               @if (selectedLogoFileName()) {
@@ -197,6 +333,17 @@
                 </div>
               }
 
+              @if (logoPreviewUrl() || currentLogoUrl()) {
+                <div class="ibs-logo-preview-wrap">
+                  <div class="ibs-logo-preview-box">
+                    <img
+                      [src]="logoPreviewUrl() || currentLogoUrl() || ''"
+                      alt="Vista previa del logo"
+                      class="ibs-logo-preview-img" />
+                  </div>
+                </div>
+              }
+
               <div class="ibs-info-block">
                 <p class="ibs-info-text">
                   Formatos permitidos: PNG, JPG, JPEG, WEBP y SVG. Tamaño máximo: 2 MB.
@@ -204,7 +351,6 @@
               </div>
 
             </div>
-
           </div>
 
         </app-ibs-modal-tab>

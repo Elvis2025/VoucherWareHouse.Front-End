@@ -6,6 +6,427 @@
   display: block;
 }
 
+/* =========================================================
+   FEATURES TAB
+   ========================================================= */
+
+.ibs-features-section {
+  display: block;
+}
+
+.ibs-features-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.ibs-features-search {
+  position: relative;
+  flex: 1 1 320px;
+  min-width: 240px;
+}
+
+.ibs-features-search i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ibs-text-dim);
+  font-size: 0.95rem;
+}
+
+.ibs-features-search input {
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--ibs-border);
+  background: color-mix(in srgb, var(--ibs-control-bg) 82%, transparent);
+  color: var(--ibs-text);
+  padding: 0 14px 0 36px;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.ibs-features-search input:focus {
+  border-color: color-mix(in srgb, var(--ibs-primary) 55%, var(--ibs-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ibs-primary) 14%, transparent);
+  background: color-mix(in srgb, var(--ibs-control-bg) 92%, transparent);
+}
+
+.ibs-features-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ibs-features-tool-btn {
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--ibs-border);
+  background: color-mix(in srgb, var(--ibs-control-bg) 70%, transparent);
+  cursor: pointer;
+  color: var(--ibs-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+.ibs-features-tool-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .08);
+  background: color-mix(in srgb, var(--ibs-control-bg) 62%, var(--ibs-primary) 8%);
+}
+
+.ibs-features-tool-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================================================
+   SAME LOOK & FEEL AS ROLES PERMISSIONS
+   ========================================================= */
+
+.perm-layout {
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 12px;
+  background: transparent !important;
+}
+
+.modules,
+.perms {
+  background: var(--ibs-card);
+  border: 1px solid var(--ibs-border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  height: clamp(380px, 56vh, 520px);
+}
+
+.modules-title,
+.perms-title {
+  padding: 12px 12px;
+  font-weight: 900;
+  color: var(--ibs-text);
+  background: transparent;
+  border: 0;
+  flex: 0 0 auto;
+}
+
+.modules-list {
+  padding: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+  grid-auto-rows: max-content;
+  align-content: start;
+}
+
+.perm-tree {
+  padding: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  gap: 10px;
+  grid-auto-rows: max-content;
+  align-content: start;
+  scrollbar-gutter: stable;
+}
+
+.module-item,
+.perm-node,
+.child {
+  --ibs-item-rail: color-mix(in srgb, var(--ibs-primary) 72%, var(--ibs-border));
+  --ibs-item-bg: color-mix(in srgb, var(--ibs-card) 88%, var(--ibs-primary) 12%);
+  --ibs-rail-w: 6px;
+  --ibs-rail-line: color-mix(in srgb, var(--ibs-border) 70%, transparent);
+}
+
+.module-item {
+  position: relative;
+  border: 1px solid var(--ibs-item-rail);
+  border-left: var(--ibs-rail-w) solid var(--ibs-item-rail);
+  border-radius: 14px;
+  background: var(--ibs-item-bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 2.75rem;
+  padding: 10px 12px;
+  transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+  box-shadow: inset 1px 0 0 var(--ibs-rail-line);
+}
+
+.module-item:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--ibs-item-bg) 95%, var(--ibs-primary) 5%);
+  box-shadow:
+    inset 1px 0 0 var(--ibs-rail-line),
+    0 6px 14px rgba(0, 0, 0, .08);
+}
+
+.module-item.active {
+  background: color-mix(in srgb, var(--ibs-item-bg) 85%, var(--ibs-primary) 15%);
+  box-shadow:
+    inset 1px 0 0 var(--ibs-rail-line),
+    0 8px 18px rgba(0, 0, 0, .10);
+}
+
+.module-item .module-name {
+  font-weight: 800;
+  color: var(--ibs-text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.module-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.module-check {
+  font-size: 16px;
+  color: var(--ibs-primary);
+  opacity: .85;
+}
+
+.module-item .module-count {
+  font-weight: 900;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ibs-control-bg) 70%, transparent);
+  color: var(--ibs-text);
+  border: 1px solid color-mix(in srgb, var(--ibs-border) 75%, transparent);
+}
+
+.perm-node {
+  position: relative;
+  border: 1px solid var(--ibs-item-rail);
+  border-left: var(--ibs-rail-w) solid var(--ibs-item-rail);
+  border-radius: 16px;
+  background: var(--ibs-item-bg);
+  width: 100%;
+  align-self: start;
+  overflow: hidden;
+  min-height: 4rem;
+  height: fit-content;
+  transition: background .16s ease, border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+  box-shadow: inset 1px 0 0 var(--ibs-rail-line);
+}
+
+.perm-node:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--ibs-item-bg) 95%, var(--ibs-primary) 5%);
+  box-shadow:
+    inset 1px 0 0 var(--ibs-rail-line),
+    0 6px 14px rgba(0, 0, 0, .08);
+}
+
+.node-head {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.node-main {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.node-main input {
+  margin-top: 4px;
+  flex: 0 0 auto;
+}
+
+.node-main .meta {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.node-main .pname {
+  font-weight: 900;
+  color: var(--ibs-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node-main .pkey {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ibs-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hamb {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--ibs-border);
+  background: color-mix(in srgb, var(--ibs-control-bg) 70%, transparent);
+  cursor: pointer;
+  color: var(--ibs-text);
+  flex: 0 0 auto;
+}
+
+.perm-node.is-open {
+  background: var(--ibs-item-bg);
+  border-color: var(--ibs-item-rail);
+  box-shadow:
+    inset 1px 0 0 var(--ibs-rail-line),
+    0 14px 34px rgba(0, 0, 0, .14);
+}
+
+.perm-node.is-open .node-head {
+  position: relative;
+}
+
+.perm-node.is-open .node-head::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 1px;
+  background: color-mix(in srgb, var(--ibs-border) 75%, transparent);
+  opacity: .95;
+}
+
+.node-children {
+  padding: 10px 12px;
+  position: static;
+  background: color-mix(in srgb, var(--ibs-surface2) 92%, transparent);
+  animation: expandSoft .14s ease-out;
+}
+
+@keyframes expandSoft {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.children-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 12px;
+}
+
+.child {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--ibs-item-rail);
+  border-left: var(--ibs-rail-w) solid var(--ibs-item-rail);
+  background: var(--ibs-item-bg);
+  cursor: pointer;
+  transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+  box-shadow: inset 1px 0 0 var(--ibs-rail-line);
+}
+
+.child input {
+  margin-top: 4px;
+  flex: 0 0 auto;
+}
+
+.child .meta {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.child .pname {
+  font-weight: 900;
+  color: var(--ibs-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.child .pkey {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ibs-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.child:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--ibs-item-bg) 95%, var(--ibs-primary) 5%);
+  box-shadow:
+    inset 1px 0 0 var(--ibs-rail-line),
+    0 6px 14px rgba(0, 0, 0, .08);
+}
+
+.err {
+  margin-bottom: 10px;
+  background: rgba(239, 68, 68, .12);
+  border: 1px solid rgba(239, 68, 68, .28);
+  color: color-mix(in srgb, var(--ibs-text) 35%, #7f1d1d);
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+.loading,
+.empty {
+  padding: 14px;
+  background: color-mix(in srgb, var(--ibs-card) 70%, transparent);
+  border: 1px solid var(--ibs-border);
+  border-radius: 14px;
+  font-weight: 700;
+  color: var(--ibs-text);
+}
+
+/* =========================================================
+   LOGO / BRANDING
+   ========================================================= */
+
 .ibs-logo-label {
   display: inline-block;
   margin-bottom: 0.55rem;
@@ -129,10 +550,10 @@
   gap: 0.5rem;
   color: #5c6678;
   font-size: 0.92rem;
+}
 
-  span {
-    word-break: break-word;
-  }
+.ibs-logo-file-name span {
+  word-break: break-word;
 }
 
 .ibs-logo-remove-btn {
@@ -200,6 +621,19 @@
   }
 }
 
+@media (max-width: 991.98px) {
+  .perm-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .modules,
+  .perms {
+    height: auto;
+    min-height: 280px;
+    max-height: 42vh;
+  }
+}
+
 @media (max-width: 767.98px) {
   .ibs-logo-dropzone {
     min-height: 150px;
@@ -214,5 +648,9 @@
   .ibs-logo-remove-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .children-grid {
+    grid-template-columns: 1fr;
   }
 }

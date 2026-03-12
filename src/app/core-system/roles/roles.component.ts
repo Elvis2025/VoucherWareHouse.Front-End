@@ -20,6 +20,7 @@ import {
 
 import { CreateRoleDialogComponent } from './create-role/create-role-dialog.component';
 import { EditRoleDialogComponent } from './edit-role/edit-role-dialog.component';
+import { RolesPermissionsModalComponent } from './permissions-roles/roles-permissions-modal.component';
 
 import {
   IbsGridAction,
@@ -102,6 +103,27 @@ export class RolesComponent
     this.showCreateOrEditRoleDialog(role.id);
   }
 
+  openPermissions(role: RoleDto): void {
+    const ref: BsModalRef = this.modalService.show(RolesPermissionsModalComponent, {
+      class: 'modal-xl',
+      initialState: {
+        roleId: role.id,
+        roleName: role.name,
+        roleDisplay: role.displayName,
+      },
+    });
+
+    ref.content?.saved?.subscribe(() => {
+      abp.notify.success(this.l('SavedSuccessfully'));
+      this.refresh();
+      ref.hide();
+    });
+
+    ref.content?.cancelled?.subscribe(() => {
+      ref.hide();
+    });
+  }
+
   delete(role: RoleDto): void {
     abp.message.confirm(
       this.l('RoleDeleteWarningMessage', role.displayName),
@@ -140,6 +162,13 @@ export class RolesComponent
 
   private configureActions(): void {
     this.actions.set([
+      {
+        id: 'permissions',
+        text: 'Permissions',
+        icon: 'bi bi-shield-lock',
+        requiredPolicy: this.updatePolicy,
+        run: (row) => this.openPermissions(row),
+      },
       {
         id: 'edit',
         text: 'Edit',
