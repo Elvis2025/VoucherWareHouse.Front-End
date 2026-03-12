@@ -1,0 +1,173 @@
+<app-ibs-modal-shell [wide]="true" (cancelled)="onClose()">
+  <app-ibs-modal-header
+    title="Permisos del usuario"
+    [accent]="userName"
+    (closed)="onClose()">
+  </app-ibs-modal-header>
+
+  <app-ibs-modal-top-bar
+    [showSearch]="true"
+    [showRefresh]="true"
+    searchPlaceholder="Buscar en todos los permisos..."
+    [searchValue]="q()"
+    [refreshDisabled]="loading()"
+    (searchChanged)="onSearch($event)"
+    (cleared)="onSearch('')"
+    (refreshed)="load()">
+  </app-ibs-modal-top-bar>
+
+  <app-ibs-modal-body>
+    @if (error()) {
+      <div class="err">{{ error() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="loading">Cargando permisos...</div>
+    } @else {
+      <div class="perm-layout">
+        <aside class="modules">
+          <div class="modules-title">Módulos</div>
+
+          <div class="modules-list">
+            @for (m of modules(); track trackModule($index, m)) {
+              <button
+                type="button"
+                class="module-item"
+                [class.active]="selectedModuleKey() === m.key"
+                (click)="selectModule(m.key)">
+
+                <span class="module-name">{{ m.title }}</span>
+
+                <span class="module-right">
+                  @if (selectedModuleKey() === m.key) {
+                    <i class="bi bi-check-lg module-check"></i>
+                  }
+                  <span class="module-count">{{ m.count }}</span>
+                </span>
+              </button>
+            }
+
+            @if ((modules()?.length ?? 0) === 0) {
+              <div class="empty">No hay permisos que coincidan con la búsqueda.</div>
+            }
+          </div>
+        </aside>
+
+        <section class="perms">
+          @if (!selectedModule()) {
+            <div class="empty">Selecciona un módulo para ver sus permisos.</div>
+          } @else {
+            <div class="perms-title">
+              <div class="perms-title__left">
+                <span>Permisos</span>
+
+                @if (lastHiddenParentTitle()) {
+                  <span
+                    class="hidden-parent-indicator"
+                    [title]="'Último padre visible que tocó el borde superior: ' + lastHiddenParentTitle()">
+                    {{ lastHiddenParentTitle() }}
+                  </span>
+                }
+              </div>
+
+              <div class="perms-tools">
+                <button
+                  type="button"
+                  class="perms-tool-btn"
+                  (click)="toggleExpandAll()"
+                  [disabled]="(visibleRows()?.length ?? 0) === 0">
+                  <i class="bi" [class.bi-plus-lg]="!allExpanded()" [class.bi-dash-lg]="allExpanded()"></i>
+                  <span>{{ allExpanded() ? 'Reducir todos' : 'Expandir todos' }}</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="perms-tool-btn"
+                  (click)="toggleSelectAll()"
+                  [disabled]="(visibleRows()?.length ?? 0) === 0">
+                  <i class="bi" [class.bi-plus-lg]="!allSelected()" [class.bi-dash-lg]="allSelected()"></i>
+                  <span>{{ allSelected() ? 'Quitar todos' : 'Seleccionar todos' }}</span>
+                </button>
+              </div>
+            </div>
+
+            <div #treeContainer class="perm-tree" (scroll)="onTreeScroll()">
+              @for (row of visibleRows(); track trackRow($index, row)) {
+                <div
+                  class="tree-row"
+                  [class.is-open]="row.isOpen"
+                  [class.is-match]="row.node.searchMatch"
+                  [style.--indent.px]="rowIndent(row)"
+                  [style.--level]="row.level"
+                  [attr.data-row-key]="row.key"
+                  [attr.data-row-title]="row.node.title"
+                  [attr.data-has-children]="row.hasChildren">
+
+                  <div class="tree-row__indent" aria-hidden="true"></div>
+
+                  <div class="tree-row__card">
+                    <div class="tree-row__content">
+                      <button
+                        type="button"
+                        class="tree-toggle"
+                        [class.is-leaf]="!row.hasChildren"
+                        [disabled]="!row.hasChildren"
+                        (click)="toggleNodeOpen(row)">
+                        @if (row.hasChildren) {
+                          <i class="bi" [class.bi-chevron-right]="!row.isOpen" [class.bi-chevron-down]="row.isOpen"></i>
+                        } @else {
+                          <span class="tree-dot"></span>
+                        }
+                      </button>
+
+                      <label class="tree-check-row">
+                        <input
+                          type="checkbox"
+                          [checked]="row.node.perm.isGranted === true"
+                          (change)="toggleNodeSelection(row, $any($event.target).checked)" />
+
+                        <div class="tree-meta">
+                          <div class="tree-name">{{ row.node.title }}</div>
+                        </div>
+                      </label>
+
+                      <div class="tree-row__right">
+                        @if (row.hasChildren) {
+                          <button
+                            type="button"
+                            class="tree-expand-btn tree-expand-btn--icon"
+                            [title]="row.isOpen ? 'Reducir hijos' : 'Expandir hijos'"
+                            (click)="toggleExpandChildren(row)">
+                            <i
+                              class="bi"
+                              [class.bi-dash-circle]="row.isOpen"
+                              [class.bi-plus-circle]="!row.isOpen">
+                            </i>
+                          </button>
+
+                          <span class="tree-badge">{{ row.node.visibleChildrenCount }}</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if ((visibleRows()?.length ?? 0) === 0) {
+                <div class="empty">
+                  No hay permisos para este módulo o la búsqueda no coincide.
+                </div>
+              }
+            </div>
+          }
+        </section>
+      </div>
+    }
+  </app-ibs-modal-body>
+
+  <app-ibs-modal-footer
+    [saveDisabled]="loading()"
+    (closed)="onClose()"
+    (saved)="saveAll()">
+  </app-ibs-modal-footer>
+</app-ibs-modal-shell>

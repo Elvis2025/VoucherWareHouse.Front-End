@@ -47,7 +47,6 @@ export class AppComponent extends AppComponentBase implements OnInit {
         this._layoutStore.sidebarExpanded.subscribe((value) => {
             this.sidebarExpanded = value;
         });
-        
         this._appTenantBrandingService.loadCurrentTenantLogo().subscribe({
                 next: (result) => {
                     console.log('Branding cargado:', result);

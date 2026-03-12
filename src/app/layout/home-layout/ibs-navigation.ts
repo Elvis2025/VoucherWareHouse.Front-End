@@ -1,5 +1,5 @@
-import {CORE_SYSTEM_NAVIGATION} from '../../core-system/core-system.navigation'
-import {VOUCHER_WAREHOUSE_NAVIGATION} from '../../voucher-warehouse/voucher-warehouse.navigation'
+import {CORE_SYSTEM_NAVIGATION} from '../../Modules/core-system/core-system.navigation'
+import {VOUCHER_WAREHOUSE_NAVIGATION} from '../../Modules/voucher-warehouse/voucher-warehouse.navigation'
 
 
 export type IbsModuleKey = 'core' 
