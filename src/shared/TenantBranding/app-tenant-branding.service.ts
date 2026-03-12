@@ -177,7 +177,7 @@ export class AppTenantBrandingService {
     this._companyType.next(normalized?.companyType ?? null);
   }
 
-  private clearBrandingState(): void {
+  public clearBrandingState(): void {
     this._branding.next(null);
     this._logoUrl.next(null);
     this._companyName.next(null);

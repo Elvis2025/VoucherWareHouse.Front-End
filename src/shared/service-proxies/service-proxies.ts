@@ -206,6 +206,229 @@ export class ConfigurationServiceProxy {
 }
 
 @Injectable()
+export class FeaturesServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @return OK
+     */
+    getAllFeatures(): Observable<FeatureDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Features/GetAllFeatures";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllFeatures(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllFeatures(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FeatureDtoListResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FeatureDtoListResultDto>;
+        }));
+    }
+
+    protected processGetAllFeatures(response: HttpResponseBase): Observable<FeatureDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FeatureDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @return OK
+     */
+    getTenantFeatures(tenantId: number | undefined): Observable<FeatureDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Features/GetTenantFeatures?";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantFeatures(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantFeatures(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FeatureDtoListResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FeatureDtoListResultDto>;
+        }));
+    }
+
+    protected processGetTenantFeatures(response: HttpResponseBase): Observable<FeatureDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FeatureDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    addFeatureToTenants(body: AddFeatureToTenantsInputDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Features/AddFeatureToTenants";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddFeatureToTenants(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddFeatureToTenants(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processAddFeatureToTenants(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    addFeaturesToTenant(body: AddFeaturesToOneTenantInputDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Features/AddFeaturesToTenant";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddFeaturesToTenant(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddFeaturesToTenant(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processAddFeaturesToTenant(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class RoleServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -477,6 +700,57 @@ export class RoleServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = PermissionDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAllPermissionsTree(): Observable<PermissionTreeDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Role/GetAllPermissionsTree";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllPermissionsTree(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllPermissionsTree(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionTreeDtoListResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionTreeDtoListResultDto>;
+        }));
+    }
+
+    protected processGetAllPermissionsTree(response: HttpResponseBase): Observable<PermissionTreeDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionTreeDtoListResultDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1852,6 +2126,114 @@ export class UserServiceProxy {
     }
 
     /**
+     * @param userId (optional) 
+     * @return OK
+     */
+    getUserPermissionsForEdit(userId: number | undefined): Observable<GetUserPermissionsForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/User/GetUserPermissionsForEdit?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUserPermissionsForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUserPermissionsForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetUserPermissionsForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetUserPermissionsForEditOutput>;
+        }));
+    }
+
+    protected processGetUserPermissionsForEdit(response: HttpResponseBase): Observable<GetUserPermissionsForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetUserPermissionsForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updateUserPermissions(body: UpdateUserPermissionsInputDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/User/UpdateUserPermissions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateUserPermissions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateUserPermissions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateUserPermissions(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param id (optional) 
      * @return OK
      */
@@ -1982,6 +2364,126 @@ export class UserServiceProxy {
         }
         return _observableOf(null as any);
     }
+}
+
+export class AddFeatureToTenantsInputDto implements IAddFeatureToTenantsInputDto {
+    featureName: string;
+    value: string;
+    tenantIds: number[];
+
+    constructor(data?: IAddFeatureToTenantsInputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.tenantIds = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.featureName = _data["featureName"];
+            this.value = _data["value"];
+            if (Array.isArray(_data["tenantIds"])) {
+                this.tenantIds = [] as any;
+                for (let item of _data["tenantIds"])
+                    this.tenantIds.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): AddFeatureToTenantsInputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddFeatureToTenantsInputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["featureName"] = this.featureName;
+        data["value"] = this.value;
+        if (Array.isArray(this.tenantIds)) {
+            data["tenantIds"] = [];
+            for (let item of this.tenantIds)
+                data["tenantIds"].push(item);
+        }
+        return data;
+    }
+
+    clone(): AddFeatureToTenantsInputDto {
+        const json = this.toJSON();
+        let result = new AddFeatureToTenantsInputDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAddFeatureToTenantsInputDto {
+    featureName: string;
+    value: string;
+    tenantIds: number[];
+}
+
+export class AddFeaturesToOneTenantInputDto implements IAddFeaturesToOneTenantInputDto {
+    tenantId: number;
+    features: FeatureValueInputDto[];
+
+    constructor(data?: IAddFeaturesToOneTenantInputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.features = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tenantId = _data["tenantId"];
+            if (Array.isArray(_data["features"])) {
+                this.features = [] as any;
+                for (let item of _data["features"])
+                    this.features.push(FeatureValueInputDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AddFeaturesToOneTenantInputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddFeaturesToOneTenantInputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tenantId"] = this.tenantId;
+        if (Array.isArray(this.features)) {
+            data["features"] = [];
+            for (let item of this.features)
+                data["features"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): AddFeaturesToOneTenantInputDto {
+        const json = this.toJSON();
+        let result = new AddFeaturesToOneTenantInputDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAddFeaturesToOneTenantInputDto {
+    tenantId: number;
+    features: FeatureValueInputDto[];
 }
 
 export class ApplicationInfoDto implements IApplicationInfoDto {
@@ -2487,6 +2989,167 @@ export interface ICreateUserDto {
     password: string;
 }
 
+export class FeatureDto implements IFeatureDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    description: string | undefined;
+    defaultValue: string | undefined;
+    currentValue: string | undefined;
+    hasCustomValueForTenant: boolean;
+
+    constructor(data?: IFeatureDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+            this.description = _data["description"];
+            this.defaultValue = _data["defaultValue"];
+            this.currentValue = _data["currentValue"];
+            this.hasCustomValueForTenant = _data["hasCustomValueForTenant"];
+        }
+    }
+
+    static fromJS(data: any): FeatureDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FeatureDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        data["description"] = this.description;
+        data["defaultValue"] = this.defaultValue;
+        data["currentValue"] = this.currentValue;
+        data["hasCustomValueForTenant"] = this.hasCustomValueForTenant;
+        return data;
+    }
+
+    clone(): FeatureDto {
+        const json = this.toJSON();
+        let result = new FeatureDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IFeatureDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    description: string | undefined;
+    defaultValue: string | undefined;
+    currentValue: string | undefined;
+    hasCustomValueForTenant: boolean;
+}
+
+export class FeatureDtoListResultDto implements IFeatureDtoListResultDto {
+    items: FeatureDto[] | undefined;
+
+    constructor(data?: IFeatureDtoListResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(FeatureDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): FeatureDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FeatureDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): FeatureDtoListResultDto {
+        const json = this.toJSON();
+        let result = new FeatureDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IFeatureDtoListResultDto {
+    items: FeatureDto[] | undefined;
+}
+
+export class FeatureValueInputDto implements IFeatureValueInputDto {
+    featureName: string;
+    value: string;
+
+    constructor(data?: IFeatureValueInputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.featureName = _data["featureName"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): FeatureValueInputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FeatureValueInputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["featureName"] = this.featureName;
+        data["value"] = this.value;
+        return data;
+    }
+
+    clone(): FeatureValueInputDto {
+        const json = this.toJSON();
+        let result = new FeatureValueInputDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IFeatureValueInputDto {
+    featureName: string;
+    value: string;
+}
+
 export class FlatPermissionDto implements IFlatPermissionDto {
     name: string | undefined;
     displayName: string | undefined;
@@ -2593,6 +3256,7 @@ export class GetRoleForEditOutput implements IGetRoleForEditOutput {
     role: RoleEditDto;
     permissions: FlatPermissionDto[] | undefined;
     grantedPermissionNames: string[] | undefined;
+    permissionsTree: PermissionTreeDto[] | undefined;
 
     constructor(data?: IGetRoleForEditOutput) {
         if (data) {
@@ -2615,6 +3279,11 @@ export class GetRoleForEditOutput implements IGetRoleForEditOutput {
                 this.grantedPermissionNames = [] as any;
                 for (let item of _data["grantedPermissionNames"])
                     this.grantedPermissionNames.push(item);
+            }
+            if (Array.isArray(_data["permissionsTree"])) {
+                this.permissionsTree = [] as any;
+                for (let item of _data["permissionsTree"])
+                    this.permissionsTree.push(PermissionTreeDto.fromJS(item));
             }
         }
     }
@@ -2639,6 +3308,11 @@ export class GetRoleForEditOutput implements IGetRoleForEditOutput {
             for (let item of this.grantedPermissionNames)
                 data["grantedPermissionNames"].push(item);
         }
+        if (Array.isArray(this.permissionsTree)) {
+            data["permissionsTree"] = [];
+            for (let item of this.permissionsTree)
+                data["permissionsTree"].push(item.toJSON());
+        }
         return data;
     }
 
@@ -2654,6 +3328,82 @@ export interface IGetRoleForEditOutput {
     role: RoleEditDto;
     permissions: FlatPermissionDto[] | undefined;
     grantedPermissionNames: string[] | undefined;
+    permissionsTree: PermissionTreeDto[] | undefined;
+}
+
+export class GetUserPermissionsForEditOutput implements IGetUserPermissionsForEditOutput {
+    permissions: UserFlatPermissionDto[] | undefined;
+    grantedPermissionNames: string[] | undefined;
+    permissionsTree: UserPermissionTreeDto[] | undefined;
+
+    constructor(data?: IGetUserPermissionsForEditOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["permissions"])) {
+                this.permissions = [] as any;
+                for (let item of _data["permissions"])
+                    this.permissions.push(UserFlatPermissionDto.fromJS(item));
+            }
+            if (Array.isArray(_data["grantedPermissionNames"])) {
+                this.grantedPermissionNames = [] as any;
+                for (let item of _data["grantedPermissionNames"])
+                    this.grantedPermissionNames.push(item);
+            }
+            if (Array.isArray(_data["permissionsTree"])) {
+                this.permissionsTree = [] as any;
+                for (let item of _data["permissionsTree"])
+                    this.permissionsTree.push(UserPermissionTreeDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetUserPermissionsForEditOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetUserPermissionsForEditOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.permissions)) {
+            data["permissions"] = [];
+            for (let item of this.permissions)
+                data["permissions"].push(item.toJSON());
+        }
+        if (Array.isArray(this.grantedPermissionNames)) {
+            data["grantedPermissionNames"] = [];
+            for (let item of this.grantedPermissionNames)
+                data["grantedPermissionNames"].push(item);
+        }
+        if (Array.isArray(this.permissionsTree)) {
+            data["permissionsTree"] = [];
+            for (let item of this.permissionsTree)
+                data["permissionsTree"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): GetUserPermissionsForEditOutput {
+        const json = this.toJSON();
+        let result = new GetUserPermissionsForEditOutput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IGetUserPermissionsForEditOutput {
+    permissions: UserFlatPermissionDto[] | undefined;
+    grantedPermissionNames: string[] | undefined;
+    permissionsTree: UserPermissionTreeDto[] | undefined;
 }
 
 export class Int64EntityDto implements IInt64EntityDto {
@@ -2893,6 +3643,124 @@ export class PermissionDtoListResultDto implements IPermissionDtoListResultDto {
 
 export interface IPermissionDtoListResultDto {
     items: PermissionDto[] | undefined;
+}
+
+export class PermissionTreeDto implements IPermissionTreeDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    description: string | undefined;
+    isGranted: boolean;
+    children: PermissionTreeDto[] | undefined;
+
+    constructor(data?: IPermissionTreeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+            this.description = _data["description"];
+            this.isGranted = _data["isGranted"];
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children.push(PermissionTreeDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PermissionTreeDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PermissionTreeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        data["description"] = this.description;
+        data["isGranted"] = this.isGranted;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): PermissionTreeDto {
+        const json = this.toJSON();
+        let result = new PermissionTreeDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPermissionTreeDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    description: string | undefined;
+    isGranted: boolean;
+    children: PermissionTreeDto[] | undefined;
+}
+
+export class PermissionTreeDtoListResultDto implements IPermissionTreeDtoListResultDto {
+    items: PermissionTreeDto[] | undefined;
+
+    constructor(data?: IPermissionTreeDtoListResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(PermissionTreeDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PermissionTreeDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PermissionTreeDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): PermissionTreeDtoListResultDto {
+        const json = this.toJSON();
+        let result = new PermissionTreeDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPermissionTreeDtoListResultDto {
+    items: PermissionTreeDto[] | undefined;
 }
 
 export class RegisterInput implements IRegisterInput {
@@ -3644,6 +4512,61 @@ export interface ITenantLoginInfoDto {
     name: string | undefined;
 }
 
+export class UpdateUserPermissionsInputDto implements IUpdateUserPermissionsInputDto {
+    grantedPermissionNames: string[] | undefined;
+    id: number;
+
+    constructor(data?: IUpdateUserPermissionsInputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["grantedPermissionNames"])) {
+                this.grantedPermissionNames = [] as any;
+                for (let item of _data["grantedPermissionNames"])
+                    this.grantedPermissionNames.push(item);
+            }
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UpdateUserPermissionsInputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateUserPermissionsInputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.grantedPermissionNames)) {
+            data["grantedPermissionNames"] = [];
+            for (let item of this.grantedPermissionNames)
+                data["grantedPermissionNames"].push(item);
+        }
+        data["id"] = this.id;
+        return data;
+    }
+
+    clone(): UpdateUserPermissionsInputDto {
+        const json = this.toJSON();
+        let result = new UpdateUserPermissionsInputDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateUserPermissionsInputDto {
+    grantedPermissionNames: string[] | undefined;
+    id: number;
+}
+
 export class UserDto implements IUserDto {
     id: number;
     userName: string;
@@ -3786,6 +4709,57 @@ export interface IUserDtoPagedResultDto {
     totalCount: number;
 }
 
+export class UserFlatPermissionDto implements IUserFlatPermissionDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    description: string | undefined;
+
+    constructor(data?: IUserFlatPermissionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): UserFlatPermissionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserFlatPermissionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        data["description"] = this.description;
+        return data;
+    }
+
+    clone(): UserFlatPermissionDto {
+        const json = this.toJSON();
+        let result = new UserFlatPermissionDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUserFlatPermissionDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    description: string | undefined;
+}
+
 export class UserLoginInfoDto implements IUserLoginInfoDto {
     id: number;
     name: string | undefined;
@@ -3843,6 +4817,73 @@ export interface IUserLoginInfoDto {
     surname: string | undefined;
     userName: string | undefined;
     emailAddress: string | undefined;
+}
+
+export class UserPermissionTreeDto implements IUserPermissionTreeDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    description: string | undefined;
+    isGranted: boolean;
+    children: UserPermissionTreeDto[] | undefined;
+
+    constructor(data?: IUserPermissionTreeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+            this.description = _data["description"];
+            this.isGranted = _data["isGranted"];
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children.push(UserPermissionTreeDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): UserPermissionTreeDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserPermissionTreeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        data["description"] = this.description;
+        data["isGranted"] = this.isGranted;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): UserPermissionTreeDto {
+        const json = this.toJSON();
+        let result = new UserPermissionTreeDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUserPermissionTreeDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    description: string | undefined;
+    isGranted: boolean;
+    children: UserPermissionTreeDto[] | undefined;
 }
 
 export interface FileParameter {
