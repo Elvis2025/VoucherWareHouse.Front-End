@@ -77,25 +77,7 @@
 
         </app-ibs-modal-tab>
 
-        <app-ibs-modal-tab
-          [label]="'UserRoles' | localize"
-          icon="bi bi-shield-check">
-
-          <div class="ibs-edit-user-section">
-            <div class="ibs-roles-grid">
-              @for (role of roles; track role.normalizedName; let i = $index) {
-                <div class="ibs-role-item">
-                  <app-ibs-check-box
-                    [text]="role.name"
-                    [name]="'role_' + i"
-                    [(ngModel)]="checkedRolesMap[role.normalizedName]">
-                  </app-ibs-check-box>
-                </div>
-              }
-            </div>
-          </div>
-
-        </app-ibs-modal-tab>
+     
 
       </app-ibs-modal-tabs>
 

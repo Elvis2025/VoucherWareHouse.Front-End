@@ -1,0 +1,222 @@
+/* =========================================================
+   ROLE USERS ASSIGNMENT MODAL (USUARIOS POR ROL)
+   - 2 paneles: no asignados / asignados
+   - Drag & Drop + botones por fila
+   - 100% tokens IBS (sin hardcode)
+   - MISMO DISEÑO que USERS ASSIGNMENT MODAL
+   ========================================================= */
+
+.ra-layout{
+  height: 550px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-width: 1100px;
+  background: transparent !important;
+}
+
+.ra-panel{
+  background: var(--ibs-card);
+  border: 1px solid var(--ibs-border);
+  border-radius: 16px;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-height: 620px;
+}
+
+.ra-head{
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ibs-border) 70%, transparent);
+}
+
+.ra-title{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+
+  .h{
+    font-weight: 900;
+    color: var(--ibs-text);
+  }
+
+  .sub{
+    font-weight: 800;
+    font-size: 12px;
+    color: var(--ibs-text-dim);
+  }
+}
+
+.ra-search{
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 12px;
+  border-radius: 14px;
+
+  border: 1px solid var(--ibs-border);
+  background: color-mix(in srgb, var(--ibs-control-bg) 75%, transparent);
+
+  color: var(--ibs-text);
+
+  i{ opacity: .75; }
+
+  input{
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--ibs-text);
+    font-weight: 700;
+  }
+}
+
+.ra-list{
+  padding: 10px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+
+  display: grid;
+  gap: 10px;
+  grid-auto-rows: max-content;
+  align-content: start;
+
+  scrollbar-gutter: stable;
+}
+
+.ra-empty{
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px dashed color-mix(in srgb, var(--ibs-border) 65%, transparent);
+  background: color-mix(in srgb, var(--ibs-card) 65%, transparent);
+  color: var(--ibs-text-dim);
+  font-weight: 800;
+}
+
+.ra-row{
+  --rail: color-mix(in srgb, var(--ibs-primary) 72%, var(--ibs-border));
+  --bg: color-mix(in srgb, var(--ibs-card) 88%, var(--ibs-primary) 12%);
+  --rail-w: 6px;
+  --rail-line: color-mix(in srgb, var(--ibs-border) 70%, transparent);
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 1px solid var(--rail);
+  border-left: var(--rail-w) solid var(--rail);
+  border-radius: 16px;
+
+  background: var(--bg);
+  box-shadow: inset 1px 0 0 var(--rail-line);
+
+  padding: 10px 12px;
+  cursor: grab;
+
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+.ra-row:hover{
+  transform: translateY(-1px);
+  box-shadow:
+    inset 1px 0 0 var(--rail-line),
+    0 8px 18px rgba(0,0,0,.10);
+  background: color-mix(in srgb, var(--bg) 95%, var(--ibs-primary) 5%);
+}
+
+.ra-row:active{
+  cursor: grabbing;
+}
+
+.ra-move{
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--ibs-border);
+  background: color-mix(in srgb, var(--ibs-control-bg) 70%, transparent);
+  color: var(--ibs-text);
+  cursor: pointer;
+
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+.ra-move:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.10);
+  background: color-mix(in srgb, var(--ibs-control-bg) 62%, var(--ibs-primary) 8%);
+}
+
+.ra-move.danger:hover{
+  background: color-mix(in srgb, var(--ibs-control-bg) 62%, var(--ibs-danger) 10%);
+}
+
+.ra-meta{
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+
+  .name{
+    font-weight: 900;
+    color: var(--ibs-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sub{
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--ibs-text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .dot{
+      margin: 0 6px;
+      opacity: .7;
+    }
+  }
+}
+
+.ra-grip{
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ibs-border) 70%, transparent);
+  background: color-mix(in srgb, var(--ibs-control-bg) 60%, transparent);
+  color: var(--ibs-text);
+  opacity: .75;
+
+  display: grid;
+  place-items: center;
+  cursor: grab;
+}
+
+.cdk-drag-preview{
+  border-radius: 16px;
+  box-shadow: 0 16px 34px rgba(0,0,0,.18);
+}
+
+.cdk-drag-placeholder{
+  opacity: 0.25;
+}
+
+.ra-list.cdk-drop-list-dragging .ra-row{
+  transition: none;
+}

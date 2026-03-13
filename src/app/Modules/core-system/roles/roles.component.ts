@@ -1,3 +1,4 @@
+import { RolesAssignmentModalComponent } from './roles-assignment/roles-assignment-modal.component';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -174,6 +175,13 @@ export class RolesComponent
         run: (row) => this.editRole(row),
       },
       {
+        id: 'roleAssignment',
+        text: 'Asignación de Roles',
+        icon: 'bi bi-person-badge',
+        requiredPolicy: this.updatePolicy,
+        run: (row) => this.showRolesAssignmentDialog(row),
+      },
+      {
         id: 'delete',
         text: 'Delete',
         icon: 'bi bi-trash',
@@ -193,6 +201,19 @@ export class RolesComponent
       : this.modalService.show(CreateRoleDialogComponent, {
           class: 'modal-lg',
         });
+
+    ref.content?.onSave?.subscribe(() => {
+      this.refresh();
+    });
+  }
+
+  private showRolesAssignmentDialog(role?: RoleDto): void {
+    const ref: BsModalRef = this.modalService.show(RolesAssignmentModalComponent, {
+          class: 'modal-lg',
+          initialState: {  roleId: role.id,
+        roleName: role.name, },
+        });
+      
 
     ref.content?.onSave?.subscribe(() => {
       this.refresh();
