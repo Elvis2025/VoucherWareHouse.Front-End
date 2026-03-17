@@ -1,0 +1,154 @@
+<app-ibs-modal-shell [wide]="true" (cancelled)="onCancel()">
+  <app-ibs-modal-header
+    title="Asignar usuarios al rol"
+    [accent]="modalAccent()"
+    (closed)="onCancel()">
+  </app-ibs-modal-header>
+
+  <app-ibs-modal-top-bar
+    [showSearch]="false"
+    [showRefresh]="true"
+    [refreshDisabled]="loading()"
+    (refreshed)="load()">
+  </app-ibs-modal-top-bar>
+
+  <app-ibs-modal-body>
+    @if (error()) {
+      <div class="ra-empty">{{ error() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="ra-empty">Cargando usuarios del sistema...</div>
+    } @else {
+      <div class="ra-layout">
+
+        <!-- IZQUIERDA: Usuarios no asignados -->
+        <section class="ra-panel">
+          <div class="ra-head">
+            <div class="ra-title">
+              <div class="h">Usuarios no asignados</div>
+              <div class="sub">{{ leftCount() }} usuario(s)</div>
+            </div>
+
+            <div class="ra-search">
+              <i class="bi bi-search"></i>
+              <input
+                type="text"
+                [ngModel]="leftQ()"
+                (ngModelChange)="leftQ.set($event)"
+                placeholder="Buscar..."
+              />
+            </div>
+          </div>
+
+          <div
+            class="ra-list"
+            cdkDropList
+            id="ruaLeft"
+            [cdkDropListData]="left()"
+            [cdkDropListConnectedTo]="['ruaRight']"
+            (cdkDropListDropped)="onDrop($event, 'left')">
+
+            @if (leftFiltered().length === 0) {
+              <div class="ra-empty">No hay usuarios disponibles.</div>
+            } @else {
+              @for (u of leftFiltered(); track trackById($index, u)) {
+                <div class="ra-row" cdkDrag [cdkDragData]="u">
+                  <button type="button" class="ra-move" (click)="moveToRight(u)" title="Asignar">
+                    <i class="bi bi-arrow-right-circle"></i>
+                  </button>
+
+                  <div class="ra-meta">
+                    <div class="name">{{ getUserDisplayName(u) }}</div>
+
+                    <div class="sub">
+                      @if (u.userName) {
+                        <span>{{ u.userName }}</span>
+                      }
+
+                      @if (u.emailAddress) {
+                        <span class="dot">•</span>
+                        <span>{{ u.emailAddress }}</span>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="ra-grip" title="Arrastrar">
+                    <i class="bi bi-grip-vertical"></i>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </section>
+
+        <!-- DERECHA: Usuarios asignados -->
+        <section class="ra-panel">
+          <div class="ra-head">
+            <div class="ra-title">
+              <div class="h">Usuarios asignados</div>
+              <div class="sub">{{ rightCount() }} usuario(s)</div>
+            </div>
+
+            <div class="ra-search">
+              <i class="bi bi-search"></i>
+              <input
+                type="text"
+                [ngModel]="rightQ()"
+                (ngModelChange)="rightQ.set($event)"
+                placeholder="Buscar..."
+              />
+            </div>
+          </div>
+
+          <div
+            class="ra-list"
+            cdkDropList
+            id="ruaRight"
+            [cdkDropListData]="right()"
+            [cdkDropListConnectedTo]="['ruaLeft']"
+            (cdkDropListDropped)="onDrop($event, 'right')">
+
+            @if (rightFiltered().length === 0) {
+              <div class="ra-empty">Aún no hay usuarios asignados.</div>
+            } @else {
+              @for (u of rightFiltered(); track trackById($index, u)) {
+                <div class="ra-row" cdkDrag [cdkDragData]="u">
+                  <button type="button" class="ra-move danger" (click)="moveToLeft(u)" title="Quitar">
+                    <i class="bi bi-arrow-left-circle"></i>
+                  </button>
+
+                  <div class="ra-meta">
+                    <div class="name">{{ getUserDisplayName(u) }}</div>
+
+                    <div class="sub">
+                      @if (u.userName) {
+                        <span>{{ u.userName }}</span>
+                      }
+
+                      @if (u.emailAddress) {
+                        <span class="dot">•</span>
+                        <span>{{ u.emailAddress }}</span>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="ra-grip" title="Arrastrar">
+                    <i class="bi bi-grip-vertical"></i>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </section>
+
+      </div>
+    }
+  </app-ibs-modal-body>
+
+  <app-ibs-modal-footer
+    [saveDisabled]="loading() || saving()"
+    (closed)="onCancel()"
+    (saved)="onSaved()">
+  </app-ibs-modal-footer>
+</app-ibs-modal-shell>
