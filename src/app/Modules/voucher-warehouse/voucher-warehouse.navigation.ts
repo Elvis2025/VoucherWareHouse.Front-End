@@ -13,7 +13,30 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
       text: 'Administración',
       icon: 'bi bi-kanban-fill',
       children: [
+        {
+          id: 'vou-war-ecf-api-aut',
+          text: 'Books (Demo)',
+          icon: '📚',
+          route: '/books',
+          requiredPolicy: 'Pages.Roles',
+        },
         
+        {
+          id: 'vou-war-tax-vou',
+          text: 'Books (Demo)',
+          icon: '📚',
+          route: '/books',
+          requiredPolicy: 'Pages.Roles',
+        },
+        {
+          id: 'vou-war-tax-vou-typ',
+          text: 'Books (Demo)',
+          icon: '📚',
+          route: '/books',
+          requiredPolicy: 'Pages.Roles',
+        },
+
+
       ],
     },
 
@@ -24,12 +47,13 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
       icon: 'bi bi-hammer',
       children: [
         {
-          id: 'books',
+          id: 'vou-war-ecf-vou-war',
           text: 'Books (Demo)',
           icon: '📚',
           route: '/books',
           requiredPolicy: 'Pages.Roles',
         },
+
       ],
     },
   ],
