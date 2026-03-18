@@ -1,7 +1,7 @@
 // ecf-voucher-warehouse-dto.ts
 
-import { BaseEntityDto } from "../../helpers/BaseEntityDto";
-import { BaseInputEntityDto } from "../../helpers/BaseInputEntityDto";
+import { BaseEntityDto } from "../../../helpers/BaseEntityDto";
+import { BaseInputEntityDto } from "../../../helpers/BaseInputEntityDto";
 
 
 

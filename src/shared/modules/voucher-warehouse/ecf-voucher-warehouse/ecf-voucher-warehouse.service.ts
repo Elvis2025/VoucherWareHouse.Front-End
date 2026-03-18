@@ -1,16 +1,16 @@
 import { inject, Injectable, InjectionToken } from "@angular/core";
 import { Observable } from "rxjs";
-import { CancelSequenceEcfInputDto, CommercialApprovalEcfInputDto, EcfVoucherOutputDto, EcfVoucherWarehouseCreateDto, EcfVoucherWarehouseInputDto, EcfVoucherWarehouseOutputDto, EcfVoucherWarehouseUpdateDto, ReceiveCreditNoteECFInputDto, ReceivePurchaseECFInputDto, ReceiveSalesEcfInputDto } from "./app-voucher-warehouse.model.service";
+import { CancelSequenceEcfInputDto, CommercialApprovalEcfInputDto, EcfVoucherOutputDto, EcfVoucherWarehouseCreateDto, EcfVoucherWarehouseInputDto, EcfVoucherWarehouseOutputDto, EcfVoucherWarehouseUpdateDto, ReceiveCreditNoteECFInputDto, ReceivePurchaseECFInputDto, ReceiveSalesEcfInputDto } from "./ecf-voucher-warehouse.model.service";
 import { HttpHeaders, HttpParams } from "@angular/common/module.d-CnjH8Dlt";
-import { API_BASE_URL } from "../../service-proxies/service-proxies";
+import { API_BASE_URL } from "../../../service-proxies/service-proxies";
 import { HttpClient } from "@angular/common/http";
-import { PagedResultDto } from "../../helpers/PagedResultDto";
+import { PagedResultDto } from "../../../helpers/PagedResultDto";
 
 
 
 
 @Injectable({ providedIn: 'root' })
-export class AppVoucherWarehouseService {
+export class EcfVoucherWarehouseService {
 
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = inject(API_BASE_URL);
