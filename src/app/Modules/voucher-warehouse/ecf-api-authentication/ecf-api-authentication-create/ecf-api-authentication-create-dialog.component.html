@@ -1,0 +1,83 @@
+<app-ibs-modal-shell [wide]="false" (cancelled)="bsModalRef.hide()">
+
+  <app-ibs-modal-header
+    [title]="'Crear nueva autenticacion para el Api de facturacion electronica' | localize"
+    (closed)="bsModalRef.hide()">
+  </app-ibs-modal-header>
+
+  <app-ibs-modal-body>
+    <div class="ibs-fields-stack">
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'Tenant'"
+                name="tenancyName"
+                [required]="true"
+                [maxLength]="64"
+                [(ngModel)]="ecfApiAuth.tenancyName">
+              </app-ibs-input>
+            </div>
+
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'Email/Usuario' | localize"
+                name="usernameOrEmailAddress"
+                [required]="true"
+                [maxLength]="64"
+                [(ngModel)]="ecfApiAuth.usernameOrEmailAddress">
+              </app-ibs-input>
+            </div>
+
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'Contraseña' | localize"
+                type="password"
+                name="password"
+                [required]="true"
+                [maxLength]="32"
+                [(ngModel)]="ecfApiAuth.password">
+              </app-ibs-input>
+            </div>
+            
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'Url de autenticacion'"
+                name="authUrl"
+                [required]="true"
+                [minLength]="2"
+                [maxLength]="256"
+                [(ngModel)]="ecfApiAuth.authUrl">
+              </app-ibs-input>
+            </div>
+
+
+            <div class="ibs-field">
+              <app-ibs-input
+                [label]="'Url Base' | localize"
+                name="baseUrl"
+                [required]="true"
+                [maxLength]="256"
+                [(ngModel)]="ecfApiAuth.baseUrl">
+              </app-ibs-input>
+            </div>
+
+            <app-ibs-check-box
+              [text]="'¿Esta activo?' | localize"
+              name="isActive"
+              [(ngModel)]="ecfApiAuth.isActive">
+            </app-ibs-check-box>
+    
+    </div>
+
+        
+   
+
+  </app-ibs-modal-body>
+
+  <app-ibs-modal-footer
+    [closeText]="'Cancel' | localize"
+    [saveText]="'Save' | localize"
+    (closed)="bsModalRef.hide()"
+    (saved)="save()">
+  </app-ibs-modal-footer>
+
+</app-ibs-modal-shell>

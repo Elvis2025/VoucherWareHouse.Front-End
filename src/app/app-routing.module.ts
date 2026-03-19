@@ -43,6 +43,18 @@ import { IbsLayoutComponent } from './layout/home-layout/ibs-layout.component';
                         loadChildren: () => import('./Modules/core-system/users/users.module').then((m) => m.UsersModule),
                         canActivate: [AppRouteGuard],
                     },
+                    {
+                        path: 'voucher-warehouse/ecf-api-authentication',
+                        loadChildren: () => import('./Modules/voucher-warehouse/voucher-warehouse.module').then((m) => m.VoucherWarehouseModule),
+                        canActivate: [AppRouteGuard],
+                    },
+                    {
+                        path: 'voucher-warehouse/ecf-voucher-warehouse',
+                        loadChildren: () => import('./Modules/voucher-warehouse/voucher-warehouse.module').then((m) => m.VoucherWarehouseModule),
+                        canActivate: [AppRouteGuard],
+                    },
+
+
                 ],
             },
         ]),

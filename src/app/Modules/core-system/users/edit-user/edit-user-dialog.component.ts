@@ -143,7 +143,5 @@ export class EditUserDialogComponent extends AppComponentBase implements OnInit 
       .map(role => role.normalizedName);
   }
 
-  private isNotEmpty(value: string | null | undefined): boolean {
-    return !!value && value.trim().length > 0;
-  }
+ 
 }

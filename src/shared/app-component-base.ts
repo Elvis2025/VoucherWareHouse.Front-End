@@ -58,4 +58,10 @@ export abstract class AppComponentBase {
     isGranted(permissionName: string): boolean {
         return this.permission.isGranted(permissionName);
     }
+
+    public isNotEmpty(value: string | null | undefined): boolean {
+
+    return !!value && value.trim().length > 0;
+
+  }
 }

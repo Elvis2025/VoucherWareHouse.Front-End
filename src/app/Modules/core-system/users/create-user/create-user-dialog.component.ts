@@ -261,10 +261,6 @@ export class CreateUserDialogComponent extends AppComponentBase implements OnIni
 
   }
 
-  private isNotEmpty(value: string | null | undefined): boolean {
-
-    return !!value && value.trim().length > 0;
-
-  }
+ 
 
 }
