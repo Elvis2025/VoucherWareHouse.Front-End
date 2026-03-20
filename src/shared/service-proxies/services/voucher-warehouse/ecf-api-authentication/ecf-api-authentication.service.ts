@@ -1,5 +1,5 @@
 import { inject, Injectable, InjectionToken } from "@angular/core";
-import { Observable } from "rxjs";
+import { map, Observable, tap } from "rxjs";
 import { EcfApiAuthenticationCreateDto, EcfApiAuthenticationInputDto, EcfApiAuthenticationOutputDto, EcfApiAuthenticationUpdateDto} from "./ecf-api-authentication.model.service";
 import { API_BASE_URL } from "../../../service-proxies";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
@@ -43,12 +43,22 @@ export class EcfApiAuthenticationService {
       params = params.set('MaxResultCount', input.maxResultCount.toString());
     }
 
-    return this.http.get<PagedResultDto<EcfApiAuthenticationOutputDto>>(`${this.baseUrl}/GetAll`, {
-      params,
-      headers: new HttpHeaders({
-        Accept: 'text/plain'
-      })
-    });
+    return this.http.get<any>(`${this.baseUrl}/GetAll`, {
+    params,
+    headers: new HttpHeaders({
+      Accept: 'application/json'
+    })
+  }).pipe(
+    tap(response => {
+      console.log('🔥 RESPONSE RAW BACKEND:', response);
+      console.log('🔥 ITEMS DIRECTO:', response?.items);
+      console.log('🔥 TOTALCOUNT DIRECTO:', response?.totalCount);
+      console.log('🔥 RESPONSE.RESULT:', response?.result);
+      console.log('🔥 ITEMS EN RESULT:', response?.result?.items);
+      console.log('🔥 TOTALCOUNT EN RESULT:', response?.result?.totalCount);
+    }),
+    map(response => response?.result ?? { items: [], totalCount: 0 })
+  );
   }
 
    create(input: EcfApiAuthenticationCreateDto): Observable<EcfApiAuthenticationOutputDto> {

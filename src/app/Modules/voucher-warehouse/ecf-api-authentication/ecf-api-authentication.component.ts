@@ -77,7 +77,8 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
         map(result => ({
             items: result.items ?? [],
             totalCount: result.totalCount ?? 0
-        })),
+        })
+    ),
         finalize(() => this.cd.detectChanges())
         ))
     return this.ecfApiAuthenticationService
@@ -94,9 +95,11 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
 
 
     protected list(event?: LazyLoadEvent): void {
-        throw new Error("Method not implemented.");
+         this.grid?.reloadFirstPage();
     }
-   
+       refresh(): void {
+        this.grid?.reload();
+    }
 
 
     

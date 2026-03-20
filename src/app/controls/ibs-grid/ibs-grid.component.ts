@@ -180,6 +180,7 @@ export class IbsGridComponent<T> extends AppComponentBase implements OnInit {
       .subscribe(res => {
         this.items.set(res.items ?? []);
         this.totalCount.set(res.totalCount ?? 0);
+        console.log(res);
       });
   }
 
