@@ -188,6 +188,7 @@ export class RolesComponent
         danger: true,
         requiredPolicy: this.deletePolicy,
         run: (row) => this.delete(row),
+         disabled: (row) => row.name === 'Admin',
       },
     ]);
   }

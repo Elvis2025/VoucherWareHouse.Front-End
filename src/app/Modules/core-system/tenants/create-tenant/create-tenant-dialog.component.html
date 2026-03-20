@@ -7,7 +7,7 @@
   <app-ibs-modal-shell [wide]="false" (cancelled)="close()">
 
     <app-ibs-modal-header
-      [title]="'CreateNewTenant' | localize"
+      [title]="'Crear nuevo tenant' | localize"
       (closed)="close()">
     </app-ibs-modal-header>
 
@@ -17,7 +17,7 @@
 
         <!-- TAB 1: DETAILS -->
         <app-ibs-modal-tab
-          [label]="'Details' | localize"
+          [label]="'Detalles' | localize"
           icon="bi bi-building">
 
           <div class="ibs-edit-user-section">
@@ -26,11 +26,11 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'TenancyName' | localize"
+                  [label]="'Nombre del tenant' | localize"
                   name="tenancyName"
                   [required]="true"
                   [minLength]="2"
-                  [maxLength]="64"
+                  [maxLength]="10"
                   [ngModel]="formState().tenancyName"
                   (ngModelChange)="updateTenancyName($event)">
                 </app-ibs-input>
@@ -38,7 +38,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'Name' | localize"
+                  [label]="'Nombre de la empresa' | localize"
                   name="name"
                   [required]="true"
                   [maxLength]="128"
@@ -49,7 +49,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'DatabaseConnectionString' | localize"
+                  [label]="'Connection String' | localize"
                   name="connectionString"
                   [maxLength]="1024"
                   [ngModel]="formState().connectionString"
@@ -59,7 +59,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'AdminEmailAddress' | localize"
+                  [label]="'Correo electronico del Admin' | localize"
                   type="email"
                   name="adminEmailAddress"
                   [required]="true"
@@ -82,7 +82,7 @@
 
             <div class="ibs-info-block">
               <p class="ibs-info-text">
-                {{ 'DefaultPasswordIs' | localize: '123qwe' }}
+                <strong>Contraseña por defecto:</strong> 123qwe
               </p>
             </div>
 
@@ -101,18 +101,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'CompanyName' | localize"
-                  name="companyName"
-                  [required]="true"
-                  [maxLength]="500"
-                  [ngModel]="brandingCompanyName()"
-                  (ngModelChange)="updateBrandingCompanyName($event)">
-                </app-ibs-input>
-              </div>
-
-              <div class="ibs-field">
-                <app-ibs-input
-                  [label]="'CompanyDescription' | localize"
+                  [label]="'Descripción de la empresa' | localize"
                   name="companyDescription"
                   [required]="true"
                   [maxLength]="500"
@@ -123,7 +112,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'CompanyType' | localize"
+                  [label]="'Tipo de empresa' | localize"
                   name="companyType"
                   [required]="true"
                   [maxLength]="500"

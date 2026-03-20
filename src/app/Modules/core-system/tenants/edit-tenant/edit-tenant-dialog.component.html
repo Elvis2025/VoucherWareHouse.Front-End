@@ -7,7 +7,7 @@
   <app-ibs-modal-shell [wide]="true" (cancelled)="close()">
 
     <app-ibs-modal-header
-      [title]="'EditTenant' | localize"
+      [title]="'Editar tenant' | localize"
       (closed)="close()">
     </app-ibs-modal-header>
 
@@ -17,14 +17,14 @@
 
         <!-- TAB DETAILS -->
         <app-ibs-modal-tab
-          [label]="'Details' | localize"
+          [label]="'Empresa' | localize"
           icon="bi bi-building">
 
           <div class="ibs-edit-user-section">
             <div class="ibs-fields-stack">
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'TenancyName' | localize"
+                  [label]="'Nombre de la empresa' | localize"
                   name="tenancyName"
                   [required]="true"
                   [minLength]="2"
@@ -36,7 +36,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'Name' | localize"
+                  [label]="'Nombre del tenant' | localize"
                   name="name"
                   [required]="true"
                   [maxLength]="128"
@@ -48,7 +48,7 @@
 
             <div class="ibs-toggle-row">
               <app-ibs-check-box
-                [text]="'IsActive' | localize"
+                [text]="'¿Está activo?' | localize"
                 name="isActive"
                 [ngModel]="formState().isActive"
                 (ngModelChange)="updateIsActive($event)">
@@ -225,7 +225,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'CompanyName' | localize"
+                  [label]="'Nombre de la empresa' | localize"
                   name="companyName"
                   [required]="true"
                   [maxLength]="500"
@@ -236,7 +236,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'CompanyDescription' | localize"
+                  [label]="'Descripción de la empresa' | localize"
                   name="companyDescription"
                   [required]="true"
                   [maxLength]="500"
@@ -247,7 +247,7 @@
 
               <div class="ibs-field">
                 <app-ibs-input
-                  [label]="'CompanyType' | localize"
+                  [label]="'Tipo de empresa' | localize"
                   name="companyType"
                   [required]="true"
                   [maxLength]="500"

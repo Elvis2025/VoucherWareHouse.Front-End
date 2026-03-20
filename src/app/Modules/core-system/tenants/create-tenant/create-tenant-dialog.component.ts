@@ -91,7 +91,6 @@ export class CreateTenantDialogComponent
       form.tenancyName.trim().length >= 2 &&
       form.name.trim().length > 0 &&
       this.isValidEmail(form.adminEmailAddress) &&
-      this.brandingCompanyName().trim().length > 0 &&
     this.brandingCompanyDescription().trim().length > 0 &&
     this.brandingCompanyType().trim().length > 0
     );
@@ -212,7 +211,7 @@ export class CreateTenantDialogComponent
           return;
         }
 
-        this.uploadLogoForTenant(tenantId, selectedLogo);
+        this.uploadLogoForTenant(tenantId,payload.name, selectedLogo);
       },
       error: () => {
         this.saving.set(false);
@@ -227,7 +226,7 @@ export class CreateTenantDialogComponent
     this.onSave.emit();
   }
 
-  private uploadLogoForTenant(tenantId: number, file: File): void {
+  private uploadLogoForTenant(tenantId: number,companyName: string , file: File): void {
     const fileParameter: FileParameter = {
       data: file,
       fileName: file.name,
@@ -235,8 +234,7 @@ export class CreateTenantDialogComponent
 
     const input = new UploadTenantLogoInputDto();
     input.tenantId = tenantId;
-    input.companyName =
-      this.brandingCompanyName().trim() || this.formState().name.trim();
+    input.companyName = companyName.trim();
     input.companyDescription = this.brandingCompanyDescription().trim();
     input.companyType = this.brandingCompanyType().trim() || 'SRL';
     input.file = fileParameter;

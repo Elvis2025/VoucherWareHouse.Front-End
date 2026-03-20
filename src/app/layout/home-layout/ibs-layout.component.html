@@ -7,7 +7,7 @@
 
   <!-- SIDEBAR -->
   <aside class="ibs-sidebar"
-       [class.collapsed]="sidebarCollapsed()"
+       [class.collapsed]="sidebarCollapsed() && !isMobile()"
        [class.mobile-open]="mobileSidebarOpen()"
        [class.pinned]="sidebarPinned()"
        (mouseenter)="onSidebarEnter()"
@@ -16,18 +16,8 @@
     <!-- Top -->
     <div class="ibs-sidebar-top">
 
-      <!-- Mobile close (SOLO cuando está abierto en mobile) -->
-      @if (mobileSidebarOpen()) {
-        <button class="btn btn-sm btn-outline-secondary d-lg-none"
-                type="button"
-                (click)="closeMobileSidebar()"
-                aria-label="Close sidebar">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      }
-
       <!-- Nueva franja superior -->
-      @if (!sidebarCollapsed()) {
+      @if (!(sidebarCollapsed() && !isMobile())) {
         <div class="ibs-sidebar-topbar-row">
           <button class="ibs-sidebar-pin d-none d-lg-inline-flex"
                   [class.active]="sidebarPinned()"
@@ -42,21 +32,31 @@
 
           <div class="ibs-sidebar-topbar-title">IBS · Voucher Warehouse</div>
 
-          <div class="ibs-sidebar-topbar-spacer"></div>
+          @if (isMobile() && mobileSidebarOpen()) {
+            <button class="ibs-sidebar-close"
+                    type="button"
+                    (click)="closeMobileSidebar()"
+                    aria-label="Cerrar sidebar"
+                    title="Cerrar sidebar">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          } @else {
+            <div class="ibs-sidebar-topbar-spacer"></div>
+          }
         </div>
       }
 
       <!-- Brand / tenant card -->
-      <div class="ibs-brand" [class.compact]="sidebarCollapsed()">
+      <div class="ibs-brand" [class.compact]="sidebarCollapsed() && !isMobile()">
         <div class="ibs-brand-card"
-             [class.compact]="sidebarCollapsed()"
-             [attr.title]="sidebarCollapsed() ? 'Abrir menú' : null">
+             [class.compact]="sidebarCollapsed() && !isMobile()"
+             [attr.title]="(sidebarCollapsed() && !isMobile()) ? 'Abrir menú' : null">
 
           <!-- Logo siempre visible (clic abre si está colapsado) -->
           <button type="button"
                   class="ibs-brand-logo-btn"
-                  (click)="sidebarCollapsed() ? toggleSidebar() : null"
-                  [attr.title]="sidebarCollapsed() ? 'Abrir menú' : 'IB Systems'"
+                  (click)="(sidebarCollapsed() && !isMobile()) ? toggleSidebar() : null"
+                  [attr.title]="(sidebarCollapsed() && !isMobile()) ? 'Abrir menú' : 'IB Systems'"
                   aria-label="IB Systems">
             <span class="ibs-brand-logo">
               @if (logoUrl$ | async; as logoUrl) {
@@ -69,7 +69,7 @@
           </button>
 
           <!-- Texto solo en expand -->
-          @if (!sidebarCollapsed()) {
+          @if (!(sidebarCollapsed() && !isMobile())) {
             <div class="ibs-brand-text">
               <div class="ibs-brand-title">
                 @if(companyName$| async; as companyName){
@@ -92,7 +92,7 @@
       </div>
     </div>
 
-    @if (!sidebarCollapsed()) {
+    @if (!(sidebarCollapsed() && !isMobile())) {
 
       <div class="ibs-search-row">
         <div class="ibs-search-ly">
@@ -192,13 +192,13 @@
         <!-- Leaf -->
         @if (!isGroup(item)) {
           <a class="ibs-link"
-             [class.compact]="sidebarCollapsed()"
+             [class.compact]="sidebarCollapsed() && !isMobile()"
              [routerLink]="item.route"
              routerLinkActive="active"
              (click)="closeMobileSidebar()"
-             [attr.title]="sidebarCollapsed() ? item.text : null">
+             [attr.title]="(sidebarCollapsed() && !isMobile()) ? item.text : null">
             <span class="ibs-ico" [class]="item.icon"></span>
-            @if (!sidebarCollapsed()) {
+            @if (!(sidebarCollapsed() && !isMobile())) {
               <span class="ibs-link-text">{{ item.text }}</span>
             }
           </a>
@@ -209,25 +209,25 @@
           <div class="ibs-group">
             <button type="button"
                     class="ibs-group-btn"
-                    [class.compact]="sidebarCollapsed()"
+                    [class.compact]="sidebarCollapsed() && !isMobile()"
                     (click)="toggleGroup(item.id)"
-                    [attr.title]="sidebarCollapsed() ? item.text : null">
+                    [attr.title]="(sidebarCollapsed() && !isMobile()) ? item.text : null">
 
               <span class="d-flex align-items-center gap-2">
                 <span class="ibs-ico" [class]="item.icon"></span>
-                @if (!sidebarCollapsed()) {
+                @if (!(sidebarCollapsed() && !isMobile())) {
                   <span class="ibs-link-text fw-semibold">{{ item.text }}</span>
                 }
               </span>
 
-              @if (!sidebarCollapsed()) {
+              @if (!(sidebarCollapsed() && !isMobile())) {
                 <i class="bi d-none d-lg-inline"
                    [class.bi-chevron-down]="!isOpen(item.id)"
                    [class.bi-chevron-up]="isOpen(item.id)"></i>
               }
             </button>
 
-            @if (isOpen(item.id) && !sidebarCollapsed()) {
+            @if (isOpen(item.id) && !(sidebarCollapsed() && !isMobile())) {
               <div class="ibs-sub">
                 @for (c of item.children; track trackById($index, c)) {
                   <a class="ibs-sublink"
@@ -247,7 +247,7 @@
       @if (filteredItems().length === 0) {
         <div class="ibs-empty">
           <i class="bi bi-exclamation-circle"></i>
-          @if (!sidebarCollapsed()) {
+          @if (!(sidebarCollapsed() && !isMobile())) {
             <span>No tienes permisos en este módulo.</span>
           }
         </div>
@@ -256,7 +256,7 @@
     </nav>
 
     <!-- Footer expandido -->
-    <div class="ibs-sidebar-footer" *ngIf="!sidebarCollapsed()">
+    <div class="ibs-sidebar-footer" *ngIf="!(sidebarCollapsed() && !isMobile())">
 
       <div class="ibs-sidebar-footer-actions">
         <div class="ibs-sidebar-footer-theme">
@@ -321,7 +321,7 @@
     </div>
 
     <!-- Footer colapsado: solo icono del modo actual -->
-    <div class="ibs-sidebar-footer compact" *ngIf="sidebarCollapsed()">
+    <div class="ibs-sidebar-footer compact" *ngIf="sidebarCollapsed() && !isMobile()">
       <button type="button"
               class="ibs-theme-icon-btn"
               (click)="toggleGlobalTheme()"
@@ -339,8 +339,18 @@
 
     <!-- Topbar -->
     <div class="ibs-topbar">
-      <div class="ibs-topbar-title">
-        {{ selectedModule()?.title }}
+      <div class="ibs-topbar-left">
+        <button class="ibs-mobile-trigger d-lg-none"
+                type="button"
+                (click)="toggleMobileSidebar()"
+                aria-label="Abrir menú"
+                title="Abrir menú">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <div class="ibs-topbar-title">
+          {{ selectedModule()?.title }}
+        </div>
       </div>
 
       <!-- User dropdown -->

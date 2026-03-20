@@ -16,7 +16,7 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
         {
           id: 'vou-war-ecf-api-authentication',
           text: 'Autenticacion Ecf API',
-          icon: 'bi building-fill-up',
+          icon: 'bi bi-shield-lock-fill',
           route: 'voucher-warehouse/ecf-api-authentication',
           requiredPolicy: 'Pages.Roles',
         },
@@ -24,14 +24,14 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
         {
           id: 'vou-war-tax-vou',
           text: 'Comprobantes',
-          icon: '📚',
+          icon: 'bi bi-receipt',
           route: 'voucher-warehouse/tax-voucher',
           requiredPolicy: 'Pages.Roles',
         },
         {
           id: 'vou-war-tax-vou-typ',
           text: 'Tipos de comprobantes',
-          icon: '📚',
+          icon: 'bi bi-collection',
           route: 'voucher-warehouse/tax-voucher',
           requiredPolicy: 'Pages.Roles',
         },
@@ -49,7 +49,7 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
         {
           id: 'vou-war-ecf-vou-war',
           text: 'Comprobantes Electronicos',
-          icon: '📚',
+          icon: 'bi bi-file-earmark-code',
           route: 'voucher-warehouse/ecf-voucher-warehouse',
           requiredPolicy: 'Pages.Roles',
         },

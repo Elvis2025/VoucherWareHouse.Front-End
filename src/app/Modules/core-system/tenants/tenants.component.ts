@@ -134,13 +134,13 @@ export class TenantsComponent
     this.columns.set([
       {
         key: 'tenancyName',
-        header: 'Nombre',
+        header: 'Tenant',
         field: 'tenancyName',
         width: '30%',
       },
       {
         key: 'name',
-        header: 'Name',
+        header: 'Empresa',
         field: 'name',
         width: '35%',
       },
@@ -170,6 +170,7 @@ export class TenantsComponent
         danger: true,
         requiredPolicy: this.deletePolicy,
         run: (row) => this.delete(row),
+        disabled: (row) => row.tenancyName === 'Default'
       },
     ]);
   }

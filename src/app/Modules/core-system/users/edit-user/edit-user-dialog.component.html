@@ -7,19 +7,14 @@
   <app-ibs-modal-shell [wide]="false" (cancelled)="close()">
 
     <app-ibs-modal-header
-      [title]="'EditUser' | localize"
+      [title]="'Editar usuario' | localize"
       (closed)="close()">
     </app-ibs-modal-header>
 
     <app-ibs-modal-body>
 
-      <app-ibs-modal-tabs>
-
-        <app-ibs-modal-tab
-          [label]="'UserDetails' | localize"
-          icon="bi bi-person">
-
-          <div class="ibs-edit-user-section">
+      
+ <div class="ibs-edit-user-section">
             <div class="ibs-fields-stack">
 
               <div class="ibs-field">
@@ -74,13 +69,6 @@
               </app-ibs-check-box>
             </div>
           </div>
-
-        </app-ibs-modal-tab>
-
-     
-
-      </app-ibs-modal-tabs>
-
     </app-ibs-modal-body>
 
     <app-ibs-modal-footer

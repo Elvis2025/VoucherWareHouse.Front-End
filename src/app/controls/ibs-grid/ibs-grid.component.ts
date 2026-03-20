@@ -137,7 +137,7 @@ export class IbsGridComponent<T> extends AppComponentBase implements OnInit {
     const count = this.pageCount();
     const idx = this.pageIndex();
     if (count <= 2) return false;
-    const pagesAfter = (count - 1) - idx;
+    const pagesAfter = count - 1 - idx;
     return pagesAfter >= 2;
   });
 
@@ -247,7 +247,6 @@ export class IbsGridComponent<T> extends AppComponentBase implements OnInit {
 
   trackByIndex = (i: number) => i;
 
-  /** Detecta si el valor de una celda es boolean para renderizar badge Sí/No */
   isBooleanValue(v: any): boolean {
     return typeof v === 'boolean';
   }
@@ -255,9 +254,11 @@ export class IbsGridComponent<T> extends AppComponentBase implements OnInit {
   cellValue(row: any, c: IbsGridColumn<T>): any {
     const key = (c.field ?? c.key) as string;
     if (!key) return '';
+
     if (key.includes('.')) {
       return key.split('.').reduce((acc, part) => (acc ? acc[part] : undefined), row) ?? '';
     }
+
     return row?.[key] ?? '';
   }
 
@@ -288,7 +289,7 @@ export class IbsGridComponent<T> extends AppComponentBase implements OnInit {
 
     this.dropdownPos = {
       top: rect.bottom + 8,
-      left: rect.right - 220,
+      left: rect.left,
     };
 
     this.openRowId = rowId;

@@ -61,32 +61,34 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   readonly sidebarCollapsed = signal<boolean>(true);
   readonly mobileSidebarOpen = signal<boolean>(false);
   readonly sidebarPinned = signal<boolean>(false);
+  readonly isMobile = signal<boolean>(window.innerWidth <= 991);
 
   readonly selectedModuleKey = signal<IbsModuleKey>('core');
   readonly search = signal<string>('');
   readonly openGroups = signal<Record<string, boolean>>({});
 
-  // ✅ Dropdown Module Picker (Angular-controlled)
+  // Dropdowns
   readonly modulePickerOpen = signal<boolean>(false);
   @ViewChild('modulePickerRoot', { static: false }) modulePickerRoot?: ElementRef<HTMLElement>;
   @ViewChild('userMenuRoot', { static: false }) userMenuRoot?: ElementRef<HTMLElement>;
 
-  // ===== USER =====
+  // User
   readonly currentUser = signal<any | null>(null);
 
-  // ===== MENU SOURCE =====
+  // Menu source
   readonly modules = signal<IbsNavModule[]>(IBS_NAV_MODULES);
 
-  // ===== THEME =====
+  // Theme
   readonly theme = signal<'dark' | 'light'>(this.readTheme());
 
-  // ===== USER MENU =====
+  // User menu
   readonly userMenuOpen = signal<boolean>(false);
 
   ngOnInit(): void {
     this.currentUser.set(this.appSession.user);
 
-    // Auto-open: grupo que contenga la URL actual
+    this.applyResponsiveState(window.innerWidth);
+
     this.syncOpenGroupsWithUrl(this.router.url);
 
     this.sub.add(
@@ -96,9 +98,8 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
           const url = (e as NavigationEnd).urlAfterRedirects || (e as NavigationEnd).url;
           this.syncOpenGroupsWithUrl(url);
           this.mobileSidebarOpen.set(false);
-
-          // ✅ Si navegas, cierra el module picker también
           this.modulePickerOpen.set(false);
+          this.userMenuOpen.set(false);
         })
     );
   }
@@ -107,7 +108,6 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     this.sub.unsubscribe();
   }
 
-  // ===== Computeds =====
   readonly visibleModules = computed(() => {
     const mods = this.modules();
     return mods.filter(m => !m.requiredPolicy || this.isGranted(m.requiredPolicy));
@@ -138,16 +138,21 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
 
   // ===== Sidebar hover/pin =====
   onSidebarEnter(): void {
-    if (window.innerWidth <= 991) return;
+    if (this.isMobile()) return;
     if (!this.sidebarPinned()) this.sidebarCollapsed.set(false);
   }
 
   onSidebarLeave(): void {
-    if (window.innerWidth <= 991) return;
+    if (this.isMobile()) return;
     if (!this.sidebarPinned()) this.sidebarCollapsed.set(true);
   }
 
   togglePinSidebar(): void {
+    if (this.isMobile()) {
+      this.mobileSidebarOpen.update(v => !v);
+      return;
+    }
+
     this.sidebarPinned.update(v => !v);
 
     if (this.sidebarPinned()) {
@@ -158,6 +163,11 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   }
 
   toggleSidebar(): void {
+    if (this.isMobile()) {
+      this.toggleMobileSidebar();
+      return;
+    }
+
     if (this.sidebarPinned()) return;
     this.sidebarCollapsed.update(v => !v);
   }
@@ -173,23 +183,27 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
 
   // ===== Module =====
   selectModule(moduleKey: IbsModuleKey): void {
-    if (this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
+    if (!this.isMobile() && this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
 
     this.selectedModuleKey.set(moduleKey);
     this.search.set('');
     this.openFirstGroup();
+
+    if (this.isMobile()) {
+      this.mobileSidebarOpen.set(false);
+    }
   }
 
   setSearch(v: string): void {
     this.search.set(v ?? '');
   }
 
-  // ===== Module Picker Dropdown handlers =====
+  // ===== Module Picker =====
   toggleModulePicker(ev: MouseEvent): void {
     ev.preventDefault();
     ev.stopPropagation();
 
-    if (this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
+    if (!this.isMobile() && this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
 
     this.modulePickerOpen.update(v => !v);
   }
@@ -203,31 +217,31 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     this.closeModulePicker();
   }
 
-  // Click afuera: cerrar
+  @HostListener('window:resize', ['$event'])
+  onResize(event: UIEvent): void {
+    const width = (event.target as Window)?.innerWidth ?? window.innerWidth;
+    this.applyResponsiveState(width);
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(ev: MouseEvent): void {
     const target = ev.target as Node | null;
 
-    // ===== Module picker =====
     if (this.modulePickerOpen()) {
       const moduleRoot = this.modulePickerRoot?.nativeElement;
-
       if (!moduleRoot || !target || !moduleRoot.contains(target)) {
         this.closeModulePicker();
       }
     }
 
-    // ===== User menu =====
     if (this.userMenuOpen()) {
       const userRoot = this.userMenuRoot?.nativeElement;
-
       if (!userRoot || !target || !userRoot.contains(target)) {
         this.closeUserMenu();
       }
     }
   }
 
-  // ESC: cerrar
   @HostListener('document:keydown', ['$event'])
   onDocumentKeydown(ev: KeyboardEvent): void {
     if (ev.key !== 'Escape') return;
@@ -244,6 +258,11 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
       handled = true;
     }
 
+    if (this.mobileSidebarOpen()) {
+      this.closeMobileSidebar();
+      handled = true;
+    }
+
     if (handled) {
       ev.preventDefault();
       ev.stopPropagation();
@@ -256,7 +275,7 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   }
 
   toggleGroup(id: string): void {
-    if (this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
+    if (!this.isMobile() && this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
     this.openGroups.update(x => ({ ...x, [id]: !x[id] }));
   }
 
@@ -313,7 +332,6 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     return initial;
   }
 
-  // ===== Track functions usadas en HTML =====
   trackById = (_: number, x: { id: string }) => x.id;
 
   trackMenuItem(index: number, it: any): string {
@@ -331,7 +349,6 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     return `idx:${index}`;
   }
 
-  // ===== Internal filters =====
   private filterItemByPermission(item: IbsNavItem): IbsNavItem | null {
     if (!item.children || item.children.length === 0) {
       return !item.requiredPolicy || this.isGranted(item.requiredPolicy) ? item : null;
@@ -365,9 +382,7 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     }
 
     this._appTenantBrandingService.loadCurrentTenantLogo().subscribe({
-      next: () => {
-        // Estado global actualizado
-      },
+      next: () => {},
       error: () => {
         this._appTenantBrandingService.clear();
       }
@@ -432,5 +447,21 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
       if (!!item.route && url.startsWith(item.route)) return null;
     }
     return null;
+  }
+
+  private applyResponsiveState(width: number): void {
+    const mobile = width <= 991;
+    this.isMobile.set(mobile);
+
+    if (mobile) {
+      this.sidebarCollapsed.set(false);
+      this.sidebarPinned.set(false);
+    } else {
+      this.mobileSidebarOpen.set(false);
+
+      if (!this.sidebarPinned()) {
+        this.sidebarCollapsed.set(true);
+      }
+    }
   }
 }

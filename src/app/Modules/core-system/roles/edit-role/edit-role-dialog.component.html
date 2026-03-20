@@ -7,19 +7,12 @@
   <app-ibs-modal-shell [wide]="false" (cancelled)="close()">
 
     <app-ibs-modal-header
-      [title]="'EditRole' | localize"
+      [title]="'Editar Rol' | localize"
       (closed)="close()">
     </app-ibs-modal-header>
 
     <app-ibs-modal-body>
-
-      <app-ibs-modal-tabs>
-
-        <app-ibs-modal-tab
-          [label]="'Details' | localize"
-          icon="bi bi-pencil-square">
-
-          <div class="ibs-edit-user-section">
+         <div class="ibs-edit-user-section">
             <div class="ibs-fields-stack">
 
               <div class="ibs-field">
@@ -57,33 +50,6 @@
 
             </div>
           </div>
-
-        </app-ibs-modal-tab>
-
-        <!-- <app-ibs-modal-tab
-          [label]="'Permissions' | localize"
-          icon="bi bi-shield-check">
-
-          <div class="ibs-edit-user-section">
-            <div class="ibs-roles-grid">
-              @for (permission of permissions(); track permission.name; let i = $index) {
-                <div class="ibs-role-item">
-                  <app-ibs-check-box
-                    [text]="permission.displayName"
-                    [name]="'permission_' + i"
-                    [disabled]="formState().isStatic"
-                    [ngModel]="checkedPermissionsMap()[permission.name] ?? false"
-                    (ngModelChange)="updatePermission(permission.name, $event)">
-                  </app-ibs-check-box>
-                </div>
-              }
-            </div>
-          </div>
-
-        </app-ibs-modal-tab> -->
-
-      </app-ibs-modal-tabs>
-
     </app-ibs-modal-body>
 
     <app-ibs-modal-footer

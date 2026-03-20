@@ -1,19 +1,13 @@
 <app-ibs-modal-shell [wide]="false" (cancelled)="bsModalRef.hide()">
 
   <app-ibs-modal-header
-    [title]="'CreateNewUser' | localize"
+    [title]="'Crear nuevo usuario' | localize"
     (closed)="bsModalRef.hide()">
   </app-ibs-modal-header>
 
   <app-ibs-modal-body>
 
-    <app-ibs-modal-tabs>
-
-      <app-ibs-modal-tab
-        [label]="'UserDetails' | localize"
-        icon="bi bi-person">
-
-        <div class="ibs-edit-user-section">
+    <div class="ibs-edit-user-section">
 
           <div class="ibs-fields-stack">
             <div class="ibs-field">
@@ -90,30 +84,6 @@
           </div>
 
         </div>
-
-      </app-ibs-modal-tab>
-
-      <app-ibs-modal-tab
-        [label]="'UserRoles' | localize"
-        icon="bi bi-shield-check">
-
-        <div>
-          <div class="ibs-roles-grid">
-            @for (role of roles; track role; let i = $index) {
-              <div class="ibs-role-item">
-                <app-ibs-check-box
-                  [text]="role.name"
-                  [checked]="isRoleChecked(role.normalizedName)"
-                  (changed)="onRoleChange(role, $event)">
-                </app-ibs-check-box>
-              </div>
-            }
-          </div>
-        </div>
-
-      </app-ibs-modal-tab>
-
-    </app-ibs-modal-tabs>
 
   </app-ibs-modal-body>
 
