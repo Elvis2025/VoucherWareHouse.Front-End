@@ -8,7 +8,7 @@ import { IbsModalFooterComponent } from "../../../controls/ibs-modal/ibs-modal-f
 import { IbsModalShellComponent } from "../../../controls/ibs-modal/ibs-modal-shell.component";
 import { IbsGridAction, IbsGridColumn, IbsGridComponent, IbsGridQuery } from "../../../controls/ibs-grid/ibs-grid.component";
 import { PagedListingComponentBase } from "../../../../shared/paged-listing-component-base";
-import { EcfApiAuthenticationInputDto, EcfApiAuthenticationOutputDto } from "../../../../shared/service-proxies/services/voucher-warehouse/ecf-api-authentication/ecf-api-authentication.model.service";
+import { EcfApiAuthenticationInputDto, EcfApiAuthenticationLoginDto, EcfApiAuthenticationOutputDto } from "../../../../shared/service-proxies/services/voucher-warehouse/ecf-api-authentication/ecf-api-authentication.model.service";
 import { LazyLoadEvent } from "primeng/api";
 
 import { ActivatedRoute } from "@angular/router";
@@ -106,37 +106,39 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
     ngOnInit(): void {
        this.columns.set([
             {
+                key: 'isActive',
+                header: 'Activo',
+                template: this.activeTpl,
+                align: 'center',
+            },
+            {
                 key: 'tenancyName',
                 header: 'Tenant',
                 field: 'tenancyName',
-                width: '15%',
+                width: '15',
             },
             {
                 key: 'userName',
                 header: 'Usuario/Email',
                 field: 'usernameOrEmailAddress',
-                width: '25%',
+                width: '15',
             },
             
             {
                 key: 'urlAuth',
                 header: 'Url de autenticación',
                 field: 'authUrl',
-                width: '25%',
+                width: '222px',
+                showFullOnHover:true
             },
             {
                 key: 'urlBase',
                 header: 'Url Base',
                 field: 'baseUrl',
-                width: '25%',
+                width: '222px',
+                showFullOnHover:true
             },
-            {
-                key: 'isActive',
-                header: 'Activo',
-                template: this.activeTpl,
-                align: 'center',
-                width: '10%',
-            },
+            
         ]);
 
         this.actions.set([
@@ -146,10 +148,19 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
                 requiredPolicy: this.createPolicy,
                 run: (row) => this.onEdit(row)
             },
+            
+            {
+                id: 'testAuth',
+                text: 'Probar Autenticación',
+                requiredPolicy: this.createPolicy,
+                run: (row) => this.onTestAuth()
+            },
+
             {
                 id: 'delete',
                 text: 'Eliminar',
                 requiredPolicy: this.createPolicy,
+                danger: true,
                 run: (row) => this.delete(row)
             },
 
@@ -175,6 +186,8 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
                           class: 'modal-lg',
                       });
                 ref.content?.onSave?.subscribe(() => this.refresh());
+
+                this.refresh();
     }
     
     protected delete(entity: EcfApiAuthenticationOutputDto): void {
@@ -190,6 +203,35 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
                 }
             }
         )
+
+
+        
+    }
+
+    protected onTestAuth(): void {
+
+
+        this.ecfApiAuthenticationService.testAuthenticateAPI().subscribe((result) => {
+
+            console.log(result)
+            if(!result.isSuccess){
+                console.log('Error de autenticacion', result);
+                abp.message.error(`Error de autenticacion: ${result.error?.message}. Codigo: (${result.error?.code})`);
+                return;
+            } 
+            if(result.unAuthorizedRequest){
+                abp.message.error('Error de autenticacion contra el api de facturación electrónica');
+                return;
+            }
+
+            abp.message.success('Usuario autenticado exitosamente !!!');
+    });
+
+
+       
+
+
+        
     }
 
     

@@ -2,6 +2,7 @@
 
 import { BaseEntityDto } from "../../../../helpers/BaseEntityDto";
 import { BaseInputEntityDto } from "../../../../helpers/BaseInputEntityDto";
+import { TaxVoucherTypesOutputDto } from "../tax-voucher-types/tax-voucher-types.model.service";
 
 
 
@@ -13,14 +14,50 @@ import { BaseInputEntityDto } from "../../../../helpers/BaseInputEntityDto";
 
 
 
-  export interface TaxVoucherCreateDto extends BaseEntityDto<number> {}
+  export interface TaxVoucherCreateDto extends BaseEntityDto<number> {
+    description: string;
+    prefix: string;
+    initialSequence: number;
+    currentSequence: number;
+    finalSequence: number;
+    registeredQuantity: number;
+    remainingQuantity: number;
+    minimumToAlert: number;
+    expeditionDate: Date;
+    expirationDate: Date;
+    taxVoucherTypeId: number;
+
+  }
 
   export interface TaxVoucherInputDto extends BaseInputEntityDto<number> {}
 
   export interface TaxVoucherOutputDto extends BaseEntityDto<number> {
-    status: string;
+    description: string;
+    prefix: string;
+    initialSequence: number;
+    currentSequence: number;
+    finalSequence: number;
+    registeredQuantity: number;
+    remainingQuantity: number;
+    minimumToAlert: number;
+    expeditionDate: Date;
+    expirationDate: Date;
+    taxVoucherType: TaxVoucherTypesOutputDto;
   }
 
-  export interface TaxVoucherUpdateDto extends BaseEntityDto<number> {}
+  export interface TaxVoucherUpdateDto extends BaseEntityDto<number> {
+
+    description: string;
+    prefix: string;
+    initialSequence: number;
+    currentSequence: number;
+    finalSequence: number;
+    registeredQuantity: number;
+    remainingQuantity: number;
+    minimumToAlert: number;
+    expeditionDate: Date;
+    expirationDate: Date;
+    taxVoucherTypeId: number;
+  }
 
   

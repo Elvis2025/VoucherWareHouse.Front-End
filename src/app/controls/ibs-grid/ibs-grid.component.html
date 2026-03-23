@@ -44,18 +44,57 @@
   <div class="ibs-table-wrap" [class.loading]="loading()">
     <div class="ibs-table-scroll">
       <table class="ibs-table">
+        <colgroup>
+          @if ((actions?.length ?? 0) > 0) {
+            <col
+              class="actions-col-group"
+              [style.width]="getActionsColumnStyle()['width']"
+              [style.min-width]="getActionsColumnStyle()['minWidth']"
+              [style.max-width]="getActionsColumnStyle()['maxWidth']" />
+          }
+
+          @for (c of resolvedColumns(); track trackByColumn($index, c)) {
+            <col
+              [style.width]="getColumnStyle(c)['width']"
+              [style.min-width]="getColumnStyle(c)['minWidth']"
+              [style.max-width]="getColumnStyle(c)['maxWidth']" />
+          }
+        </colgroup>
+
         <thead>
           <tr>
             @if ((actions?.length ?? 0) > 0) {
-              <th class="actions-col actions-head">Acciones</th>
+              <th
+                class="actions-col actions-head"
+                [style.width]="getActionsColumnStyle()['width']"
+                [style.min-width]="getActionsColumnStyle()['minWidth']"
+                [style.max-width]="getActionsColumnStyle()['maxWidth']">
+                <div class="ibs-th-inner">
+                  <span class="ibs-th-label">Acciones</span>
+                </div>
+              </th>
             }
 
-            @for (c of columns; track c.key) {
+            @for (c of resolvedColumns(); track trackByColumn($index, c)) {
               <th
-                [style.width]="c.width ?? null"
-                [class.center]="c.align === 'center'"
-                [class.right]="c.align === 'right'">
-                {{ c.header }}
+                #thEl
+                [style.width]="getColumnStyle(c)['width']"
+                [style.min-width]="getColumnStyle(c)['minWidth']"
+                [style.max-width]="getColumnStyle(c)['maxWidth']"
+                [class.center]="c.align === 'center' || isActiveLikeColumn(c)">
+                <div class="ibs-th-inner">
+                  <span class="ibs-th-label">{{ c.header }}</span>
+
+                  @if (isColumnResizable(c)) {
+                    <button
+                      type="button"
+                      class="ibs-col-resizer"
+                      tabindex="-1"
+                      aria-hidden="true"
+                      (mousedown)="startResize(c, $event, thEl)">
+                    </button>
+                  }
+                </div>
               </th>
             }
           </tr>
@@ -66,7 +105,7 @@
             <tr>
               <td
                 class="ibs-empty"
-                [attr.colspan]="columns.length + ((actions?.length ?? 0) > 0 ? 1 : 0)">
+                [attr.colspan]="resolvedColumns().length + ((actions?.length ?? 0) > 0 ? 1 : 0)">
                 <i class="bi bi-inbox"></i>
                 <span>No hay resultados.</span>
               </td>
@@ -76,7 +115,11 @@
           @for (row of items(); track trackByIndex($index)) {
             <tr>
               @if ((actions?.length ?? 0) > 0) {
-                <td class="actions-col">
+                <td
+                  class="actions-col"
+                  [style.width]="getActionsColumnStyle()['width']"
+                  [style.min-width]="getActionsColumnStyle()['minWidth']"
+                  [style.max-width]="getActionsColumnStyle()['maxWidth']">
                   @if (visibleActions().length > 0) {
                     <app-ibs-dropdown
                       variant="icon"
@@ -90,22 +133,37 @@
                 </td>
               }
 
-              @for (c of columns; track c.key) {
+              @for (c of resolvedColumns(); track trackByColumn($index, c)) {
                 <td
-                  [class.center]="c.align === 'center'"
+                  [style.width]="getColumnStyle(c)['width']"
+                  [style.min-width]="getColumnStyle(c)['minWidth']"
+                  [style.max-width]="getColumnStyle(c)['maxWidth']"
+                  [class.center]="c.align === 'center' || isActiveLikeColumn(c)"
                   [class.right]="c.align === 'right'">
-                  @if (c.template) {
-                    <ng-container
-                      [ngTemplateOutlet]="c.template"
-                      [ngTemplateOutletContext]="{ $implicit: row }">
-                    </ng-container>
-                  } @else if (isBooleanValue(cellValue(row, c))) {
-                    <span [class]="cellValue(row, c) ? 'ibs-badge ibs-badge--yes' : 'ibs-badge ibs-badge--no'">
-                      {{ cellValue(row, c) ? 'Sí' : 'No' }}
-                    </span>
-                  } @else {
-                    {{ cellValue(row, c) }}
-                  }
+                  <div
+                    class="ibs-cell-inner"
+                    [class.ibs-cell-hoverable]="c.showFullOnHover"
+                    [class.ibs-cell-strict]="hasStrictWidth(c)"
+                    (mouseenter)="showHoverPanel($event, row, c)"
+                    (mouseleave)="hideHoverPanel()">
+
+                    @if (c.template) {
+                      <ng-container
+                        [ngTemplateOutlet]="c.template"
+                        [ngTemplateOutletContext]="{ $implicit: row }">
+                      </ng-container>
+                    } @else if (isBooleanValue(cellValue(row, c))) {
+                      <span [class]="cellValue(row, c) ? 'ibs-badge ibs-badge--yes' : 'ibs-badge ibs-badge--no'">
+                        {{ cellValue(row, c) ? 'Sí' : 'No' }}
+                      </span>
+                    } @else {
+                      <span
+                        class="ibs-cell-text"
+                        [class.is-truncated]="hasStrictWidth(c)">
+                        {{ cellValue(row, c) }}
+                      </span>
+                    }
+                  </div>
                 </td>
               }
             </tr>
@@ -184,6 +242,16 @@
       </div>
     }
   </div>
+
+  @if (hoverPanel().visible) {
+    <div
+      class="ibs-hover-panel"
+      [style.top.px]="hoverPanel().top"
+      [style.left.px]="hoverPanel().left">
+      <div class="ibs-hover-panel__label">{{ hoverPanel().label }}</div>
+      <div class="ibs-hover-panel__text">{{ hoverPanel().text }}</div>
+    </div>
+  }
 
   @if (canCreate()) {
     <button type="button" class="ibs-fab" (click)="onCreate()" title="Crear nuevo registro">

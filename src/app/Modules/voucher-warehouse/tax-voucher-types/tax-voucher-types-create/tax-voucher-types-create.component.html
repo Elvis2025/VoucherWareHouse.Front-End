@@ -9,65 +9,55 @@
     <div class="ibs-fields-stack">
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Tenant'"
-                name="tenancyName"
+                [label]="'Codigo del comprobante'"
+                name="lblcode"
                 [required]="true"
                 [maxLength]="64"
-                [(ngModel)]="ecfApiAuth.tenancyName">
+                [(ngModel)]="taxVoucherCreate.code">
               </app-ibs-input>
             </div>
 
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Email/Usuario' | localize"
-                name="ecfApiAuthPassworduser"
+                [label]="'descripcion del comprobante'"
+                name="lbldescription"
                 [required]="true"
-                [maxLength]="64"
-                [(ngModel)]="ecfApiAuth.usernameOrEmailAddress"
-                autocomplete="off"
-                >
+                [maxLength]="2000"
+                [minLength]="1"
+                [(ngModel)]="taxVoucherCreate.description">
               </app-ibs-input>
             </div>
 
-            <div class="ibs-field">
-              <app-ibs-input
-                [label]="'Contraseña' | localize"
-                type="password"
-                name="ecfApiAuthPassword"
-                [required]="true"
-                [maxLength]="32"
-                [(ngModel)]="ecfApiAuth.password"
-                autocomplete="off"
-                >
-              </app-ibs-input>
-            </div>
+      
+
             
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Url de autenticacion'"
-                name="authUrl"
+                [label]="'Formato del comprobante'"
+                name="lblformat"
                 [required]="true"
                 [minLength]="2"
                 [maxLength]="256"
-                [(ngModel)]="ecfApiAuth.authUrl">
+                [(ngModel)]="taxVoucherCreate.format">
               </app-ibs-input>
             </div>
 
 
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Url Base' | localize"
-                name="baseUrl"
+                [label]="'Longitud del comprobante' | localize"
+                name="lbltxl"
                 [required]="true"
                 [maxLength]="256"
-                [(ngModel)]="ecfApiAuth.baseUrl">
+                type="number"
+                [(ngModel)]="taxVoucherCreate.taxVoucherLenght">
               </app-ibs-input>
             </div>
 
             <app-ibs-check-box
               [text]="'¿Esta activo?' | localize"
               name="isActive"
-              [(ngModel)]="ecfApiAuth.isActive">
+              [(ngModel)]="taxVoucherCreate.isActive">
             </app-ibs-check-box>
     
     </div>

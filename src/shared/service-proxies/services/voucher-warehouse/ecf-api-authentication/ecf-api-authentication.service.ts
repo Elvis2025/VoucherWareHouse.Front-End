@@ -1,6 +1,6 @@
 import { inject, Injectable, InjectionToken } from "@angular/core";
 import { map, Observable, tap } from "rxjs";
-import { EcfApiAuthenticationCreateDto, EcfApiAuthenticationInputDto, EcfApiAuthenticationOutputDto, EcfApiAuthenticationUpdateDto} from "./ecf-api-authentication.model.service";
+import { EcfApiAuthenticationCreateDto, EcfApiAuthenticationInputDto, EcfApiAuthenticationLoginDto, EcfApiAuthenticationLoginResultDto, EcfApiAuthenticationOutputDto, EcfApiAuthenticationUpdateDto} from "./ecf-api-authentication.model.service";
 import { API_BASE_URL } from "../../../service-proxies";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { PagedResultDto } from "../../../../helpers/PagedResultDto";
@@ -27,6 +27,17 @@ export class EcfApiAuthenticationService {
     });
   }
 
+  getFirstOrDefault(): Observable<EcfApiAuthenticationOutputDto> {
+
+    return this.http.get<any>(`${this.baseUrl}/GetFirstOrDefault`, {
+      headers: new HttpHeaders({
+        Accept: 'text/plain'
+      })
+    }).pipe(
+      map(response => response?.result ?? null)
+    );
+  }
+
 
   getAll(input: EcfApiAuthenticationInputDto): Observable<PagedResultDto<EcfApiAuthenticationOutputDto>> {
     let params = new HttpParams();
@@ -49,14 +60,6 @@ export class EcfApiAuthenticationService {
       Accept: 'application/json'
     })
   }).pipe(
-    tap(response => {
-      console.log('🔥 RESPONSE RAW BACKEND:', response);
-      console.log('🔥 ITEMS DIRECTO:', response?.items);
-      console.log('🔥 TOTALCOUNT DIRECTO:', response?.totalCount);
-      console.log('🔥 RESPONSE.RESULT:', response?.result);
-      console.log('🔥 ITEMS EN RESULT:', response?.result?.items);
-      console.log('🔥 TOTALCOUNT EN RESULT:', response?.result?.totalCount);
-    }),
     map(response => response?.result ?? { items: [], totalCount: 0 })
   );
   }
@@ -87,7 +90,19 @@ export class EcfApiAuthenticationService {
     });
   }
 
-  
+  testAuthenticateAPI(): Observable<EcfApiAuthenticationLoginResultDto> {
+
+    return this.http.post<any>(`${this.baseUrl}/AuthenticateAPI`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Accept: 'text/plain'
+      })
+    }).pipe(
+      
+      
+      map(response => response.result ?? { isSuccess: false, unAuthorizedRequest: false, result: null, error: null })
+    );
+  }
 
 
 

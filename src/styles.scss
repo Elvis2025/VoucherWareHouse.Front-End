@@ -345,3 +345,51 @@ body.swal2-shown {
     gap: 0.75rem;
   }
 }
+
+
+.grid-template-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 16px;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.field-col {
+  min-width: 0;
+  width: 100%;
+}
+.field-row {
+  grid-column: 1 / -1;
+}
+.field-col-checkbox {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+}
+
+/* Asegura que los custom components respeten la columna */
+:host ::ng-deep .field-col app-ibs-input,
+:host ::ng-deep .field-col app-ibs-check-box {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .grid-template-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+:host ::ng-deep input[type="number"]::-webkit-outer-spin-button,
+:host ::ng-deep input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+:host ::ng-deep input[type="number"] {
+  -moz-appearance: textfield;
+}

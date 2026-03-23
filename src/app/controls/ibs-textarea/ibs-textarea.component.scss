@@ -1,0 +1,231 @@
+:host {
+  display: block;
+}
+
+/* Contenedor */
+.ibs-field {
+  width: 100%;
+  position: relative;
+}
+
+/* Marco/control */
+.ibs-control {
+  position: relative;
+  border-radius: 14px;
+  border: 1px solid var(--inp-border);
+  background: var(--inp-bg);
+  cursor: text;
+
+  transition:
+    box-shadow .2s ease,
+    border-color .2s ease,
+    background .2s ease;
+}
+
+.ibs-control:hover {
+  border-color: color-mix(in srgb, var(--inp-border) 70%, var(--ibs-text-dim));
+}
+
+/* Textarea */
+.ibs-textarea {
+  width: 100%;
+  min-height: 124px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--txt-1);
+
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.45;
+
+  resize: vertical;
+  padding: 34px 44px 14px 14px;
+  border-radius: 14px;
+
+  &::placeholder {
+    color: color-mix(in srgb, var(--txt-2) 82%, transparent);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: .7;
+  }
+}
+
+/* resize dinámico por input */
+.ibs-textarea[style*="resize: none"] {
+  resize: none;
+}
+
+/* Floating label */
+.ibs-label {
+  position: absolute;
+  left: 14px;
+  top: 16px;
+  pointer-events: none;
+
+  color: var(--txt-2);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  transition:
+    color .15s ease,
+    opacity .15s ease;
+}
+
+.ibs-required {
+  color: inherit;
+  font-weight: 700;
+  transform: translateY(-1px);
+  opacity: .9;
+}
+
+/* Acciones */
+.ibs-actions {
+  position: absolute;
+  right: 8px;
+  top: 10px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ibs-clear {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    background .15s ease,
+    border-color .15s ease,
+    transform .05s ease,
+    opacity .15s ease,
+    visibility .15s ease;
+
+  i {
+    font-size: 16px;
+    color: var(--ib-icon);
+    line-height: 1;
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--ibs-control-bg) 70%, transparent);
+    border-color: var(--ibs-border);
+
+    i {
+      color: var(--ib-icon-hover);
+    }
+  }
+
+  &:active {
+    transform: scale(.98);
+  }
+}
+
+.ibs-field.is-focused .ibs-clear {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Focus */
+.ibs-field.is-focused .ibs-control {
+  border-color: var(--inp-border-focus);
+  box-shadow: var(--focus);
+}
+
+/* Error */
+.ibs-field.is-error .ibs-control {
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--inp-border));
+  box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--danger) 16%, transparent);
+}
+
+/* Disabled */
+.ibs-field.is-disabled .ibs-control {
+  cursor: not-allowed;
+  opacity: .78;
+}
+
+/* Autofill */
+.ibs-textarea:-webkit-autofill,
+.ibs-textarea:-webkit-autofill:hover,
+.ibs-textarea:-webkit-autofill:focus,
+.ibs-textarea:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--txt-1) !important;
+  caret-color: var(--txt-1);
+  -webkit-box-shadow: 0 0 0 1000px var(--inp-bg) inset !important;
+  box-shadow: 0 0 0 1000px var(--inp-bg) inset !important;
+  transition: background-color 999999s ease-out 0s;
+}
+
+/* Meta inferior */
+.ibs-meta {
+  margin-top: 6px;
+  padding: 0 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  color: var(--txt-2);
+}
+
+.ibs-hint,
+.ibs-count {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.ibs-hint {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ibs-count {
+  flex: 0 0 auto;
+  opacity: .88;
+}
+
+.ibs-meta.is-valid {
+  color: color-mix(in srgb, var(--txt-2) 75%, var(--ibs-text));
+}
+
+.ibs-meta.is-invalid {
+  color: color-mix(in srgb, var(--danger) 72%, var(--txt-2));
+}
+
+/* Resize modes */
+:host([data-resize='none']) .ibs-textarea {
+  resize: none;
+}
+
+@media (max-width: 768px) {
+  .ibs-textarea {
+    min-height: 112px;
+  }
+
+  .ibs-hint,
+  .ibs-count {
+    font-size: 10.5px;
+  }
+}

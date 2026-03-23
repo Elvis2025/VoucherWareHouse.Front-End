@@ -4,11 +4,11 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  forwardRef,
   HostBinding,
   Input,
   Output,
   ViewChild,
+  forwardRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -63,6 +63,24 @@ export class IbsInputComponent implements ControlValueAccessor {
   @Input() pattern?: string;
   @Input() ariaLabel?: string;
 
+  /**
+   * Cuando type="number", internamente el input nativo se renderiza como text
+   * para evitar spinners y mejorar UX, pero manteniendo el API actual.
+   */
+  @Input() numberAsText = true;
+
+  /**
+   * Define cómo sanitizar cuando type="number".
+   * - integer: solo enteros, opcional signo negativo
+   * - decimal: enteros o decimales, opcional signo negativo
+   */
+  @Input() numericMode: 'integer' | 'decimal' = 'integer';
+
+  /**
+   * Permite signo negativo cuando type="number".
+   */
+  @Input() allowNegative = false;
+
   @Output() inputEvent = new EventEmitter<InputEvent>();
   @Output() changeEvent = new EventEmitter<Event>();
   @Output() focusEvent = new EventEmitter<FocusEvent>();
@@ -82,7 +100,8 @@ export class IbsInputComponent implements ControlValueAccessor {
   constructor(private cdr: ChangeDetectorRef) {}
 
   writeValue(value: unknown): void {
-    this.value = value == null ? '' : String(value);
+    const next = value == null ? '' : String(value);
+    this.value = this.isNumberLike ? this.sanitizeNumericValue(next) : next;
     this.syncDomValue();
     this.cdr.markForCheck();
   }
@@ -110,23 +129,62 @@ export class IbsInputComponent implements ControlValueAccessor {
     return this.hasValue;
   }
 
-  get nativePattern(): string | null {
-    const pattern = this.pattern?.trim();
-    if (!pattern) return null;
+  get isNumberLike(): boolean {
+    return this.type === 'number';
+  }
 
-    try {
-      new RegExp(pattern);
-      return pattern;
-    } catch {
+  get nativeType(): string {
+    if (this.isNumberLike && this.numberAsText) {
+      return 'text';
+    }
+
+    return this.type;
+  }
+
+  get resolvedInputMode(): string | null {
+    if (this.inputMode?.trim()) {
+      return this.inputMode.trim();
+    }
+
+    if (this.isNumberLike) {
+      return this.numericMode === 'decimal' ? 'decimal' : 'numeric';
+    }
+
+    return null;
+  }
+
+  get resolvedPattern(): string | null {
+    const explicitPattern = this.safePattern(this.pattern);
+    if (explicitPattern) {
+      return explicitPattern;
+    }
+
+    if (!this.isNumberLike) {
       return null;
     }
+
+    if (this.numericMode === 'decimal') {
+      return this.allowNegative ? '^-?[0-9]*[.,]?[0-9]*$' : '^[0-9]*[.,]?[0-9]*$';
+    }
+
+    return this.allowNegative ? '^-?[0-9]*$' : '^[0-9]*$';
   }
 
   onInput(ev: Event): void {
     const el = ev.target as HTMLInputElement | null;
     if (!el) return;
 
-    this.value = el.value;
+    let nextValue = el.value;
+
+    if (this.isNumberLike) {
+      nextValue = this.sanitizeNumericValue(nextValue);
+
+      if (el.value !== nextValue) {
+        el.value = nextValue;
+      }
+    }
+
+    this.value = nextValue;
     this.onChange(this.value);
     this.inputEvent.emit(ev as InputEvent);
     this.cdr.markForCheck();
@@ -146,6 +204,16 @@ export class IbsInputComponent implements ControlValueAccessor {
     this.focused = false;
     this.touched = true;
     this.onTouched();
+
+    if (this.isNumberLike && this.numericMode === 'decimal') {
+      const normalized = this.normalizeDecimalEnding(this.value);
+      if (normalized !== this.value) {
+        this.value = normalized;
+        this.syncDomValue();
+        this.onChange(this.value);
+      }
+    }
+
     this.blurEvent.emit(ev);
     this.cdr.markForCheck();
   }
@@ -191,6 +259,89 @@ export class IbsInputComponent implements ControlValueAccessor {
     if (el.value !== nextValue) {
       el.value = nextValue;
     }
+  }
+
+  private safePattern(pattern?: string): string | null {
+    const value = pattern?.trim();
+    if (!value) return null;
+
+    try {
+      new RegExp(value);
+      return value;
+    } catch {
+      return null;
+    }
+  }
+
+  private sanitizeNumericValue(raw: string): string {
+    if (!raw) return '';
+
+    const normalized = raw.replace(',', '.');
+
+    if (this.numericMode === 'decimal') {
+      return this.sanitizeDecimal(normalized);
+    }
+
+    return this.sanitizeInteger(normalized);
+  }
+
+  private sanitizeInteger(raw: string): string {
+    let result = '';
+    let hasSign = false;
+
+    for (let i = 0; i < raw.length; i++) {
+      const ch = raw[i];
+
+      if (ch >= '0' && ch <= '9') {
+        result += ch;
+        continue;
+      }
+
+      if (ch === '-' && this.allowNegative && i === 0 && !hasSign) {
+        result += ch;
+        hasSign = true;
+      }
+    }
+
+    return result;
+  }
+
+  private sanitizeDecimal(raw: string): string {
+    let result = '';
+    let hasSign = false;
+    let hasDot = false;
+
+    for (let i = 0; i < raw.length; i++) {
+      const ch = raw[i];
+
+      if (ch >= '0' && ch <= '9') {
+        result += ch;
+        continue;
+      }
+
+      if (ch === '-' && this.allowNegative && i === 0 && !hasSign) {
+        result += ch;
+        hasSign = true;
+        continue;
+      }
+
+      if (ch === '.' && !hasDot) {
+        result += ch;
+        hasDot = true;
+      }
+    }
+
+    return result;
+  }
+
+  private normalizeDecimalEnding(raw: string): string {
+    if (!raw) return raw;
+
+    if (raw.endsWith('.')) {
+      return raw.slice(0, -1);
+    }
+
+    return raw;
   }
 
   @HostBinding('class.is-disabled')

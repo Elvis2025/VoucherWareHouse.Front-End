@@ -89,29 +89,25 @@ export class UsersComponent
     ngOnInit(): void {
         this.columns.set([
             {
+                key: 'isActive',
+                header: 'Activo',
+                template: this.activeTpl,
+                align: 'center',
+            },
+            {
                 key: 'userName',
                 header: 'Usuario',
                 field: 'userName',
-                width: '15%',
             },
             {
                 key: 'fullName',
                 header: 'Nombre',
                 template: this.nameTpl,
-                width: '25%',
             },
             {
                 key: 'emailAddress',
                 header: 'Correo',
                 field: 'emailAddress',
-                width: '35%',
-            },
-            {
-                key: 'isActive',
-                header: 'Activo',
-                template: this.activeTpl,
-                align: 'center',
-                width: '10%',
             },
         ]);
 

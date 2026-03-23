@@ -37,13 +37,14 @@
   background: transparent;
   color: var(--txt-1);
 
-  /* ✅ evita que el browser “toque” la tipografía/alto percibido */
+  /* evita que el browser toque la tipografía/alto percibido */
   font: inherit;
   line-height: 1.2;
 
   /* deja espacio a la derecha para (alert + clear) */
   padding: 8px 72px 10px 14px;
   font-size: 14px;
+  appearance: none;
 
   &::placeholder{
     color: transparent; /* clave para float label */
@@ -55,8 +56,26 @@
   }
 }
 
-/* ✅ FIX: autofill/autocomplete (Chrome/Edge)
-   - evita que cambie fondo/color y que “parezca” otro control */
+/* Number-like renderizado como text para mejor UX */
+.ibs-input.is-number-like{
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* Chrome, Edge, Safari */
+.ibs-input[type="number"]::-webkit-outer-spin-button,
+.ibs-input[type="number"]::-webkit-inner-spin-button{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.ibs-input[type="number"]{
+  -moz-appearance: textfield;
+}
+
+/* FIX: autofill/autocomplete (Chrome/Edge)
+   - evita que cambie fondo/color y que parezca otro control */
 .ibs-input:-webkit-autofill,
 .ibs-input:-webkit-autofill:hover,
 .ibs-input:-webkit-autofill:focus,
@@ -64,7 +83,7 @@
   -webkit-text-fill-color: var(--txt-1);
   caret-color: var(--txt-1);
 
-  /* “pinta” el fondo del autofill con tu mismo inp-bg */
+  /* pinta el fondo del autofill con tu mismo inp-bg */
   -webkit-box-shadow: 0 0 0 1000px var(--inp-bg) inset;
   box-shadow: 0 0 0 1000px var(--inp-bg) inset;
 
@@ -91,7 +110,7 @@
   transition: transform .15s ease, top .15s ease, font-size .15s ease, color .15s ease;
 }
 
-/* ✅ Asterisco: mismo color del label (como pediste) */
+/* Asterisco: mismo color del label */
 .ibs-required{
   color: inherit;
   font-weight: 700;
@@ -102,15 +121,11 @@
 /* Subir label cuando hay texto o focus */
 .ibs-input:focus + .ibs-label,
 .ibs-input:not(:placeholder-shown) + .ibs-label{
-  top: -20px;                 /* se monta sobre el borde */
+  top: -20px;
   transform: translateY(0);
   font-size: 12px;
-
-  /* más presencia */
   font-weight: 900;
   color: var(--ibs-text);
-
-  /* “corte” limpio sobre el borde */
   padding: 0 6px;
   background: transparent;
 }
@@ -133,9 +148,7 @@
   gap: 8px;
 }
 
-/* ✅ Alert: círculo rojo, ícono blanco (no chillón)
-   - el rojo lo suavizo mezclándolo con border
-*/
+/* Alert: círculo rojo, ícono blanco */
 .ibs-alert{
   width: 22px;
   height: 22px;
@@ -155,7 +168,7 @@
   }
 }
 
-/* ✅ Clear: sutil (solo icono), y respeta tus icon tokens */
+/* Clear: sutil */
 .ibs-clear{
   width: 30px;
   height: 30px;
@@ -187,9 +200,7 @@
   }
 }
 
-/* ✅ Error: borde rojo NO chillón (mezclado con inp-border)
-   + ring suave, sin gritar
-*/
+/* Error */
 .ibs-field.is-error .ibs-control{
   border-color: color-mix(in srgb, var(--danger) 55%, var(--inp-border));
   box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--danger) 16%, transparent);
@@ -219,21 +230,15 @@
   -webkit-text-fill-color: var(--txt-1) !important;
 }
 
-/* 🔥 FIX AUTOFILL CHROME / EDGE */
+/* FIX AUTOFILL CHROME / EDGE */
 .ibs-input:-webkit-autofill,
 .ibs-input:-webkit-autofill:hover,
 .ibs-input:-webkit-autofill:focus,
 .ibs-input:-webkit-autofill:active {
-
-  /* texto */
   -webkit-text-fill-color: var(--txt-1) !important;
   caret-color: var(--txt-1);
-
-  /* fondo forzado igual que tu diseño */
   -webkit-box-shadow: 0 0 0 1000px var(--inp-bg) inset !important;
   box-shadow: 0 0 0 1000px var(--inp-bg) inset !important;
-
   border-radius: 14px !important;
-
   transition: background-color 999999s ease-out 0s;
 }

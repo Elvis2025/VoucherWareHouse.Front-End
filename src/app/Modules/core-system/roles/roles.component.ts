@@ -147,13 +147,11 @@ export class RolesComponent
         key: 'name',
         header: 'RoleName',
         field: 'name',
-        width: '40%',
       },
       {
         key: 'displayName',
         header: 'DisplayName',
         field: 'displayName',
-        width: '45%',
       },
     ]);
   }

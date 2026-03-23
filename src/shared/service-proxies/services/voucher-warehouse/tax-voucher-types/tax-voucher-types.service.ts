@@ -1,9 +1,8 @@
 import { inject, Injectable, InjectionToken } from "@angular/core";
-import { Observable } from "rxjs";
+import { map, Observable } from "rxjs";
 import { TaxVoucherTypesCreateDto, TaxVoucherTypesInputDto, TaxVoucherTypesOutputDto, TaxVoucherTypesUpdateDto} from "./tax-voucher-types.model.service";
-import { HttpHeaders, HttpParams } from "@angular/common/module.d-CnjH8Dlt";
 import { API_BASE_URL } from "../../../service-proxies";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { PagedResultDto } from "../../../../helpers/PagedResultDto";
 
 
@@ -20,12 +19,15 @@ export class TaxVoucherTypesService {
   get(id: number): Observable<TaxVoucherTypesOutputDto> {
     const params = new HttpParams().set('Id', id.toString());
 
-    return this.http.get<TaxVoucherTypesOutputDto>(`${this.baseUrl}/Get`, {
+    return this.http.get<any>(`${this.baseUrl}/Get`, {
       params,
       headers: new HttpHeaders({
         Accept: 'text/plain'
       })
-    });
+    }).pipe(
+      map(response => response?.result)
+
+    );
   }
 
 
@@ -44,12 +46,14 @@ export class TaxVoucherTypesService {
       params = params.set('MaxResultCount', input.maxResultCount.toString());
     }
 
-    return this.http.get<PagedResultDto<TaxVoucherTypesOutputDto>>(`${this.baseUrl}/GetAll`, {
+    return this.http.get<any>(`${this.baseUrl}/GetAll`, {
       params,
       headers: new HttpHeaders({
         Accept: 'text/plain'
       })
-    });
+    }).pipe(
+        map(response => response?.result ?? { items: [], totalCount: 0 })
+      );
   }
 
    create(input: TaxVoucherTypesCreateDto): Observable<TaxVoucherTypesOutputDto> {

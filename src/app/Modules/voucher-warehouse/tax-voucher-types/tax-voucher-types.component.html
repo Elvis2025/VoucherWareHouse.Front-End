@@ -1,0 +1,20 @@
+<ng-template #activeTpl let-u>
+  <span [class]="u.isActive ? 'ibs-badge ibs-badge--yes' : 'ibs-badge ibs-badge--no'">
+    {{ u.isActive ? 'Sí' : 'No' }}
+  </span>
+</ng-template>
+
+<ng-template #nameTpl let-u>
+  {{ u.name }} {{ u.surname }}
+</ng-template>
+
+<app-ibs-grid
+  [title]="'Tipos de comprobantes electrónicos'"
+  [subtitle]="'Mantenimiento para configurar los tipos de comprobantes electrónicos'"
+  [placeholderSearch]="'Buscar...'"
+  [columns]="columns()"
+  [actions]="actions()"
+  [createPolicy]="createPolicy"
+  [load]="loadTaxVoucherTypes"
+  (create)="onCreate()">
+</app-ibs-grid>

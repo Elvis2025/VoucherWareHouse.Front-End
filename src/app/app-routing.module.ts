@@ -45,12 +45,22 @@ import { IbsLayoutComponent } from './layout/home-layout/ibs-layout.component';
                     },
                     {
                         path: 'voucher-warehouse/ecf-api-authentication',
-                        loadChildren: () => import('./Modules/voucher-warehouse/voucher-warehouse.module').then((m) => m.VoucherWarehouseModule),
+                        loadChildren: () => import('./Modules/voucher-warehouse/ecf-api-authentication/ecf-api-authentication.module').then((m) => m.EcfApiAuthenticationModule),
+                        canActivate: [AppRouteGuard],
+                    },
+                    {
+                        path: 'voucher-warehouse/tax-vouchers',
+                        loadChildren: () => import('./Modules/voucher-warehouse/tax-voucher/tax-voucher.module').then((m) => m.TaxVoucherModule),
+                        canActivate: [AppRouteGuard],
+                    },
+                    {
+                        path: 'voucher-warehouse/tax-vouchers-types',
+                        loadChildren: () => import('./Modules/voucher-warehouse/tax-voucher-types/tax-voucher-types.module').then((m) => m.TaxVoucherTypeModule),
                         canActivate: [AppRouteGuard],
                     },
                     {
                         path: 'voucher-warehouse/ecf-voucher-warehouse',
-                        loadChildren: () => import('./Modules/voucher-warehouse/voucher-warehouse.module').then((m) => m.VoucherWarehouseModule),
+                        loadChildren: () => import('./Modules/voucher-warehouse/ecf-api-authentication/ecf-api-authentication.module').then((m) => m.EcfApiAuthenticationModule),
                         canActivate: [AppRouteGuard],
                     },
 

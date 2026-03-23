@@ -1,40 +1,30 @@
 <div
   class="ibs-field"
-  [class.is-focused]="focused"
+  [class.is-focused]="focused()"
   [class.is-disabled]="disabled"
+  [class.is-error]="error"
+  [class.has-value]="hasValue()"
 >
   <div class="ibs-control" (click)="focus()">
-    <input
-      #inp
-      class="ibs-input"
-      [class.is-number-like]="type === 'number'"
+    <textarea
+      #textareaEl
+      class="ibs-textarea"
       [id]="id"
       [attr.name]="name || null"
-      [type]="nativeType"
-      [placeholder]="placeholder"
+      [attr.placeholder]="placeholder || null"
       [required]="required || null"
       [disabled]="disabled || null"
       [readonly]="readonly || null"
-      [attr.autocomplete]="autocomplete || 'off'"
-      [attr.inputmode]="resolvedInputMode"
-      [attr.maxlength]="maxLength ?? null"
+      [rows]="rows"
       [attr.minlength]="minLength ?? null"
-      [attr.min]="nativeType === 'text' ? null : (min ?? null)"
-      [attr.max]="nativeType === 'text' ? null : (max ?? null)"
-      [attr.step]="nativeType === 'text' ? null : (step ?? null)"
-      [attr.pattern]="resolvedPattern"
+      [attr.maxlength]="maxLength ?? null"
+      [attr.autocomplete]="autocomplete || 'off'"
       [attr.aria-label]="ariaLabel || label || null"
+      [spellcheck]="spellcheck"
       (input)="onInput($event)"
-      (change)="onChangeNative($event)"
-      (focus)="onFocus($event)"
-      (blur)="onBlur($event)"
-      (keydown)="onKeydown($event)"
-      (keyup)="onKeyup($event)"
-      autocomplete="off"
-      autocorrect="off"
-      autocapitalize="off"
-      spellcheck="false"
-    />
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    ></textarea>
 
     <label class="ibs-label" [for]="id">
       {{ label }}
@@ -57,4 +47,23 @@
       }
     </div>
   </div>
+
+  @if (showHelper()) {
+    <div
+      class="ibs-meta"
+      [class.is-invalid]="currentLengthState() === 'invalid'"
+      [class.is-valid]="currentLengthState() === 'valid'"
+    >
+      <span class="ibs-hint">
+        {{ helperText() }}
+      </span>
+
+      <span class="ibs-count">
+        {{ charCount() }}
+        @if (maxLength != null) {
+          <span>/{{ maxLength }}</span>
+        }
+      </span>
+    </div>
+  }
 </div>

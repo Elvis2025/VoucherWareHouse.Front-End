@@ -1,0 +1,164 @@
+<div
+  class="ibs-field"
+  [class.is-open]="isOpen"
+  [class.is-focused]="focused || isOpen"
+  [class.is-disabled]="disabled"
+  [class.is-error]="error"
+  [class.is-multiple]="multiple"
+>
+  <div class="ibs-control">
+    <button
+      #triggerEl
+      type="button"
+      class="ibs-trigger"
+      [id]="id"
+      [attr.name]="name || null"
+      [disabled]="disabled || null"
+      [attr.aria-label]="ariaLabel || label || null"
+      [attr.aria-expanded]="isOpen"
+      aria-haspopup="listbox"
+      [attr.aria-controls]="id + '-panel'"
+      (click)="onTriggerClick($event)"
+      (focus)="onTriggerFocus()"
+      (blur)="onTriggerBlur()"
+      (keydown)="onTriggerKeydown($event)"
+    >
+      <div class="ibs-value-wrap">
+        @if (multiple && selectedOptions.length > 0) {
+          <div class="ibs-chips">
+            @for (opt of selectedOptions; track trackByValue($index, opt)) {
+              <span class="ibs-chip">
+                <span class="ibs-chip-text">{{ opt.label }}</span>
+
+                @if (!disabled && !readonly) {
+                  <button
+                    type="button"
+                    class="ibs-chip-remove"
+                    (click)="removeChip(opt, $event)"
+                    [attr.aria-label]="'Quitar ' + opt.label"
+                  >
+                    <i class="bi bi-x"></i>
+                  </button>
+                }
+              </span>
+            }
+          </div>
+        } @else {
+          <span class="ibs-value" [class.is-placeholder]="!hasValue">
+            {{ hasValue ? displayLabel : placeholder }}
+          </span>
+        }
+      </div>
+
+      <label class="ibs-label" [for]="id">
+        {{ label }}
+        @if (required) {
+          <span class="ibs-required">*</span>
+        }
+      </label>
+
+      <div class="ibs-actions" aria-hidden="true">
+        @if (showClear) {
+          <button
+            type="button"
+            class="ibs-clear"
+            (mousedown)="$event.preventDefault()"
+            (click)="clear($event)"
+            [attr.aria-label]="'Limpiar ' + label"
+          >
+            <i class="bi bi-x"></i>
+          </button>
+        }
+
+        <span class="ibs-chevron" [class.is-open]="isOpen">
+          <i class="bi bi-chevron-down"></i>
+        </span>
+      </div>
+    </button>
+
+    @if (isOpen) {
+      <div
+        class="ibs-panel"
+        [id]="id + '-panel'"
+        [ngStyle]="panelStyles"
+      >
+        @if (searchable) {
+          <div class="ibs-search-wrap">
+            <input
+              #searchInputEl
+              type="text"
+              class="ibs-search"
+              [placeholder]="searchPlaceholder"
+              [value]="searchTerm"
+              (input)="onSearchInput($event)"
+              (keydown)="onSearchKeydown($event)"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
+
+            @if (searchTerm) {
+              <button
+                type="button"
+                class="ibs-search-clear"
+                (click)="clearSearch($event)"
+                aria-label="Limpiar búsqueda"
+              >
+                <i class="bi bi-x"></i>
+              </button>
+            }
+          </div>
+        }
+
+        <div
+          class="ibs-options"
+          role="listbox"
+          [attr.aria-multiselectable]="multiple || null"
+          [style.max-height.px]="optionsViewportMaxHeight"
+        >
+          @if (filteredOptions.length > 0) {
+            @for (opt of filteredOptions; track trackByValue($index, opt)) {
+              <button
+                type="button"
+                class="ibs-option"
+                role="option"
+                [class.is-selected]="isSelected(opt)"
+                [class.is-active]="$index === activeIndex"
+                [class.is-disabled]="opt.disabled"
+                [attr.aria-selected]="isSelected(opt)"
+                [disabled]="opt.disabled || null"
+                (click)="onOptionClick(opt, $event)"
+              >
+                <div class="ibs-option-main">
+                  @if (opt.icon) {
+                    <i class="ibs-option-icon" [class]="opt.icon"></i>
+                  }
+
+                  <div class="ibs-option-texts">
+                    <span class="ibs-option-label">{{ opt.label }}</span>
+
+                    @if (opt.description) {
+                      <span class="ibs-option-description">{{ opt.description }}</span>
+                    }
+                  </div>
+                </div>
+
+                @if (isSelected(opt)) {
+                  <span class="ibs-option-check">
+                    <i class="bi bi-check2"></i>
+                  </span>
+                }
+              </button>
+            }
+          } @else {
+            <div class="ibs-empty">
+              <i class="bi bi-inbox"></i>
+              <span>{{ emptyText }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

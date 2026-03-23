@@ -133,23 +133,20 @@ export class TenantsComponent
   private configureColumns(): void {
     this.columns.set([
       {
+        key: 'isActive',
+        header: 'Activo',
+        field: 'isActive',
+        align: 'center',
+      },
+      {
         key: 'tenancyName',
         header: 'Tenant',
         field: 'tenancyName',
-        width: '30%',
       },
       {
         key: 'name',
         header: 'Empresa',
         field: 'name',
-        width: '35%',
-      },
-      {
-        key: 'isActive',
-        header: 'Activo',
-        field: 'isActive',
-        align: 'center',
-        width: '15%',
       },
     ]);
   }

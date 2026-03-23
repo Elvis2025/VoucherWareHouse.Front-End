@@ -1,0 +1,151 @@
+<app-ibs-modal-shell [wide]="false" (cancelled)="bsModalRef.hide()">
+
+  <app-ibs-modal-header
+    [title]="'Crear nueva autenticacion para el Api de facturacion electronica' | localize"
+    (closed)="bsModalRef.hide()">
+  </app-ibs-modal-header>
+
+<app-ibs-modal-body>
+  <div class="grid-template-2">
+
+    <div class="field-col">
+      <app-ibs-select
+        label="Tipo de comprobante"
+        [options]="taxVoucherTypeOptions"
+        bindLabel="codeAndDescription"
+        bindValue="id"
+        required="true"
+        [(ngModel)]="taxVoucherCreate.taxVoucherTypeId">
+        </app-ibs-select>
+
+    </div>
+
+    <div class="field-col">
+      <app-ibs-input
+        [label]="'Cantidad registrada'"
+        name="registeredQuantity"
+        [required]="true"
+         [minLength]="1"
+        type="number"
+        [(ngModel)]="taxVoucherCreate.registeredQuantity">
+      </app-ibs-input>
+    </div>
+
+    <div class="field-col">
+      <app-ibs-input
+        [label]="'Prefijo'"
+        name="prefix"
+        [maxLength]="2000"
+        [minLength]="1"
+        [(ngModel)]="taxVoucherCreate.prefix">
+      </app-ibs-input>
+    </div>
+
+    <div class="field-col">
+      <app-ibs-input
+        [label]="'Secuencia actual'"
+        name="currentSequence"
+        [required]="true"
+        [minLength]="1"
+        type="number"
+        [(ngModel)]="taxVoucherCreate.currentSequence">
+      </app-ibs-input>
+    </div>
+
+
+  
+    
+<div class="field-col">
+    <app-ibs-input
+    [label]="'Fecha de expedicion' | localize"
+    name="expeditionDate"
+        [required]="true"
+        type="date"
+        [minLength]="0"
+        [(ngModel)]="taxVoucherCreate.expeditionDate">
+      </app-ibs-input>
+    </div>
+
+    <div class="field-col">
+    <app-ibs-input
+    [label]="'Minimo para alertar' | localize"
+    name="minimumToAlert"
+    [required]="true"
+    type="number"
+    [minLength]="0"
+    [(ngModel)]="taxVoucherCreate.minimumToAlert">
+</app-ibs-input>
+</div>
+
+
+
+
+  <div class="field-col">
+      <app-ibs-input
+        [label]="'Fecha de caducidad' | localize"
+        name="expirationDate"
+        [required]="true"
+        type="date"
+        [minLength]="0"
+        [(ngModel)]="taxVoucherCreate.expirationDate">
+      </app-ibs-input>
+    </div>
+    <div class="field-col">
+      <app-ibs-input
+        [label]="'Cantidad restante' | localize"
+        name="remainingQuantity"
+        type="number"
+        [minLength]="1"
+        disabled="true"
+        [(ngModel)]="taxVoucherCreate.remainingQuantity">
+    </app-ibs-input>
+</div>
+
+
+  
+  <div class="field-col field-col-checkbox">
+      <app-ibs-check-box
+        [text]="'¿Esta activo?' | localize"
+        name="isActive"
+        [(ngModel)]="taxVoucherCreate.isActive">
+      </app-ibs-check-box>
+    </div>
+
+    <div class="field-col">
+      <app-ibs-input
+        [label]="'Secuencia final' | localize"
+        name="finalSequence"
+        [required]="true"
+        type="number"
+        [minLength]="1"
+        disabled="true"
+        [(ngModel)]="taxVoucherCreate.finalSequence">
+      </app-ibs-input>
+    </div>
+
+    <div class="field-col field-row">
+
+      <app-ibs-textarea
+        label="Comentario"
+        [rows]="3"
+        [maxLength]="250"
+        [(ngModel)]="taxVoucherCreate.description">
+        </app-ibs-textarea>
+    </div>
+
+
+
+
+    
+
+  </div>
+</app-ibs-modal-body>
+
+  <app-ibs-modal-footer
+    [closeText]="'Cancel' | localize"
+    [saveText]="'Save' | localize"
+    (closed)="bsModalRef.hide()"
+    (saved)="save()">
+  </app-ibs-modal-footer>
+
+</app-ibs-modal-shell>

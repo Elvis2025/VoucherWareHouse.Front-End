@@ -25,14 +25,14 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
           id: 'vou-war-tax-vou',
           text: 'Comprobantes',
           icon: 'bi bi-receipt',
-          route: 'voucher-warehouse/tax-voucher',
+          route: 'voucher-warehouse/tax-vouchers',
           requiredPolicy: 'Pages.Roles',
         },
         {
           id: 'vou-war-tax-vou-typ',
           text: 'Tipos de comprobantes',
           icon: 'bi bi-collection',
-          route: 'voucher-warehouse/tax-voucher',
+          route: 'voucher-warehouse/tax-vouchers-types',
           requiredPolicy: 'Pages.Roles',
         },
 
