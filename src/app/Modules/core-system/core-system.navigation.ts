@@ -7,6 +7,7 @@ export const CORE_SYSTEM_NAVIGATION: IbsNavModule = {
   key: 'core',
   title: 'Core Systems',
   icon: 'bi-shield-lock-fill',
+  defaultRoute: 'core-system/users',
   items: [
     // Administration
     {
@@ -68,19 +69,13 @@ export const CORE_SYSTEM_NAVIGATION: IbsNavModule = {
 
     // Maintenance
     {
-      id: 'cor-mai',
-      text: 'Mantenimientos',
-      icon: 'bi bi-hammer',
-      children: [
-        {
-          id: 'books',
-          text: 'Books (Demo)',
-          icon: '📚',
-          route: '/books',
-          requiredPolicy: 'CoreSystem.Books',
-        },
-      ],
-    },
+  id: 'cor-mai',
+  text: 'Mantenimientos',
+  icon: 'bi bi-hammer',
+  children: [
+    
+  ],
+}
   ],
   requiredPolicy: 'Pages.Roles',
 };

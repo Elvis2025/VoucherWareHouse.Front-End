@@ -40,8 +40,15 @@ import { AppTenantBrandingService } from '@shared/TenantBranding/app-tenant-bran
 })
 export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDestroy {
   private sub = new Subscription();
-  logoUrl$ = this._appTenantBrandingService.logoUrl$;
 
+  private readonly STORAGE_KEYS = {
+    theme: 'ib-theme',
+    sidebarPinned: 'ibs-layout.sidebar-pinned',
+    selectedModule: 'ibs-layout.selected-module',
+    lastRoute: 'ibs-layout.last-route',
+  } as const;
+
+  logoUrl$ = this._appTenantBrandingService.logoUrl$;
   companyDescription$ = this._appTenantBrandingService.companyDescription$;
   companyName$ = this._appTenantBrandingService.companyName$;
   companyType$ = this._appTenantBrandingService.companyType$;
@@ -54,16 +61,15 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   ) {
     super(injector);
     this.loadCurrentTenantLogo();
-    console.log(this.logoUrl$, 'este es el logo');
   }
 
   // ===== UI =====
   readonly sidebarCollapsed = signal<boolean>(true);
   readonly mobileSidebarOpen = signal<boolean>(false);
-  readonly sidebarPinned = signal<boolean>(false);
+  readonly sidebarPinned = signal<boolean>(this.readSidebarPinned());
   readonly isMobile = signal<boolean>(window.innerWidth <= 991);
 
-  readonly selectedModuleKey = signal<IbsModuleKey>('core');
+  readonly selectedModuleKey = signal<IbsModuleKey>(this.readStoredModuleKey());
   readonly search = signal<string>('');
   readonly openGroups = signal<Record<string, boolean>>({});
 
@@ -88,15 +94,19 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     this.currentUser.set(this.appSession.user);
 
     this.applyResponsiveState(window.innerWidth);
-
-    this.syncOpenGroupsWithUrl(this.router.url);
+    this.restoreInitialNavigationState();
 
     this.sub.add(
       this.router.events
         .pipe(filter(e => e instanceof NavigationEnd))
         .subscribe((e) => {
-          const url = (e as NavigationEnd).urlAfterRedirects || (e as NavigationEnd).url;
+          const nav = e as NavigationEnd;
+          const url = this.normalizeUrl(nav.urlAfterRedirects || nav.url);
+
+          this.persistLastRoute(url);
+          this.syncModuleStateWithUrl(url);
           this.syncOpenGroupsWithUrl(url);
+
           this.mobileSidebarOpen.set(false);
           this.modulePickerOpen.set(false);
           this.userMenuOpen.set(false);
@@ -153,13 +163,10 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
       return;
     }
 
-    this.sidebarPinned.update(v => !v);
-
-    if (this.sidebarPinned()) {
-      this.sidebarCollapsed.set(false);
-    } else {
-      this.sidebarCollapsed.set(true);
-    }
+    const next = !this.sidebarPinned();
+    this.sidebarPinned.set(next);
+    this.persistSidebarPinned(next);
+    this.sidebarCollapsed.set(!next);
   }
 
   toggleSidebar(): void {
@@ -182,12 +189,23 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   }
 
   // ===== Module =====
-  selectModule(moduleKey: IbsModuleKey): void {
-    if (!this.isMobile() && this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
+  selectModule(moduleKey: IbsModuleKey, navigateToDefault = false): void {
+    if (!this.isMobile() && this.sidebarCollapsed()) {
+      this.sidebarCollapsed.set(false);
+    }
 
     this.selectedModuleKey.set(moduleKey);
+    this.persistSelectedModule(moduleKey);
+
     this.search.set('');
     this.openFirstGroup();
+
+    if (navigateToDefault) {
+      const targetRoute = this.getDefaultRouteForModule(moduleKey);
+      if (targetRoute) {
+        this.router.navigateByUrl(targetRoute);
+      }
+    }
 
     if (this.isMobile()) {
       this.mobileSidebarOpen.set(false);
@@ -203,7 +221,9 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     ev.preventDefault();
     ev.stopPropagation();
 
-    if (!this.isMobile() && this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
+    if (!this.isMobile() && this.sidebarCollapsed()) {
+      this.sidebarCollapsed.set(false);
+    }
 
     this.modulePickerOpen.update(v => !v);
   }
@@ -213,7 +233,7 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   }
 
   onModulePick(key: IbsModuleKey): void {
-    this.selectModule(key);
+    this.selectModule(key, true);
     this.closeModulePicker();
   }
 
@@ -271,11 +291,18 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
 
   // ===== Group helpers =====
   isGroup(item: IbsNavItem): boolean {
-    return !!item.children && item.children.length > 0;
+    return !!item.children?.length;
+  }
+
+  hasRoute(item: IbsNavItem): boolean {
+    return !!item.route;
   }
 
   toggleGroup(id: string): void {
-    if (!this.isMobile() && this.sidebarCollapsed()) this.sidebarCollapsed.set(false);
+    if (!this.isMobile() && this.sidebarCollapsed()) {
+      this.sidebarCollapsed.set(false);
+    }
+
     this.openGroups.update(x => ({ ...x, [id]: !x[id] }));
   }
 
@@ -316,11 +343,12 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     const next = this.theme() === 'dark' ? 'light' : 'dark';
     this.theme.set(next);
     document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('ib-theme', next);
+    localStorage.setItem(this.STORAGE_KEYS.theme, next);
   }
 
   private readTheme(): 'dark' | 'light' {
-    const saved = (localStorage.getItem('ib-theme') as 'dark' | 'light' | null);
+    const saved = localStorage.getItem(this.STORAGE_KEYS.theme) as 'dark' | 'light' | null;
+
     if (saved === 'dark' || saved === 'light') {
       document.documentElement.setAttribute('data-theme', saved);
       return saved;
@@ -350,7 +378,7 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
   }
 
   private filterItemByPermission(item: IbsNavItem): IbsNavItem | null {
-    if (!item.children || item.children.length === 0) {
+    if (!item.children?.length) {
       return !item.requiredPolicy || this.isGranted(item.requiredPolicy) ? item : null;
     }
 
@@ -358,9 +386,25 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
       .map(c => this.filterItemByPermission(c))
       .filter((x): x is IbsNavItem => !!x);
 
-    if (children.length === 0) return null;
-
+    if (children.length === 0 && !item.route) return null;
     if (item.requiredPolicy && !this.isGranted(item.requiredPolicy)) return null;
+
+    return { ...item, children };
+  }
+
+  private filterItemBySearch(item: IbsNavItem, q: string): IbsNavItem | null {
+    const selfMatch = (item.text ?? '').toLowerCase().includes(q);
+
+    if (!item.children?.length) {
+      return selfMatch ? item : null;
+    }
+
+    const children = item.children
+      .map(c => this.filterItemBySearch(c, q))
+      .filter((x): x is IbsNavItem => !!x);
+
+    if (selfMatch) return { ...item, children: item.children };
+    if (children.length === 0) return null;
 
     return { ...item, children };
   }
@@ -383,44 +427,26 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
 
     this._appTenantBrandingService.loadCurrentTenantLogo().subscribe({
       next: () => {},
-      error: () => {
-        this._appTenantBrandingService.clear();
-      }
+      error: () => this._appTenantBrandingService.clear(),
     });
   }
 
-  private filterItemBySearch(item: IbsNavItem, q: string): IbsNavItem | null {
-    const selfMatch = (item.text ?? '').toLowerCase().includes(q);
-
-    if (!item.children || item.children.length === 0) {
-      return selfMatch ? item : null;
-    }
-
-    const children = item.children
-      .map(c => this.filterItemBySearch(c, q))
-      .filter((x): x is IbsNavItem => !!x);
-
-    if (selfMatch) return item;
-    if (children.length === 0) return null;
-
-    return { ...item, children };
-  }
-
   private openFirstGroup(): void {
-    const items = this.filteredItems();
-    const firstGroup = items.find(i => this.isGroup(i));
+    const firstGroup = this.findFirstGroup(this.filteredItems());
     this.openGroups.set(firstGroup ? { [firstGroup.id]: true } : {});
   }
 
   private syncOpenGroupsWithUrl(url: string): void {
-    const items = this.filteredItems();
-    const groupToOpen = this.findGroupContainingRoute(items, url);
+    const ids = this.findOpenGroupIdsByUrl(this.filteredItems(), url);
 
-    if (groupToOpen) {
-      this.openGroups.update(x => ({ ...x, [groupToOpen.id]: true }));
-    } else {
-      this.openFirstGroup();
+    if (ids.length > 0) {
+      const next: Record<string, boolean> = {};
+      for (const id of ids) next[id] = true;
+      this.openGroups.set(next);
+      return;
     }
+
+    this.openFirstGroup();
   }
 
   toggleUserMenu(ev: MouseEvent): void {
@@ -438,30 +464,175 @@ export class IbsLayoutComponent extends AppComponentBase implements OnInit, OnDe
     this.userMenuOpen.set(false);
   }
 
-  private findGroupContainingRoute(items: IbsNavItem[], url: string): IbsNavItem | null {
-    for (const item of items) {
-      if (this.isGroup(item)) {
-        const has = (item.children ?? []).some(c => !!c.route && url.startsWith(c.route));
-        if (has) return item;
-      }
-      if (!!item.route && url.startsWith(item.route)) return null;
-    }
-    return null;
-  }
-
   private applyResponsiveState(width: number): void {
     const mobile = width <= 991;
     this.isMobile.set(mobile);
 
     if (mobile) {
       this.sidebarCollapsed.set(false);
-      this.sidebarPinned.set(false);
-    } else {
-      this.mobileSidebarOpen.set(false);
+      return;
+    }
 
-      if (!this.sidebarPinned()) {
-        this.sidebarCollapsed.set(true);
+    this.mobileSidebarOpen.set(false);
+    this.sidebarCollapsed.set(!this.sidebarPinned());
+  }
+
+  private restoreInitialNavigationState(): void {
+    const currentUrl = this.normalizeUrl(this.router.url);
+
+    this.syncModuleStateWithUrl(currentUrl);
+    this.syncOpenGroupsWithUrl(currentUrl);
+
+    if (this.shouldRestoreLastRoute(currentUrl)) {
+      const lastRoute = this.readStoredLastRoute();
+      if (lastRoute) {
+        this.router.navigateByUrl(lastRoute);
+        return;
       }
     }
+
+    const matchedModule = this.findModuleByUrl(currentUrl);
+    if (!matchedModule) {
+      const storedModule = this.readStoredModuleKey();
+      this.selectModule(storedModule, false);
+    }
+  }
+
+  private shouldRestoreLastRoute(url: string): boolean {
+    const normalized = this.normalizeUrl(url);
+    return normalized === '/' || normalized === '' || normalized === '/app';
+  }
+
+  private syncModuleStateWithUrl(url: string): void {
+    const matchedModule = this.findModuleByUrl(url);
+    if (matchedModule) {
+      this.selectedModuleKey.set(matchedModule.key);
+      this.persistSelectedModule(matchedModule.key);
+      return;
+    }
+
+    const storedModule = this.readStoredModuleKey();
+    this.selectedModuleKey.set(storedModule);
+  }
+
+  private findModuleByUrl(url: string): IbsNavModule | null {
+    const normalizedUrl = this.normalizeUrl(url);
+
+    for (const module of this.visibleModules()) {
+      if (this.moduleContainsRoute(module.items, normalizedUrl)) {
+        return module;
+      }
+    }
+
+    return null;
+  }
+
+  private moduleContainsRoute(items: IbsNavItem[], url: string): boolean {
+    for (const item of items) {
+      if (item.route && this.routeMatches(url, item.route)) {
+        return true;
+      }
+
+      if (item.children?.length && this.moduleContainsRoute(item.children, url)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private getDefaultRouteForModule(moduleKey: IbsModuleKey): string | null {
+    const module = this.visibleModules().find(m => m.key === moduleKey);
+    if (!module) return null;
+
+    if (module.defaultRoute) return module.defaultRoute;
+
+    return this.findFirstNavigableRoute(module.items);
+  }
+
+  private findFirstNavigableRoute(items: IbsNavItem[]): string | null {
+    for (const item of items) {
+      if (item.route) return item.route;
+
+      if (item.children?.length) {
+        const childRoute = this.findFirstNavigableRoute(item.children);
+        if (childRoute) return childRoute;
+      }
+    }
+
+    return null;
+  }
+
+  private findFirstGroup(items: IbsNavItem[]): IbsNavItem | null {
+    for (const item of items) {
+      if (this.isGroup(item)) return item;
+    }
+
+    return null;
+  }
+
+  private findOpenGroupIdsByUrl(items: IbsNavItem[], url: string, parents: string[] = []): string[] {
+    for (const item of items) {
+      const currentParents = this.isGroup(item) ? [...parents, item.id] : [...parents];
+
+      if (item.route && this.routeMatches(url, item.route)) {
+        return parents;
+      }
+
+      if (item.children?.length) {
+        const result = this.findOpenGroupIdsByUrl(item.children, url, currentParents);
+        if (result.length > 0) return result;
+
+        const hasDirectChildMatch = item.children.some(child => !!child.route && this.routeMatches(url, child.route!));
+        if (hasDirectChildMatch) {
+          return currentParents;
+        }
+      }
+    }
+
+    return [];
+  }
+
+  private routeMatches(currentUrl: string, itemRoute: string): boolean {
+    const current = this.normalizeUrl(currentUrl);
+    const target = this.normalizeUrl(itemRoute);
+
+    return current === target || current.startsWith(`${target}/`);
+  }
+
+  private normalizeUrl(url: string): string {
+    const value = (url ?? '').trim();
+    if (!value) return '/';
+
+    const clean = value.split('?')[0].split('#')[0];
+    return clean.startsWith('/') ? clean : `/${clean}`;
+  }
+
+  private readSidebarPinned(): boolean {
+    return localStorage.getItem(this.STORAGE_KEYS.sidebarPinned) === 'true';
+  }
+
+  private persistSidebarPinned(value: boolean): void {
+    localStorage.setItem(this.STORAGE_KEYS.sidebarPinned, String(value));
+  }
+
+  private readStoredModuleKey(): IbsModuleKey {
+    const stored = localStorage.getItem(this.STORAGE_KEYS.selectedModule) as IbsModuleKey | null;
+    const valid = IBS_NAV_MODULES.some(m => m.key === stored);
+
+    return valid && stored ? stored : 'core';
+  }
+
+  private persistSelectedModule(value: IbsModuleKey): void {
+    localStorage.setItem(this.STORAGE_KEYS.selectedModule, value);
+  }
+
+  private persistLastRoute(url: string): void {
+    const normalized = this.normalizeUrl(url);
+    localStorage.setItem(this.STORAGE_KEYS.lastRoute, normalized);
+  }
+
+  private readStoredLastRoute(): string | null {
+    return localStorage.getItem(this.STORAGE_KEYS.lastRoute);
   }
 }

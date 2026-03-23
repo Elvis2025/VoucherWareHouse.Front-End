@@ -16,7 +16,6 @@
     <!-- Top -->
     <div class="ibs-sidebar-top">
 
-      <!-- Nueva franja superior -->
       @if (!(sidebarCollapsed() && !isMobile())) {
         <div class="ibs-sidebar-topbar-row">
           <button class="ibs-sidebar-pin d-none d-lg-inline-flex"
@@ -46,13 +45,11 @@
         </div>
       }
 
-      <!-- Brand / tenant card -->
       <div class="ibs-brand" [class.compact]="sidebarCollapsed() && !isMobile()">
         <div class="ibs-brand-card"
              [class.compact]="sidebarCollapsed() && !isMobile()"
              [attr.title]="(sidebarCollapsed() && !isMobile()) ? 'Abrir menú' : null">
 
-          <!-- Logo siempre visible (clic abre si está colapsado) -->
           <button type="button"
                   class="ibs-brand-logo-btn"
                   (click)="(sidebarCollapsed() && !isMobile()) ? toggleSidebar() : null"
@@ -68,22 +65,19 @@
             </span>
           </button>
 
-          <!-- Texto solo en expand -->
           @if (!(sidebarCollapsed() && !isMobile())) {
             <div class="ibs-brand-text">
               <div class="ibs-brand-title">
-                @if(companyName$| async; as companyName){
-                  {{companyName}} <span class="ibs-brand-suffix">{{companyType$ | async}}</span>
-                }
-                @else {
+                @if(companyName$ | async; as companyName) {
+                  {{ companyName }} <span class="ibs-brand-suffix">{{ companyType$ | async }}</span>
+                } @else {
                   IB SYSTEMS <span class="ibs-brand-suffix">SRL</span>
                 }
               </div>
 
-              @if(companyDescription$ | async; as companyDescription){
-                <div class="ibs-brand-sub">{{companyDescription}}</div>
-              }
-              @else {
+              @if(companyDescription$ | async; as companyDescription) {
+                <div class="ibs-brand-sub">{{ companyDescription }}</div>
+              } @else {
                 <div class="ibs-brand-sub">Sistemas inteligentes de negocios</div>
               }
             </div>
@@ -93,7 +87,6 @@
     </div>
 
     @if (!(sidebarCollapsed() && !isMobile())) {
-
       <div class="ibs-search-row">
         <div class="ibs-search-ly">
           <i class="bi bi-search"></i>
@@ -117,10 +110,8 @@
         </div>
       </div>
 
-      <!-- MODULE PICKER -->
       <div class="ibs-module">
         <div class="dropdown ibs-module-picker" #modulePickerRoot>
-
           <button class="ibs-module-btn dropdown-toggle"
                   type="button"
                   (click)="toggleModulePicker($event)"
@@ -143,7 +134,6 @@
           @if (modulePickerOpen()) {
             <ul class="dropdown-menu ibs-module-menu ibs-theme-menu show"
                 (click)="$event.stopPropagation()">
-
               @for (m of visibleModules(); track trackMenuItem($index, m)) {
                 <li>
                   <button type="button"
@@ -164,12 +154,9 @@
               }
             </ul>
           }
-
         </div>
       </div>
-
     } @else {
-      <!-- Compact action: botón expandir -->
       <div class="ibs-compact-actions">
         <button class="ibs-compact-expand"
                 type="button"
@@ -178,86 +165,96 @@
                 [attr.aria-label]="sidebarPinned() ? 'Desfijar sidebar' : 'Fijar sidebar'"
                 [attr.title]="sidebarPinned() ? 'Desfijar menú' : 'Fijar menú (quedará abierto)'">
           <i class="bi"
-            [class.bi-pin-angle-fill]="sidebarPinned()"
-            [class.bi-layout-sidebar-inset]="!sidebarPinned()"></i>
+             [class.bi-pin-angle-fill]="sidebarPinned()"
+             [class.bi-layout-sidebar-inset]="!sidebarPinned()"></i>
         </button>
       </div>
     }
 
-    <!-- Menu -->
-    <nav class="ibs-menu">
+    <!-- SOLO ESTA ZONA SCROLLEA -->
+    <div class="ibs-sidebar-scroll-area" [class.compact]="sidebarCollapsed() && !isMobile()">
+      <nav class="ibs-menu">
+        <ng-container
+          *ngTemplateOutlet="navItemsTemplate; context: { $implicit: filteredItems(), level: 0 }">
+        </ng-container>
 
-      @for (item of filteredItems(); track trackById($index, item)) {
-
-        <!-- Leaf -->
-        @if (!isGroup(item)) {
-          <a class="ibs-link"
-             [class.compact]="sidebarCollapsed() && !isMobile()"
-             [routerLink]="item.route"
-             routerLinkActive="active"
-             (click)="closeMobileSidebar()"
-             [attr.title]="(sidebarCollapsed() && !isMobile()) ? item.text : null">
-            <span class="ibs-ico" [class]="item.icon"></span>
+        @if (filteredItems().length === 0) {
+          <div class="ibs-empty">
+            <i class="bi bi-exclamation-circle"></i>
             @if (!(sidebarCollapsed() && !isMobile())) {
+              <span>No tienes permisos en este módulo.</span>
+            }
+          </div>
+        }
+      </nav>
+    </div>
+
+    <ng-template #navItemsTemplate let-items let-level="level">
+      @for (item of items; track trackById($index, item)) {
+
+        @if (!isGroup(item) && hasRoute(item)) {
+          <a
+            [class.ibs-link]="level === 0"
+            [class.ibs-sublink]="level > 0"
+            [class.compact]="level === 0 && sidebarCollapsed() && !isMobile()"
+            [class.ibs-sublink-level-2]="level === 2"
+            [class.ibs-sublink-level-3]="level >= 3"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            (click)="closeMobileSidebar()"
+            [attr.title]="(level === 0 && sidebarCollapsed() && !isMobile()) ? item.text : null">
+
+            <span class="ibs-ico" [class.sm]="level > 0" [class]="item.icon"></span>
+
+            @if (!(level === 0 && sidebarCollapsed() && !isMobile())) {
               <span class="ibs-link-text">{{ item.text }}</span>
             }
           </a>
         }
 
-        <!-- Group -->
         @if (isGroup(item)) {
-          <div class="ibs-group">
+          <div class="ibs-group"
+               [class.ibs-group-root]="level === 0"
+               [class.ibs-group-nested]="level > 0">
+
             <button type="button"
-                    class="ibs-group-btn"
-                    [class.compact]="sidebarCollapsed() && !isMobile()"
+                    [class.ibs-group-btn]="level === 0"
+                    [class.ibs-group-btn-root]="level === 0"
+                    [class.ibs-group-btn-nested]="level > 0"
+                    [class.ibs-sublink]="level > 0"
+                    [class.compact]="level === 0 && sidebarCollapsed() && !isMobile()"
                     (click)="toggleGroup(item.id)"
-                    [attr.title]="(sidebarCollapsed() && !isMobile()) ? item.text : null">
+                    [attr.title]="(level === 0 && sidebarCollapsed() && !isMobile()) ? item.text : null">
 
               <span class="d-flex align-items-center gap-2">
-                <span class="ibs-ico" [class]="item.icon"></span>
-                @if (!(sidebarCollapsed() && !isMobile())) {
-                  <span class="ibs-link-text fw-semibold">{{ item.text }}</span>
+                <span class="ibs-ico" [class.sm]="level > 0" [class]="item.icon"></span>
+
+                @if (!(level === 0 && sidebarCollapsed() && !isMobile())) {
+                  <span class="ibs-link-text" [class.fw-semibold]="level === 0">{{ item.text }}</span>
                 }
               </span>
 
-              @if (!(sidebarCollapsed() && !isMobile())) {
-                <i class="bi d-none d-lg-inline"
+              @if (!(level === 0 && sidebarCollapsed() && !isMobile())) {
+                <i class="bi"
                    [class.bi-chevron-down]="!isOpen(item.id)"
                    [class.bi-chevron-up]="isOpen(item.id)"></i>
               }
             </button>
 
-            @if (isOpen(item.id) && !(sidebarCollapsed() && !isMobile())) {
-              <div class="ibs-sub">
-                @for (c of item.children; track trackById($index, c)) {
-                  <a class="ibs-sublink"
-                     [routerLink]="c.route"
-                     routerLinkActive="active"
-                     (click)="closeMobileSidebar()">
-                    <span class="ibs-ico sm" [class]="c.icon"></span>
-                    <span>{{ c.text }}</span>
-                  </a>
-                }
+            @if (isOpen(item.id) && !(level === 0 && sidebarCollapsed() && !isMobile())) {
+              <div [class.ibs-sub]="level === 0" [class.ibs-sub-nested]="level > 0">
+                <ng-container
+                  *ngTemplateOutlet="navItemsTemplate; context: { $implicit: item.children ?? [], level: level + 1 }">
+                </ng-container>
               </div>
             }
           </div>
         }
       }
-
-      @if (filteredItems().length === 0) {
-        <div class="ibs-empty">
-          <i class="bi bi-exclamation-circle"></i>
-          @if (!(sidebarCollapsed() && !isMobile())) {
-            <span>No tienes permisos en este módulo.</span>
-          }
-        </div>
-      }
-
-    </nav>
+    </ng-template>
 
     <!-- Footer expandido -->
     <div class="ibs-sidebar-footer" *ngIf="!(sidebarCollapsed() && !isMobile())">
-
       <div class="ibs-sidebar-footer-actions">
         <div class="ibs-sidebar-footer-theme">
           <button type="button"
@@ -320,7 +317,7 @@
       </div>
     </div>
 
-    <!-- Footer colapsado: solo icono del modo actual -->
+    <!-- Footer colapsado -->
     <div class="ibs-sidebar-footer compact" *ngIf="sidebarCollapsed() && !isMobile()">
       <button type="button"
               class="ibs-theme-icon-btn"
@@ -336,8 +333,6 @@
 
   <!-- MAIN -->
   <main class="ibs-main">
-
-    <!-- Topbar -->
     <div class="ibs-topbar">
       <div class="ibs-topbar-left">
         <button class="ibs-mobile-trigger d-lg-none"
@@ -353,7 +348,6 @@
         </div>
       </div>
 
-      <!-- User dropdown -->
       <div class="ibs-user ms-auto" #userMenuRoot>
         <button class="ibs-user-btn"
                 type="button"
@@ -396,7 +390,5 @@
     <div class="ibs-content">
       <router-outlet></router-outlet>
     </div>
-
   </main>
-
 </div>

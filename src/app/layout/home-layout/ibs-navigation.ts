@@ -1,9 +1,9 @@
-import {CORE_SYSTEM_NAVIGATION} from '../../Modules/core-system/core-system.navigation'
-import {VOUCHER_WAREHOUSE_NAVIGATION} from '../../Modules/voucher-warehouse/voucher-warehouse.navigation'
+import { CORE_SYSTEM_NAVIGATION } from '../../Modules/core-system/core-system.navigation';
+import { VOUCHER_WAREHOUSE_NAVIGATION } from '../../Modules/voucher-warehouse/voucher-warehouse.navigation';
 
-
-export type IbsModuleKey = 'core' 
-  | 'vou-war' 
+export type IbsModuleKey =
+  | 'core'
+  | 'vou-war'
   | 'generic-invoice'
   | 'sales'
   | 'shopping';
@@ -11,10 +11,10 @@ export type IbsModuleKey = 'core'
 export interface IbsNavItem {
   id: string;
   text: string;
-  icon?: string; // emoji/simple (sin depender de librerías)
+  icon?: string;
   route?: string;
   children?: IbsNavItem[];
-  requiredPolicy?: string; // ABP permission name
+  requiredPolicy?: string;
 }
 
 export interface IbsNavModule {
@@ -23,14 +23,16 @@ export interface IbsNavModule {
   icon?: string;
   items: IbsNavItem[];
   requiredPolicy?: string;
+
+  /**
+   * Ruta por defecto al seleccionar el módulo.
+   * Si no se define, se buscará automáticamente
+   * la primera ruta navegable disponible.
+   */
+  defaultRoute?: string;
 }
 
-/**
- * Nota:
- * - requiredPolicy debe ser el nombre EXACTO del permiso en ABP.
- * - Si no estás seguro del nombre, déjalo vacío y se mostrará.
- */
 export const IBS_NAV_MODULES: IbsNavModule[] = [
   CORE_SYSTEM_NAVIGATION,
-  VOUCHER_WAREHOUSE_NAVIGATION
-]; // orden alfabético por título
+  VOUCHER_WAREHOUSE_NAVIGATION,
+];
