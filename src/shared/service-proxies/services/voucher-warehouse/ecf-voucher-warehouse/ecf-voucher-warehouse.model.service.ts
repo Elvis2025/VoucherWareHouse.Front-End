@@ -54,7 +54,9 @@ import { BaseInputEntityDto } from "../../../../helpers/BaseInputEntityDto";
     error: ErrorDto | null;
   }
 
-  export interface EcfVoucherWarehouseCreateDto extends BaseEntityDto<number> {}
+  export interface EcfVoucherWarehouseCreateDto extends BaseEntityDto<number> {
+    
+  }
 
   export interface EcfVoucherWarehouseInputDto extends BaseInputEntityDto<number> {}
 

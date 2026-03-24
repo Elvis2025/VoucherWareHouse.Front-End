@@ -48,7 +48,7 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
       children: [
         {
           id: 'vou-war-ecf-vou-war',
-          text: 'Comprobantes Electronicos',
+          text: 'Generar Comprobantes Electronicos',
           icon: 'bi bi-file-earmark-code',
           route: 'voucher-warehouse/ecf-voucher-warehouse',
           requiredPolicy: 'Pages.Roles',
