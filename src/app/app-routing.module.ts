@@ -60,7 +60,7 @@ import { IbsLayoutComponent } from './layout/home-layout/ibs-layout.component';
                     },
                     {
                         path: 'voucher-warehouse/ecf-voucher-warehouse',
-                        loadChildren: () => import('./Modules/voucher-warehouse/ecf-api-authentication/ecf-api-authentication.module').then((m) => m.EcfApiAuthenticationModule),
+                        loadChildren: () => import('./Modules/voucher-warehouse/generate-ecf-voucher-warehouse/generate-ecf-voucher-warehouse.module').then((m) => m.GenerateEcfVoucherWarehouseModule),
                         canActivate: [AppRouteGuard],
                     },
 

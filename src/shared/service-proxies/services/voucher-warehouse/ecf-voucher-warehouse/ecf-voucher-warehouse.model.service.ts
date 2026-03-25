@@ -58,7 +58,9 @@ import { BaseInputEntityDto } from "../../../../helpers/BaseInputEntityDto";
     
   }
 
-  export interface EcfVoucherWarehouseInputDto extends BaseInputEntityDto<number> {}
+  export interface EcfVoucherWarehouseInputDto extends BaseInputEntityDto<number> {
+      
+}
 
   export interface EcfVoucherWarehouseOutputDto extends BaseEntityDto<number> {
     status: string;
@@ -153,6 +155,7 @@ import { BaseInputEntityDto } from "../../../../helpers/BaseInputEntityDto";
   export interface CommercialApprovalEcfInputDto {
     detalleAprobacionComercial: DetalleAprobacionComercial;
   }
+
 
   export interface DetalleAprobacionComercial {
     rNCEmisor: string;
@@ -354,7 +357,9 @@ import { BaseInputEntityDto } from "../../../../helpers/BaseInputEntityDto";
     numeroPedidoInterno: string;
     zonaVenta: string;
   }
-
+export interface LoadExcelInputDto {
+  file: File | null;
+}
   export interface IdDoc {
     tipoeCF: string;
     eNCF: string;

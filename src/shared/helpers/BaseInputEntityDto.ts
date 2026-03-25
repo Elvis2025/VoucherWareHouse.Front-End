@@ -5,4 +5,5 @@ export abstract class BaseInputEntityDto<TPrimaryKey> extends BaseEntityDto<TPri
   defaultMaxResultCount: number;
   maxResultCount: number;
   sorting:string;
+  filterText: string;
 }

@@ -1,0 +1,50 @@
+<ng-template #activeTpl let-u>
+  <span [class]="u.isActive ? 'ibs-badge ibs-badge--yes' : 'ibs-badge ibs-badge--no'">
+    {{ u.isActive ? 'Sí' : 'No' }}
+  </span>
+</ng-template>
+
+<ng-template #nameTpl let-u>
+  {{ u.name }} {{ u.surname }}
+</ng-template>
+
+<app-ibs-grid
+[title]="'Comprobantes Ecf'"
+[subtitle]="'Mantenimiento para generar comprobantes Ecf'"
+[placeholderSearch]="'Buscar...'"
+[columns]="columns()"
+[load]="loadEcfVouchers"
+[createPolicy]="'False'"
+>
+ <div class="d-flex justify-content-end gap-2 mb-3">
+ 
+
+      @if (selectedFile) {
+          <button
+            type="button"
+            class="btn btn-outline-danger"
+            (click)="clearSelectedFile(fileInput)">
+             Quitar <i class="bi bi-trash-fill"></i>
+          </button>
+         <button
+            type="button"
+            class="btn btn-primary "
+            [disabled]="!selectedFile || isUploading"
+            (click)="uploadExcel(fileInput)">
+            @if(!isUploading){
+                Enviar comprobantes <i class="bi bi-send-fill"></i>
+            }
+            @else{
+                'Subiendo...' <i class="bi bi-spinner"></i>
+            }
+
+            </button>
+  
+      }
+   
+   <div class="input-group">
+  <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+  <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04">Button</button>
+</div>
+  </div>
+</app-ibs-grid>

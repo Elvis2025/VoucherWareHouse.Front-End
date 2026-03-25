@@ -1,9 +1,8 @@
 import { inject, Injectable, InjectionToken } from "@angular/core";
-import { Observable } from "rxjs";
-import { CancelSequenceEcfInputDto, CommercialApprovalEcfInputDto, EcfVoucherOutputDto, EcfVoucherWarehouseCreateDto, EcfVoucherWarehouseInputDto, EcfVoucherWarehouseOutputDto, EcfVoucherWarehouseUpdateDto, ReceiveCreditNoteECFInputDto, ReceivePurchaseECFInputDto, ReceiveSalesEcfInputDto } from "./ecf-voucher-warehouse.model.service";
-import { HttpHeaders, HttpParams } from "@angular/common/module.d-CnjH8Dlt";
+import { map, Observable } from "rxjs";
+import { CancelSequenceEcfInputDto, CommercialApprovalEcfInputDto, EcfVoucherOutputDto, EcfVoucherWarehouseCreateDto, EcfVoucherWarehouseInputDto, EcfVoucherWarehouseOutputDto, EcfVoucherWarehouseUpdateDto, LoadExcelInputDto, ReceiveCreditNoteECFInputDto, ReceivePurchaseECFInputDto, ReceiveSalesEcfInputDto } from "./ecf-voucher-warehouse.model.service";
 import { API_BASE_URL } from "../../../service-proxies";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { PagedResultDto } from "../../../../helpers/PagedResultDto";
 
 
@@ -43,13 +42,18 @@ export class EcfVoucherWarehouseService {
     if (input.maxResultCount !== undefined && input.maxResultCount !== null) {
       params = params.set('MaxResultCount', input.maxResultCount.toString());
     }
-
-    return this.http.get<PagedResultDto<EcfVoucherWarehouseOutputDto>>(`${this.baseUrl}/GetAll`, {
+    if (input.filterText !== undefined && input.filterText !== null) {
+      params = params.set('FilterText', input.filterText.toString());
+    }
+console.log(input,'Here is the data')
+    return this.http.get<any>(`${this.baseUrl}/GetAll`, {
       params,
       headers: new HttpHeaders({
         Accept: 'text/plain'
       })
-    });
+    }).pipe(
+      map(response => response?.result ?? {items: [], totalCount: 0})
+    );
   }
 
    create(input: EcfVoucherWarehouseCreateDto): Observable<EcfVoucherWarehouseOutputDto> {
@@ -125,6 +129,16 @@ export class EcfVoucherWarehouseService {
       })
     });
   }
+
+ sendEcfExcel(input: LoadExcelInputDto): Observable<void> {
+  const formData = new FormData();
+
+  if (input.file) {
+    formData.append('File', input.file, input.file.name);
+  }
+
+  return this.http.post<void>(`${this.baseUrl}/LoadExcel`, formData);
+}
 
 
 

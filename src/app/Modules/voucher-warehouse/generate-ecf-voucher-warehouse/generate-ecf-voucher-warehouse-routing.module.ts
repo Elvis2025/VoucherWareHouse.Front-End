@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { EcfApiAuthenticationComponent } from './ecf-api-authentication.component';
+import { GenerateEcfVoucherWarehouseComponent } from './generate-ecf-voucher-warehouse.component';
 
 
 const routes: Routes = [
     
     {
         path: '',
-        component: EcfApiAuthenticationComponent,
+        component: GenerateEcfVoucherWarehouseComponent,
         pathMatch: 'full',
     },
 ];
@@ -16,4 +16,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class EcfApiAuthenticationRoutingModule {}
+export class GenerateEcfVoucherWarehouseRoutingModule {}

@@ -71,16 +71,7 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
     input.maxResultCount = q.maxResultCount ?? 10;
     input.sorting = q.sorting ?? '';
     //input.filterText = this.keyword ?? '';
-    console.log(this.ecfApiAuthenticationService
-        .getAll(input)
-        .pipe(
-        map(result => ({
-            items: result.items ?? [],
-            totalCount: result.totalCount ?? 0
-        })
-    ),
-        finalize(() => this.cd.detectChanges())
-        ))
+
     return this.ecfApiAuthenticationService
         .getAll(input)
         .pipe(
@@ -115,13 +106,13 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
                 key: 'tenancyName',
                 header: 'Tenant',
                 field: 'tenancyName',
-                width: '15',
+                width: '105px',
             },
             {
                 key: 'userName',
                 header: 'Usuario/Email',
                 field: 'usernameOrEmailAddress',
-                width: '15',
+                width: '115px',
             },
             
             {
