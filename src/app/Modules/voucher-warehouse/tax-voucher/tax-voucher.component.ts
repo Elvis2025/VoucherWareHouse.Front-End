@@ -39,7 +39,6 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
     constructor(
         injector: Injector,
         private taxVoucherService: TaxVoucherService,
-        private taxVoucherTypesService: TaxVoucherTypesService,
         private modalService: BsModalService,
         private activatedRoute: ActivatedRoute,
         cd: ChangeDetectorRef
