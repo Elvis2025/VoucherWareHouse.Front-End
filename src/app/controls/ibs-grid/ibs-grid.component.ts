@@ -25,6 +25,7 @@ import {
 import { AppComponentBase } from '../../../shared/app-component-base';
 
 export type IbsAlign = 'left' | 'center' | 'right';
+export type IbsLinkTarget = '_self' | '_blank';
 
 export interface IbsGridColumn<T> {
   key?: string;
@@ -37,6 +38,38 @@ export interface IbsGridColumn<T> {
   sortable?: boolean;
   resizable?: boolean;
   showFullOnHover?: boolean;
+
+  /**
+   * Link normal
+   */
+  isLink?: boolean;
+
+  /**
+   * Link tipo QR
+   */
+  isQrCode?: boolean;
+
+  /**
+   * URL real del link.
+   * Si no se define, se usa el valor del field.
+   */
+  linkUrl?: keyof T | string | ((row: T, value: any) => string | null | undefined);
+
+  /**
+   * Texto visible del link.
+   * Si no se define o viene vacío, se usa el valor del field.
+   */
+  linkText?: keyof T | string | ((row: T, value: any) => string | null | undefined);
+
+  /**
+   * Target del link
+   */
+  linkTarget?: IbsLinkTarget;
+
+  /**
+   * Texto opcional de acción dentro del panel QR
+   */
+  qrActionText?: string;
 }
 
 type IbsGridResolvedColumn<T> = IbsGridColumn<T> & {
@@ -71,6 +104,15 @@ type HoverPanelState = {
   label: string;
   top: number;
   left: number;
+};
+
+type QrPanelState = {
+  visible: boolean;
+  label: string;
+  text: string;
+  url: string;
+  qrUrl: string;
+  actionText: string;
 };
 
 @Component({
@@ -154,6 +196,15 @@ export class IbsGridComponent<T>
     left: 0,
   });
 
+  readonly qrPanel = signal<QrPanelState>({
+    visible: false,
+    label: '',
+    text: '',
+    url: '',
+    qrUrl: '',
+    actionText: 'Navegar al enlace',
+  });
+
   private resizingColumnKey: string | null = null;
   private resizeStartX = 0;
   private resizeStartWidth = 0;
@@ -219,6 +270,7 @@ export class IbsGridComponent<T>
 
   ngOnDestroy(): void {
     document.body.classList.remove('ibs-grid-resizing');
+    document.body.classList.remove('ibs-grid-qr-open');
   }
 
   private normalizeColumns(): void {
@@ -563,6 +615,7 @@ export class IbsGridComponent<T>
 
   showHoverPanel(event: MouseEvent, row: T, c: IbsGridResolvedColumn<T>): void {
     if (!c.showFullOnHover) return;
+    if (this.isLinkColumn(c) || this.isQrColumn(c)) return;
 
     const text = this.cellDisplayValue(row, c)?.trim();
     if (!text) return;
@@ -605,5 +658,130 @@ export class IbsGridComponent<T>
       top: 0,
       left: 0,
     });
+  }
+
+  isLinkColumn(c: IbsGridResolvedColumn<T>): boolean {
+    return c.isLink === true && c.isQrCode !== true;
+  }
+
+  isQrColumn(c: IbsGridResolvedColumn<T>): boolean {
+    return c.isQrCode === true;
+  }
+
+  private resolveValueByPath(source: any, key?: keyof T | string): any {
+    const path = String(key ?? '').trim();
+    if (!path) return null;
+
+    if (path.includes('.')) {
+      return path.split('.').reduce((acc, part) => (acc ? acc[part] : undefined), source) ?? null;
+    }
+
+    return source?.[path] ?? null;
+  }
+
+  resolveLinkUrl(row: T, c: IbsGridResolvedColumn<T>): string {
+    const value = this.cellValue(row, c);
+
+    if (typeof c.linkUrl === 'function') {
+      return String(c.linkUrl(row, value) ?? '').trim();
+    }
+
+    if (typeof c.linkUrl === 'string' && c.linkUrl.trim()) {
+      return String(this.resolveValueByPath(row, c.linkUrl) ?? '').trim();
+    }
+
+    return String(value ?? '').trim();
+  }
+
+  resolveLinkText(row: T, c: IbsGridResolvedColumn<T>): string {
+    const value = this.cellValue(row, c);
+    let resolved: any = null;
+
+    if (typeof c.linkText === 'function') {
+      resolved = c.linkText(row, value);
+    } else if (typeof c.linkText === 'string' && c.linkText.trim()) {
+      resolved = this.resolveValueByPath(row, c.linkText);
+    }
+
+    const text = String(resolved ?? '').trim();
+    if (text) {
+      return text;
+    }
+
+    return this.cellDisplayValue(row, c);
+  }
+
+  resolveLinkTarget(c: IbsGridResolvedColumn<T>): IbsLinkTarget {
+    return c.linkTarget ?? '_blank';
+  }
+
+  hasValidLink(row: T, c: IbsGridResolvedColumn<T>): boolean {
+    const url = this.resolveLinkUrl(row, c);
+    return !!url;
+  }
+
+  openLink(event: MouseEvent, row: T, c: IbsGridResolvedColumn<T>): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const url = this.resolveLinkUrl(row, c);
+    if (!url) return;
+
+    const target = this.resolveLinkTarget(c);
+    window.open(url, target, target === '_blank' ? 'noopener,noreferrer' : undefined);
+  }
+
+  openQrPanel(event: MouseEvent, row: T, c: IbsGridResolvedColumn<T>): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const text = this.resolveLinkText(row, c)?.trim();
+    const url = this.resolveLinkUrl(row, c)?.trim();
+
+    if (!url) return;
+
+    const qrUrl =
+      'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' +
+      encodeURIComponent(url);
+
+    this.qrPanel.set({
+      visible: true,
+      label: c.header,
+      text: text || url,
+      url,
+      qrUrl,
+      actionText: c.qrActionText?.trim() || 'Navegar al enlace',
+    });
+
+    document.body.classList.add('ibs-grid-qr-open');
+  }
+
+  closeQrPanel(): void {
+    const current = this.qrPanel();
+    if (!current.visible) return;
+
+    this.qrPanel.set({
+      visible: false,
+      label: '',
+      text: '',
+      url: '',
+      qrUrl: '',
+      actionText: 'Navegar al enlace',
+    });
+
+    document.body.classList.remove('ibs-grid-qr-open');
+  }
+
+  openQrNavigation(): void {
+    const current = this.qrPanel();
+    if (!current.url) return;
+
+    window.open(current.url, '_blank', 'noopener,noreferrer');
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscClosePanels(): void {
+    this.closeQrPanel();
+    this.hideHoverPanel();
   }
 }

@@ -126,7 +126,7 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
                 key: 'urlBase',
                 header: 'Url Base',
                 field: 'baseUrl',
-                width: '222px',
+                width: '100%',
                 showFullOnHover:true
             },
             

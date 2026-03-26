@@ -39,7 +39,9 @@
       </button>
     </div>
   </div>
+
   <ng-content></ng-content>
+
   <!-- Card -->
   <div class="ibs-table-wrap" [class.loading]="loading()">
     <div class="ibs-table-scroll">
@@ -142,7 +144,7 @@
                   [class.right]="c.align === 'right'">
                   <div
                     class="ibs-cell-inner"
-                    [class.ibs-cell-hoverable]="c.showFullOnHover"
+                    [class.ibs-cell-hoverable]="c.showFullOnHover && !isLinkColumn(c) && !isQrColumn(c)"
                     [class.ibs-cell-strict]="hasStrictWidth(c)"
                     (mouseenter)="showHoverPanel($event, row, c)"
                     (mouseleave)="hideHoverPanel()">
@@ -156,6 +158,28 @@
                       <span [class]="cellValue(row, c) ? 'ibs-badge ibs-badge--yes' : 'ibs-badge ibs-badge--no'">
                         {{ cellValue(row, c) ? 'Sí' : 'No' }}
                       </span>
+                    } @else if (isQrColumn(c) && hasValidLink(row, c)) {
+                      <button
+                        type="button"
+                        class="ibs-cell-link ibs-cell-link--qr"
+                        [class.is-truncated]="hasStrictWidth(c)"
+                        (click)="openQrPanel($event, row, c)">
+                        <span class="ibs-cell-link__text">
+                          {{ resolveLinkText(row, c) }}
+                        </span>
+                        <i class="bi bi-qr-code"></i>
+                      </button>
+                    } @else if (isLinkColumn(c) && hasValidLink(row, c)) {
+                      <a
+                        href=""
+                        class="ibs-cell-link"
+                        [class.is-truncated]="hasStrictWidth(c)"
+                        (click)="openLink($event, row, c)">
+                        <span class="ibs-cell-link__text">
+                          {{ resolveLinkText(row, c) }}
+                        </span>
+                        <i class="bi bi-box-arrow-up-right"></i>
+                      </a>
                     } @else {
                       <span
                         class="ibs-cell-text"
@@ -250,6 +274,46 @@
       [style.left.px]="hoverPanel().left">
       <div class="ibs-hover-panel__label">{{ hoverPanel().label }}</div>
       <div class="ibs-hover-panel__text">{{ hoverPanel().text }}</div>
+    </div>
+  }
+
+  @if (qrPanel().visible) {
+    <div class="ibs-qr-backdrop" (click)="closeQrPanel()"></div>
+
+    <div
+      class="ibs-qr-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Vista de código QR"
+      (click)="$event.stopPropagation()">
+
+      <button
+        type="button"
+        class="ibs-qr-panel__close"
+        title="Cerrar"
+        (click)="closeQrPanel()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <div class="ibs-qr-panel__eyebrow">
+        <i class="bi bi-qr-code"></i>
+        <span>{{ qrPanel().label }}</span>
+      </div>
+
+      <div class="ibs-qr-panel__image-wrap">
+        <img
+          class="ibs-qr-panel__image"
+          [src]="qrPanel().qrUrl"
+          [alt]="'QR de ' + qrPanel().text" />
+      </div>
+
+      <button
+        type="button"
+        class="ibs-qr-panel__cta"
+        (click)="openQrNavigation()">
+        <i class="bi bi-box-arrow-up-right"></i>
+        <span>{{ qrPanel().actionText }}</span>
+      </button>
     </div>
   }
 

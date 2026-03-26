@@ -75,17 +75,54 @@ export class GenerateEcfVoucherWarehouseComponent extends PagedListingComponentB
     ngOnInit(): void {
         this.columns.set([
             {
+                key:'code',
+                header: 'Codigo Interno',
+                field: 'code',
+                width: '118px'
+            },
+            {
                key: 'status',
                header:'Estado',
                field: 'statusFomatted',
-               width: '150px'
+               width: '190px'
            },
+           
+            {
+                key: 'dgiiQrCodeUrl',
+                header:'Consulta a la DGII',
+                field: 'dgiiQrCodeUrl',
+                width: '160px',
+                isQrCode: true,
+                linkText: () => 'Consultar e-NCF',
+                linkTarget: '_blank',
+                qrActionText: 'Consultar e-NCF'
+            },
+            {
+                key: 'dgiiResponseMessage',
+                header:'Respuesta de la DGII',
+                field: 'dgiiResponseMessage',
+                width: '162px',
+                showFullOnHover: true
+            },
            {
                 key: 'dgiiUsedSequence',
                 header:'Secuencia consumida',
                 field: 'dgiiUsedSequenceFormatted',
-                width: '180px',
+                width: '160px',
                 align: 'center',
+            },
+            
+            {
+                key: 'tipoECF',
+                header:'Tipo de NCF',
+                field: 'tipoECF',
+                width: '110px'
+            },
+            {
+                key: 'eNCF',
+                header:'e-NCF',
+                field: 'encf',
+                width: '150px'
             },
             {
                 key: 'rNCEmisor',
@@ -112,19 +149,7 @@ export class GenerateEcfVoucherWarehouseComponent extends PagedListingComponentB
                 field: 'razonSocialComprador',
                 width: '150px'
             },
-            {
-                key: 'eNCF',
-                header:'e-NCF',
-                field: 'encf',
-                width: '150px'
-            },
             
-            {
-                key: 'tipoECF',
-                header:'Tipo de NCF',
-                field: 'tipoECF',
-                width: '150px'
-            },
 
             {
                 key: 'fechaEmision',
@@ -143,21 +168,6 @@ export class GenerateEcfVoucherWarehouseComponent extends PagedListingComponentB
                 key: 'montoTotal',
                 header:'Monto Total',
                 field: 'montoTotal',
-                width: '150px'
-            },
-           
-            {
-                key: 'dgiiQrCodeUrl',
-                header:'Url DGII',
-                field: 'dgiiQrCodeUrl',
-                width: '150px'
-            },
-            {
-                key: 'dgiiResponseMessage',
-                header:'Respuesta de la DGII',
-                field: 'dgiiResponseMessage',
-                width: '150px',
-                showFullOnHover: true
             },
             
         ])
