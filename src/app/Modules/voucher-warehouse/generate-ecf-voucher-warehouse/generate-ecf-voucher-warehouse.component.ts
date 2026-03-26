@@ -80,6 +80,13 @@ export class GenerateEcfVoucherWarehouseComponent extends PagedListingComponentB
                field: 'statusFomatted',
                width: '150px'
            },
+           {
+                key: 'dgiiUsedSequence',
+                header:'Secuencia consumida',
+                field: 'dgiiUsedSequenceFormatted',
+                width: '180px',
+                align: 'center',
+            },
             {
                 key: 'rNCEmisor',
                 header:'RNC Emisor',
@@ -149,15 +156,10 @@ export class GenerateEcfVoucherWarehouseComponent extends PagedListingComponentB
                 key: 'dgiiResponseMessage',
                 header:'Respuesta de la DGII',
                 field: 'dgiiResponseMessage',
-                width: '150px'
+                width: '150px',
+                showFullOnHover: true
             },
-
-            // {
-            //     key: 'dgiiUsedSequence',
-            //     header:'Respuesta de la DGII',
-            //     field: 'dgiiUsedSequence',
-            //     width: '150px'
-            // },
+            
         ])
     }
     

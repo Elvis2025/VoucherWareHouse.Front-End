@@ -1,54 +1,56 @@
-﻿<div  class="wrap">
-    <section class="card" aria-label="Inicio de sesión">
-        <div class="topbar">
-            <!-- Si tú no manejas tenant aquí en Angular, lo dejamos “Host” fijo por diseño.
-                 Si ya tienes tenant en algún service, luego lo conectas sin cambiar el layout. -->
-            <div class="tenant-pill">
-                <span class="badge" id="tenantBadge">{{ currentTenantText }}</span>
+﻿<div class="ibs-lg-wrap">
+    <section class="ibs-lg-card" aria-label="Inicio de sesión">
+        <div class="ibs-lg-topbar">
+            <div class="ibs-lg-tenant-pill">
+                <span class="ibs-lg-badge" id="tenantBadge">{{ currentTenantText }}</span>
 
-                <!-- Si tienes vista de seleccionar tenant, cambia el routerLink -->
-                <button type="button" class="link-btn" (click)="openTenantModal()">
+                <button type="button" class="ibs-lg-link-btn" (click)="openTenantModal()">
                     Cambiar tenant
                 </button>
             </div>
         </div>
 
-        <div class="brand">
-            <div class="brand-logo">
+        <div class="ibs-lg-brand">
+            <div class="ibs-lg-brand-logo">
                 @if (logoUrl$ | async; as logoUrl) {
                     <img [src]="logoUrl" alt="iThotSystem" />
                 }
                 @else {
                     <img src="../../../assets/img/logo/logo-ibs.png" alt="IB Systems" />
-                }       
+                }
             </div>
 
-            @if(companyName$| async; as companyName){
-               <h1 class="brand-name">{{companyName}} <span class="brand-suffix">{{companyType$ | async}}</span></h1>
-               <p class="brand-tag">{{companyDescription$ | async}}</p>
+            @if (companyName$ | async; as companyName) {
+                <h1 class="ibs-lg-brand-name">
+                    {{ companyName }}
+                    <span class="ibs-lg-brand-suffix">{{ companyType$ | async }}</span>
+                </h1>
+                <p class="ibs-lg-brand-tag">{{ companyDescription$ | async }}</p>
             }
             @else {
-                <h1 class="brand-name">IB SYSTEMS <span class="brand-suffix">SRL</span></h1>
-                <p class="brand-tag">Sistemas Inteligentes de Negocios</p>
-            }      
+                <h1 class="ibs-lg-brand-name">
+                    IB SYSTEMS
+                    <span class="ibs-lg-brand-suffix">SRL</span>
+                </h1>
+                <p class="ibs-lg-brand-tag">Sistemas Inteligentes de Negocios</p>
+            }
         </div>
 
-        <div class="divider"></div>
+        <div class="ibs-lg-divider"></div>
 
-        <div class="content">
-            <h2 class="title">{{ 'LogIn' | localize }}</h2>
+        <div class="ibs-lg-content">
+            <h2 class="ibs-lg-title">{{ 'LogIn' | localize }}</h2>
 
             <form novalidate autocomplete="off" #loginForm="ngForm" (ngSubmit)="login()" id="loginForm">
-                <!-- USER -->
-                <div class="row">
-                    <label for="user">{{ 'UserNameOrEmail' | localize }}</label>
+                <div class="ibs-lg-row">
+                    <label class="ibs-lg-label" for="user">{{ 'UserNameOrEmail' | localize }}</label>
 
-                    <div class="field">
-                        <i class="bi bi-person field-icon" aria-hidden="true"></i>
+                    <div class="ibs-lg-field">
+                        <i class="bi bi-person ibs-lg-field-icon" aria-hidden="true"></i>
 
                         <input
                             id="user"
-                            class="input input-with-icons"
+                            class="ibs-lg-input ibs-lg-input-with-icons"
                             type="text"
                             name="userNameOrEmailAddress"
                             [(ngModel)]="authService.authenticateModel.userNameOrEmailAddress"
@@ -59,24 +61,23 @@
                             #userNameOrEmailAddressModel="ngModel"
                             #userNameOrEmailAddressEl />
 
-                        <!-- ABP validation (se queda igual) -->
                     </div>
 
                     <abp-validation-summary
                         [control]="userNameOrEmailAddressModel"
-                        [controlEl]="userNameOrEmailAddressEl"></abp-validation-summary>
+                        [controlEl]="userNameOrEmailAddressEl">
+                    </abp-validation-summary>
                 </div>
 
-                <!-- PASS -->
-                <div class="row">
-                    <label for="pass">{{ 'Password' | localize }}</label>
+                <div class="ibs-lg-row">
+                    <label class="ibs-lg-label" for="pass">{{ 'Password' | localize }}</label>
 
-                    <div class="field">
-                        <i class="bi bi-lock field-icon" aria-hidden="true"></i>
+                    <div class="ibs-lg-field">
+                        <i class="bi bi-lock ibs-lg-field-icon" aria-hidden="true"></i>
 
                         <input
                             id="pass"
-                            class="input input-with-icons"
+                            class="ibs-lg-input ibs-lg-input-with-icons"
                             [type]="showPassword ? 'text' : 'password'"
                             name="password"
                             [(ngModel)]="authService.authenticateModel.password"
@@ -89,7 +90,7 @@
 
                         <button
                             type="button"
-                            class="field-action"
+                            class="ibs-lg-field-action"
                             (click)="togglePassword()"
                             [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                             [attr.aria-pressed]="showPassword">
@@ -100,41 +101,40 @@
                     <abp-validation-summary [control]="passwordModel" [controlEl]="passwordEl"></abp-validation-summary>
                 </div>
 
-                <!-- REMEMBER + FORGOT -->
-                <div class="row inline">
-                    <div class="check">
+                <div class="ibs-lg-row ibs-lg-inline">
+                    <div class="ibs-lg-check">
                         <input
                             type="checkbox"
                             id="rememberMe"
                             name="rememberMe"
                             [(ngModel)]="authService.rememberMe" />
-                        <label for="rememberMe" style="margin: 0;">{{ 'RememberMe' | localize }}</label>
+                        <label class="ibs-lg-label" for="rememberMe" style="margin: 0;">
+                            {{ 'RememberMe' | localize }}
+                        </label>
                     </div>
 
-                    <div class="forgot">
+                    <div class="ibs-lg-forgot">
                         <a [routerLink]="['/account/forgot-password']">{{ 'ForgotPassword' | localize }}</a>
                     </div>
                 </div>
 
-                <!-- SUBMIT -->
-                <div class="row">
+                <div class="ibs-lg-row">
                     <button
                         type="submit"
-                        class="btn"
+                        class="ibs-lg-btn"
                         id="loginSubmitBtn"
                         [disabled]="!loginForm.form.valid || submitting">
                         {{ 'LogIn' | localize }}
                     </button>
                 </div>
 
-                <!-- REGISTER -->
-                <div class="row" *ngIf="isSelfRegistrationAllowed">
-                    <a class="btn-ghost btn" id="goRegisterBtn" [routerLink]="['../register']">
+                <div class="ibs-lg-row" *ngIf="isSelfRegistrationAllowed">
+                    <a class="ibs-lg-btn-ghost" id="goRegisterBtn" [routerLink]="['../register']">
                         {{ 'Register' | localize }}
                     </a>
                 </div>
 
-                <div class="foot">
+                <div class="ibs-lg-foot">
                     <span>© {{ year }} · iThotSystems</span>
                 </div>
             </form>
@@ -143,9 +143,9 @@
 </div>
 
 @if (tenantOpen()) {
-  <app-tenant-change-dialog
-    [tenancyName]="tenantName()"
-    (cancelled)="onTenantCancel()"
-    (saved)="onTenantSaved()">
-  </app-tenant-change-dialog>
+    <app-tenant-change-dialog
+        [tenancyName]="tenantName()"
+        (cancelled)="onTenantCancel()"
+        (saved)="onTenantSaved()">
+    </app-tenant-change-dialog>
 }
