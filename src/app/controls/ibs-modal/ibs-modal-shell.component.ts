@@ -9,23 +9,9 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./ibs-modal-shell.shared.scss'],
   styles: [
     `
-      :host {
-        position: fixed;
-        inset: 0;
-        display: block;
-        width: 100vw;
-        height: 100dvh;
-        z-index: 3000;
-        isolation: isolate;
-        pointer-events: none;
-        font-size: 14px;
-      }
-
       .ibs-modal-layer {
         position: fixed;
         inset: 0;
-        width: 100vw;
-        height: 100dvh;
         display: flex;
         align-items: flex-start;
         justify-content: center;
@@ -35,11 +21,10 @@ import { CommonModule } from '@angular/common';
       }
 
       .ibs-modal-backdrop {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.55);
-        backdrop-filter: blur(2px);
-        -webkit-backdrop-filter: blur(2px);
+       
+        //background: rgba(0, 0, 0, 0.55);
+        //backdrop-filter: blur(2px);
+        //-webkit-backdrop-filter: blur(2px);
       }
 
       .ibs-modal {

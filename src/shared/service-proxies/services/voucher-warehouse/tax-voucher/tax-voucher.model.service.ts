@@ -32,22 +32,7 @@ import { TaxVoucherTypesOutputDto } from "../tax-voucher-types/tax-voucher-types
   export interface TaxVoucherInputDto extends BaseInputEntityDto<number> {}
 
   export interface TaxVoucherOutputDto extends BaseEntityDto<number> {
-    description: string;
-    prefix: string;
-    initialSequence: number;
-    currentSequence: number;
-    finalSequence: number;
-    registeredQuantity: number;
-    remainingQuantity: number;
-    minimumToAlert: number;
-    expeditionDate: Date;
-    expirationDate: Date;
-    taxVoucherType: TaxVoucherTypesOutputDto;
-  }
-
-  export interface TaxVoucherUpdateDto extends BaseEntityDto<number> {
-
-    description: string;
+    comment: string;
     prefix: string;
     initialSequence: number;
     currentSequence: number;
@@ -58,6 +43,22 @@ import { TaxVoucherTypesOutputDto } from "../tax-voucher-types/tax-voucher-types
     expeditionDate: Date;
     expirationDate: Date;
     taxVoucherTypeId: number;
+  }
+
+  export interface TaxVoucherUpdateDto extends BaseEntityDto<number> {
+
+    comment: string;
+    prefix: string;
+    initialSequence: number;
+    currentSequence: number;
+    finalSequence: number;
+    registeredQuantity: number;
+    remainingQuantity: number;
+    minimumToAlert: number;
+    expeditionDate: Date;
+    expirationDate: Date;
+    taxVoucherTypeId: number;
+    
   }
 
   

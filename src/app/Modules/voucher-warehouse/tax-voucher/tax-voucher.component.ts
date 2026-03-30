@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, OnInit, signal, TemplateRef, ViewChild } from "@angular/core";
 import { PagedListingComponentBase } from "../../../../shared/paged-listing-component-base";
-import { TaxVoucherInputDto, TaxVoucherOutputDto } from "../../../../shared/service-proxies/services/voucher-warehouse/tax-voucher/tax-voucher.model.service";
+import { TaxVoucherInputDto, TaxVoucherOutputDto, TaxVoucherUpdateDto } from "../../../../shared/service-proxies/services/voucher-warehouse/tax-voucher/tax-voucher.model.service";
 import { LazyLoadEvent } from "primeng/api";
 import { IbsGridAction, IbsGridColumn, IbsGridComponent, IbsGridQuery } from "../../../controls/ibs-grid/ibs-grid.component";
 import { TaxVoucherService } from "../../../../shared/service-proxies/services/voucher-warehouse/tax-voucher/tax-voucher.service";
@@ -12,7 +12,7 @@ import { TaxVoucherUpdateComponent } from "./tax-voucher-update/tax-voucher-upda
 import { TaxVoucherCreateComponent } from "./tax-voucher-create/tax-voucher-create.component";
 import { finalize, map, Observable } from "rxjs";
 import { TaxVoucherTypesService } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher-types/tax-voucher-types.service";
-import { TaxVoucherTypesOutputDto } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher-types/tax-voucher-types.model.service";
+import { TaxVoucherTypesInputDto, TaxVoucherTypesOutputDto } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher-types/tax-voucher-types.model.service";
 
 
 
@@ -35,10 +35,11 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
  @ViewChild('activeTpl', { static: true }) activeTpl!: TemplateRef<{ $implicit: TaxVoucherOutputDto }>;
     @ViewChild('nameTpl', { static: true }) nameTpl!: TemplateRef<{ $implicit: TaxVoucherOutputDto }>;
     @ViewChild(IbsGridComponent) grid?: IbsGridComponent<TaxVoucherOutputDto>;
-    
+    taxVoucherUpdate!: TaxVoucherUpdateDto;
     constructor(
         injector: Injector,
         private taxVoucherService: TaxVoucherService,
+        private taxVoucherTypesService: TaxVoucherTypesService,
         private modalService: BsModalService,
         private activatedRoute: ActivatedRoute,
         cd: ChangeDetectorRef
@@ -77,9 +78,51 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
             );
     };
 
+    readonly loadTaxVouchersTypes =
+        (
+            q: IbsGridQuery
+        ): Observable<{ items: { codeAndDescription: string; id: number }[] }> => {
     
+            const input = {} as unknown as TaxVoucherTypesInputDto;
+    
+            input.skipCount = q.skipCount ?? 0;
+            input.maxResultCount = q.maxResultCount ?? 0;
+            input.sorting = q.sorting ?? '';
+            // input.filterText = this.keyword ?? '';
+    
+            return this.taxVoucherTypesService
+                .getAll(input)
+                .pipe(
+                    map(result => ({
+                        items: (result.items ?? []).map(x => ({
+                            id: x.id,
+                            codeAndDescription: x.codeAndDescription
+                        }))
+                    })),
+                    finalize(() => this.cd.detectChanges())
+                );
+        };
 
 
+
+    taxVoucherTypeOptions: { id: number; codeAndDescription: string }[] = [];
+
+       
+    loadTypes(id:number): void {
+        this.loadTaxVouchersTypes({
+            skipCount: null,
+            maxResultCount: null,
+            sorting: ''
+        } as IbsGridQuery).subscribe({
+            next: res => {
+            this.taxVoucherTypeOptions = res.items;
+            this.taxVoucherUpdate.taxVoucherTypeId = this.taxVoucherTypeOptions.find((x) => x.id === id).id
+            this.cd.detectChanges();
+            }
+        });
+    }
+    
+    
     keyword = '';
     isActive: boolean;
 
@@ -182,7 +225,7 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
 
     protected delete(entity: TaxVoucherOutputDto): void {
         abp.message.confirm(
-             this.l('UserDeleteWarningMessage', entity.description),
+             this.l('UserDeleteWarningMessage', entity.comment),
             undefined,
             (result: boolean) => {
                 if (result) {
@@ -202,18 +245,94 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
     onCreate(): void {
         this.openCreateOrEditDialog();
     }
-    
-    private openCreateOrEditDialog(id?: number){
-            const ref: BsModalRef = id
-                    ? this.modalService.show(TaxVoucherUpdateComponent, {
-                            class: 'modal-lg',
-                            initialState:{id},
-                        })
-                    : this.modalService.show(TaxVoucherCreateComponent, {
-                            class: 'modal-lg',
-                        });
-                ref.content?.onSave?.subscribe(() => this.refresh());
+     private createEmptyDto(): TaxVoucherUpdateDto {
+        return {
+          comment: '',
+          prefix: '',
+          initialSequence: null,
+          currentSequence: null,
+          finalSequence: null,
+          registeredQuantity: null,
+          remainingQuantity: null,
+          minimumToAlert: null,
+          expeditionDate: null,
+          expirationDate: null,
+          taxVoucherTypeId: null,
+          isActive: true
+        } as TaxVoucherUpdateDto;
+      }
 
-                this.refresh();
+    private openCreateOrEditDialog(id?: number){
+        if (!id) {
+            const ref: BsModalRef = this.modalService.show(TaxVoucherCreateComponent, {
+                class: 'modal-lg',
+            });
+
+            ref.content?.onSave?.subscribe(() => this.refresh());
+            return;
+        }
+
+        abp.ui.setBusy();
+        this.taxVoucherService
+            .get(id)
+            .pipe(
+                finalize(() => {
+                abp.ui.clearBusy();
+                })
+            )
+            .subscribe({
+                next: (res) => {
+                    if (res === undefined || res === null) {
+                        abp.message.warn(
+                            'No se pudo cargar el comprobante.',
+                            'Comprobante'
+                        );
+                        this.modalService.hide();
+                        return;
+                    }
+                    
+                    if (res.taxVoucherTypeId === undefined || res.taxVoucherTypeId === null) {
+                        abp.message.warn(
+                            'No se pudo cargar el tipo de comprobate para este comprobante.',
+                            'Tipo de Comprobante'
+                        );
+                        this.modalService.hide();
+                        return;
+                    }
+                    this.taxVoucherUpdate = this.createEmptyDto();
+                    this.taxVoucherUpdate.taxVoucherTypeId = res.taxVoucherTypeId;
+                    this.taxVoucherUpdate.registeredQuantity = res.registeredQuantity;
+                    this.taxVoucherUpdate.currentSequence = res.currentSequence;
+                    this.taxVoucherUpdate.expeditionDate = res.expeditionDate;
+                    this.taxVoucherUpdate.minimumToAlert = res.minimumToAlert;
+                    this.taxVoucherUpdate.expirationDate = res.expirationDate;
+                    this.taxVoucherUpdate.remainingQuantity = res.remainingQuantity;
+                    this.taxVoucherUpdate.finalSequence = res.finalSequence;
+                    this.taxVoucherUpdate.comment = res.comment;
+                    this.cd.markForCheck();
+                        
+                    const ref: BsModalRef = this.modalService.show(TaxVoucherUpdateComponent, {
+                        class: 'modal-lg',
+                        initialState: {
+                            id,
+                            taxVoucherUpdate: res
+                        },
+                    });
+
+                    ref.content?.onSave?.subscribe(() => this.refresh());
+                },
+                error: (error) => {
+                    const message =
+                    error?.error?.error?.message ||
+                    error?.error?.message ||
+                    'Error inesperado al cargar el comprobante.';
+
+                    abp.message.error(message);
+                    this.modalService.hide();
+                }
+            });                        
+              //  ref.content?.onSave?.subscribe(() => this.refresh());
+
+           
     }
 }

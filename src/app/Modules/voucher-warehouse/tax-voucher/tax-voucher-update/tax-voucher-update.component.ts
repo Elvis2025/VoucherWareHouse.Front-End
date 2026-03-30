@@ -9,8 +9,15 @@ import { IbsModalFooterComponent } from "../../../../controls/ibs-modal/ibs-moda
 import { IbsModalShellComponent } from "../../../../controls/ibs-modal/ibs-modal-shell.component";
 import { IbsInputComponent } from "../../../../controls/ibs-input/ibs-input.component";
 import { IbsCheckBoxComponent } from "../../../../controls/ibs-check-box/ibs-check-box.component";
-import { TaxVoucherCreateDto, TaxVoucherUpdateDto } from "../../../../../shared/service-proxies/services/voucher-warehouse/tax-voucher/tax-voucher.model.service";
+import { TaxVoucherCreateDto, TaxVoucherOutputDto, TaxVoucherUpdateDto } from "../../../../../shared/service-proxies/services/voucher-warehouse/tax-voucher/tax-voucher.model.service";
 import { BsModalRef } from "ngx-bootstrap/modal";
+import { IbsTextareaComponent } from "@app/controls/ibs-textarea/ibs-textarea.component";
+import { IbsGridQuery } from "@app/controls/ibs-grid/ibs-grid.component";
+import { finalize, map, Observable } from "@node_modules/rxjs";
+import { TaxVoucherTypesInputDto } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher-types/tax-voucher-types.model.service";
+import { TaxVoucherTypesService } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher-types/tax-voucher-types.service";
+import { IbsSelectComponent } from "@app/controls/ibs-select/ibs-select.component";
+import { TaxVoucherService } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher/tax-voucher.service";
 
 
 
@@ -28,7 +35,9 @@ import { BsModalRef } from "ngx-bootstrap/modal";
     IbsModalFooterComponent,
     IbsModalShellComponent,
     IbsInputComponent,
-    IbsCheckBoxComponent
+    IbsCheckBoxComponent,
+    IbsTextareaComponent,
+    IbsSelectComponent
   ],
   templateUrl: './tax-voucher-update.component.html',
   styleUrls: ['./tax-voucher-update.component.scss'],
@@ -38,32 +47,47 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
 
     @Output() onSave = new EventEmitter<void>();
         @Input({required: true}) id!: number;
+        @Input() taxVoucherUpdate!: TaxVoucherUpdateDto;
     saving = false;
-    ecfApiAuth: TaxVoucherUpdateDto;
     keyword = '';
     isActive = true;
-
+    
     constructor(
         injector: Injector,
-       // private taxVoucherService: TaxVoucherCreateDto,
+       private taxVoucherTypesService: TaxVoucherTypesService,
+       private taxVoucherService: TaxVoucherService,
         public bsModalRef: BsModalRef,
         private cd: ChangeDetectorRef
     ) {
         super(injector);
-        this.ecfApiAuth = this.createEmptyDto();
+       //  this.taxVoucherUpdate = this.createEmptyDto();
+      
     }
 
 
     ngAfterViewInit(): void {
-        //throw new Error("Method not implemented.");
-    }
-    ngOnInit(): void {
-       // throw new Error("Method not implemented.");
+            
+      this.cd.detectChanges();
     }
 
+    ngOnInit(): void {
+
+     //  this.resetForm();
+       
+    }
+    public init(): void {
+
+       this.resetForm();
+       
+    }
+
+    
+
+    
+        
         private createEmptyDto(): TaxVoucherUpdateDto {
         return {
-          description: '',
+          comment: '',
           prefix: '',
           initialSequence: null,
           currentSequence: null,
@@ -77,4 +101,54 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
           isActive: true
         } as TaxVoucherUpdateDto;
       }
+
+
+      save(): void{
+        if (this.saving) {
+            return;
+        }
+
+        if (!this.validateForm()) {
+            return;
+        }
+
+        this.saving = true;
+        this.cd.markForCheck();
+        console.log(this.taxVoucherUpdate)
+        this.taxVoucherService.create(this.taxVoucherUpdate).subscribe({
+            next: () => {
+                this.notify.info(this.l('SavedSuccessfully'));
+                this.onSave.emit();
+                this.resetForm();
+                this.bsModalRef.hide();
+            },
+            error: (error) => {
+                const message =
+                error?.error?.error?.message ||
+                error?.error?.message ||
+                'Error inesperado';
+
+                abp.message.error(message);
+                this.saving = false;
+                this.cd.markForCheck();
+            },
+            complete: () => {
+                this.saving = false;
+                this.cd.markForCheck();
+            }
+        });
+    }
+
+    private validateForm(): boolean {
+    
+
+    return true;
+  }
+  taxVoucherTypeOptions: { id: number; codeAndDescription: string }[] = [];
+
+      private resetForm(): void {
+        
+       // this.loadCurrentTaxVoucher();
+       
+    }
 }

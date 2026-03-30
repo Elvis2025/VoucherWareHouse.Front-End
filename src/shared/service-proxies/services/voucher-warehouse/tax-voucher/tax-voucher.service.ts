@@ -19,12 +19,12 @@ export class TaxVoucherService {
   get(id: number): Observable<TaxVoucherOutputDto> {
     const params = new HttpParams().set('Id', id.toString());
 
-    return this.http.get<TaxVoucherOutputDto>(`${this.baseUrl}/Get`, {
+    return this.http.get<any>(`${this.baseUrl}/Get`, {
       params,
       headers: new HttpHeaders({
         Accept: 'text/plain'
       })
-    });
+    }).pipe(map( response => response?.result));
   }
 
 
