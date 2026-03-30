@@ -33,16 +33,6 @@
 
     <div class="field-col">
       <app-ibs-input
-        [label]="'Prefijo'"
-        name="prefix"
-        [maxLength]="2000"
-        [minLength]="1"
-        [(ngModel)]="taxVoucherCreate.prefix">
-      </app-ibs-input>
-    </div>
-
-    <div class="field-col">
-      <app-ibs-input
         [label]="'Secuencia actual'"
         name="currentSequence"
         [required]="true"
@@ -129,7 +119,7 @@
         label="Comentario"
         [rows]="3"
         [maxLength]="250"
-        [(ngModel)]="taxVoucherCreate.description">
+        [(ngModel)]="taxVoucherCreate.comment">
         </app-ibs-textarea>
     </div>
 

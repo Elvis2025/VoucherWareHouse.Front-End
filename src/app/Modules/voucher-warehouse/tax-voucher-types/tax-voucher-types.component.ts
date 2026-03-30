@@ -88,23 +88,16 @@ export class TaxVoucherTypesComponent extends PagedListingComponentBase<TaxVouch
             },
             {
                 key: 'code',
+                header: 'Codigo',
+                field: 'code',
+                width: '5',
+            },
+            {
+                key: 'code',
                 header: 'Tipos de comprobantes',
                 field: 'codeAndDescription',
                 width: '5',
             },
-            {
-                key: 'format',
-                header: 'Formato',
-                field: 'format',
-                width: '25',
-            },
-            {
-                key: 'maxLenght',
-                header: 'Longitud máxima',
-                field: 'taxVoucherLenght',
-                width: '25',
-            }
-           
         ]);
 
         this.actions.set([

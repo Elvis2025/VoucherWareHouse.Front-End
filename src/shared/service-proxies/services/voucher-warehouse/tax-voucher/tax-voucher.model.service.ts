@@ -15,7 +15,7 @@ import { TaxVoucherTypesOutputDto } from "../tax-voucher-types/tax-voucher-types
 
 
   export interface TaxVoucherCreateDto extends BaseEntityDto<number> {
-    description: string;
+    comment: string;
     prefix: string;
     initialSequence: number;
     currentSequence: number;

@@ -1,3 +1,4 @@
+import { IbsDatepickerComponent } from './../../../../controls/ibs-datepicker/ibs-datepicker.component';
 import { IbsTextareaComponent } from './../../../../controls/ibs-textarea/ibs-textarea.component';
 import { IbsSelectComponent } from './../../../../controls/ibs-select/ibs-select.component';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, OnInit, Output } from "@angular/core";
@@ -18,6 +19,7 @@ import { TaxVoucherTypesService } from "@shared/service-proxies/services/voucher
 import { finalize, map, Observable, tap } from "rxjs";
 import { IbsGridQuery } from "@app/controls/ibs-grid/ibs-grid.component";
 import { TaxVoucherTypesInputDto } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher-types/tax-voucher-types.model.service";
+import { BsDatepickerConfig, BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 
 
 
@@ -37,7 +39,9 @@ import { TaxVoucherTypesInputDto } from "@shared/service-proxies/services/vouche
     IbsInputComponent,
     IbsCheckBoxComponent,
     IbsSelectComponent,
-    IbsTextareaComponent
+    IbsDatepickerComponent,
+    IbsTextareaComponent,
+    BsDatepickerModule
   ],
   templateUrl: './tax-voucher-create.component.html',
   styleUrls: ['./tax-voucher-create.component.scss'],
@@ -51,7 +55,13 @@ export class TaxVoucherCreateComponent extends AppComponentBase implements OnIni
     taxVoucherCreate: TaxVoucherCreateDto;
     keyword = '';
     isActive = true;
-
+dpConfig: Partial<BsDatepickerConfig> = {
+    containerClass: 'theme-dark-blue',
+    dateInputFormat: 'DD-MM-YYYY',
+    showWeekNumbers: false,
+    adaptivePosition: true,
+    isAnimated: false
+  };
     constructor(
         injector: Injector,
         private taxVoucherService: TaxVoucherService,
@@ -71,7 +81,7 @@ export class TaxVoucherCreateComponent extends AppComponentBase implements OnIni
         const input = {} as unknown as TaxVoucherTypesInputDto;
 
         input.skipCount = q.skipCount ?? 0;
-        input.maxResultCount = q.maxResultCount ?? 10;
+        input.maxResultCount = q.maxResultCount ?? 0;
         input.sorting = q.sorting ?? '';
         // input.filterText = this.keyword ?? '';
 
@@ -116,7 +126,7 @@ export class TaxVoucherCreateComponent extends AppComponentBase implements OnIni
     }
     private createEmptyDto(): TaxVoucherCreateDto {
         return {
-          description: '',
+          comment: '',
           prefix: '',
           initialSequence: 0,
           currentSequence: null,
@@ -168,17 +178,7 @@ export class TaxVoucherCreateComponent extends AppComponentBase implements OnIni
     }
 
     private validateForm(): boolean {
-    if (!this.isNotEmpty(this.taxVoucherCreate.prefix)) {
-      this.message.warn('El codigo del comprobante es requerido');
-      return false;
-    }
-
-    if (!this.isNotEmpty(this.taxVoucherCreate.description)) {
-      this.message.warn('La descripcion del comprobante es requerido');
-      return false;
-    }
-
-   
+    
 
     return true;
   }

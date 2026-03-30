@@ -9,7 +9,7 @@
     <div class="ibs-fields-stack">
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Codigo del comprobante'"
+                [label]="'Codigo del comprobante Ej: E31'"
                 name="lblcode"
                 [required]="true"
                 [maxLength]="64"
@@ -19,7 +19,7 @@
 
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'descripcion del comprobante'"
+                [label]="'Descripcion del comprobante (Ej: Factura de crédito fiscal )'"
                 name="lbldescription"
                 [required]="true"
                 [maxLength]="2000"
@@ -33,7 +33,7 @@
             
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Formato del comprobante'"
+                [label]="'Formato del comprobante (Ej: E310000000000)'"
                 name="lblformat"
                 [required]="true"
                 [minLength]="2"
@@ -45,7 +45,7 @@
 
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Longitud del comprobante' | localize"
+                [label]="'Longitud del comprobante (Ej: E31 + 0000000000 = 12 caractres)'"
                 name="lbltxl"
                 [required]="true"
                 [maxLength]="256"

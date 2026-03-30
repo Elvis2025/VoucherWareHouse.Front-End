@@ -103,12 +103,6 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
                 width: '15%',
             },
             {
-                key: 'prefix',
-                header: 'Prefijo',
-                field: 'prefix',
-                width: '25%',
-            },
-            {
                 key: 'currentSequence',
                 header: 'Secuencia Actual',
                 field: 'currentSequence',
@@ -141,19 +135,19 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
             {
                 key: 'expeditionDate',
                 header: 'Fecha de expedición',
-                field: 'expeditionDate',
+                field: 'expeditionDateFormatted',
                 width: '25%',
             },
             {
                 key: 'expirationDate',
                 header: 'Fecha de expiración',
-                field: 'expirationDate',
+                field: 'expirationDateFormatted',
                 width: '25%',
             },
             {
                 key: 'description',
                 header: 'Comentario',
-                field: 'description',
+                field: 'comment',
                 width: '150px',
                 showFullOnHover: true
             }

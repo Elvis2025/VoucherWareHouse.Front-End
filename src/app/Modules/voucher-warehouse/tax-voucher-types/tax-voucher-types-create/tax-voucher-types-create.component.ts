@@ -49,6 +49,7 @@ export class TaxVoucherTypesCreateComponent extends AppComponentBase implements 
   ) {
     super(injector);
     this.taxVoucherCreate = this.createEmptyDto();
+    this.taxVoucherCreate.isActive = true;
   }
 
   ngOnInit(): void {
@@ -63,7 +64,7 @@ export class TaxVoucherTypesCreateComponent extends AppComponentBase implements 
     return {
       code: '',
       description: '',
-      taxVoucherLenght: 0,
+      taxVoucherLenght: null,
       format: '',
       isActive: true
     } as TaxVoucherTypesCreateDto;
