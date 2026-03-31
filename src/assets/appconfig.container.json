@@ -1,6 +1,6 @@
 {
     "remoteServiceBaseUrl": "http://localhost:44311",
-    "appBaseUrl": "http://localhost:4200",
+    "appBaseUrl": "https://almhostsin.ibsystems.com.do",
     "localeMappings": [
         {
             "from": "pt-BR",
