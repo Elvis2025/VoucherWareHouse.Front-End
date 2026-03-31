@@ -30,10 +30,11 @@
               <div class="sub">{{ leftCount() }} usuario(s)</div>
             </div>
 
-            <div class="ra-search">
+            <div class="ibs-search">
               <i class="bi bi-search"></i>
               <input
                 type="text"
+                class="ibs-search-input"
                 [ngModel]="leftQ()"
                 (ngModelChange)="leftQ.set($event)"
                 placeholder="Buscar..."
@@ -90,9 +91,10 @@
               <div class="sub">{{ rightCount() }} usuario(s)</div>
             </div>
 
-            <div class="ra-search">
+            <div  class="ibs-search">
               <i class="bi bi-search"></i>
               <input
+              class="ibs-search-input"
                 type="text"
                 [ngModel]="rightQ()"
                 (ngModelChange)="rightQ.set($event)"

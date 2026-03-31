@@ -50,15 +50,7 @@
   width: 100%;
 }
 
-.ibs-refresh {
-  width: 100%;
-  min-height: 44px;
-  padding: 0 14px;
-  gap: 10px;
-  font-weight: 1000;
-  letter-spacing: 0.2px;
-  filter: saturate(0.85);
-}
+
 
 /* =========================
    Table container
@@ -917,10 +909,7 @@ html[data-theme="dark"] .ibs-badge--no {
     flex-wrap: wrap;
   }
 
-  .ibs-refresh {
-    width: auto;
-  }
-
+ 
   .ibs-table-wrap {
     border-radius: 18px;
     border-width: 2px;

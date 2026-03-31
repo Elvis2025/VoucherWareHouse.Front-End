@@ -143,7 +143,18 @@ body.swal2-shown {
   box-shadow: var(--ibs-accent-shadow-hover);
 }
 
-
+.ibs-refresh {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  gap: 10px;
+  font-weight: 1000;
+  letter-spacing: 0.2px;
+  filter: saturate(0.85);
+}
+ .ibs-refresh {
+    width: auto;
+  }
 
 .ibs-btn-close{
   background: transparent;

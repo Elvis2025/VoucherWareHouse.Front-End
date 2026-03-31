@@ -1,13 +1,11 @@
-<div class="d-flex justify-content-between align-items-center gap-3 px-3 py-2 border-bottom bg-light ibs-modal-topbar">
+<div class="ibs-modal-topbar">
   <div class="topbar-left d-flex align-items-center gap-2 flex-grow-1">
     @if (showSearch) {
-      <div class="input-group ibs-search">
-        <span class="input-group-text">
-          <i class="bi bi-search"></i>
-        </span>
+      <div class="ibs-search">
+        <i class="bi bi-search"></i>
 
         <input
-          class="form-control ibs-search-input"
+          class="ibs-search-input"
           [placeholder]="searchPlaceholder"
           [value]="searchValue"
           (input)="searchChanged.emit($any($event.target).value)"
@@ -16,7 +14,7 @@
         @if (searchValue) {
           <button
             type="button"
-            class="btn btn-outline-secondary ibs-search-clear"
+            class="ibs-search-clear"
             (click)="cleared.emit()"
             title="Limpiar">
             <i class="bi bi-x-lg"></i>
@@ -30,7 +28,7 @@
 
   @if (showRefresh) {
     <button
-      class="btn btn-primary ibs-btn-save"
+      class="ibs-action-btn ibs-refresh"
       type="button"
       (click)="refreshed.emit()"
       [disabled]="refreshDisabled">

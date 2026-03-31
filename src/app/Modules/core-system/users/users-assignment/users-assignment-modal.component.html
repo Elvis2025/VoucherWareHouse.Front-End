@@ -1,3 +1,4 @@
+
 <app-ibs-modal-shell [wide]="true" (cancelled)="onCancel()">
   <app-ibs-modal-header
     title="Asignar roles al usuario"
@@ -29,10 +30,11 @@
               <div class="sub">{{ leftCount() }} rol(es)</div>
             </div>
 
-            <div class="ra-search">
+            <div class="ibs-search">
               <i class="bi bi-search"></i>
               <input
                 type="text"
+                class="ibs-search-input"
                 [ngModel]="leftQ()"
                 (ngModelChange)="leftQ.set($event)"
                 placeholder="Buscar..."
@@ -81,10 +83,11 @@
               <div class="sub">{{ rightCount() }} rol(es)</div>
             </div>
 
-            <div class="ra-search">
+            <div class="ibs-search">
               <i class="bi bi-search"></i>
               <input
                 type="text"
+                class="ibs-search-input"
                 [ngModel]="rightQ()"
                 (ngModelChange)="rightQ.set($event)"
                 placeholder="Buscar..."

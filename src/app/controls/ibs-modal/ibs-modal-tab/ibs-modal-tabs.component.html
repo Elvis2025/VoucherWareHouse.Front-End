@@ -3,7 +3,7 @@
     <li class="nav-item" role="presentation">
       <button
         type="button"
-        class="nav-link ibs-tab-btn"
+        class="ibs-tab-btn"
         role="tab"
         [class.active]="activeIndex() === i"
         [class.disabled]="tab.disabled"
@@ -19,7 +19,7 @@
   }
 </ul>
 
-<div class="tab-content ibs-tab-panel p-3 border border-top-0 rounded-bottom bg-white">
+<div class="ibs-tab-panel">
   @for (tab of tabs; track tab.label; let i = $index) {
     @if (activeIndex() === i) {
       <div class="tab-pane fade show active">
