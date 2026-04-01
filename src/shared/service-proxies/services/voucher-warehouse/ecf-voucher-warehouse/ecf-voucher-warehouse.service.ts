@@ -1,6 +1,6 @@
 import { inject, Injectable, InjectionToken } from "@angular/core";
 import { map, Observable } from "rxjs";
-import { CancelSequenceEcfInputDto, CommercialApprovalEcfInputDto, EcfVoucherOutputDto, EcfVoucherWarehouseCreateDto, EcfVoucherWarehouseInputDto, EcfVoucherWarehouseOutputDto, EcfVoucherWarehouseUpdateDto, LoadExcelInputDto, ReceiveCreditNoteECFInputDto, ReceivePurchaseECFInputDto, ReceiveSalesEcfInputDto } from "./ecf-voucher-warehouse.model.service";
+import { CancelSequenceEcfInputDto, CommercialApprovalEcfInputDto, EcfVoucherOutputDto, EcfVoucherWarehouseCreateDto, EcfVoucherWarehouseInputDto, EcfVoucherWarehouseOutputDto, EcfVoucherWarehouseUpdateDto, LoadExcelInputDto, ReceiveCreditNoteECFInputDto, ReceivePurchaseECFInputDto, ReceiveSalesEcfInputDto,EcfVoucherJobStatusDto, GetEcfVoucherJobsInputDto, CancelEcfVoucherJobInputDto } from "./ecf-voucher-warehouse.model.service";
 import { API_BASE_URL } from "../../../service-proxies";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { PagedResultDto } from "../../../../helpers/PagedResultDto";
@@ -141,7 +141,50 @@ console.log(input,'Here is the data')
 }
 
 
+  getJobStatus(jobId: string): Observable<EcfVoucherJobStatusDto> {
+    const params = new HttpParams().set('jobId', jobId);
 
+    return this.http.get<any>(`${this.baseUrl}/GetJobStatus`, {
+      params,
+      headers: new HttpHeaders({
+        Accept: 'text/plain'
+      })
+    }).pipe(
+      map(response => response?.result as EcfVoucherJobStatusDto)
+    );
+  }
+
+  getJobsStatus(input: GetEcfVoucherJobsInputDto): Observable<EcfVoucherJobStatusDto[]> {
+    let params = new HttpParams();
+
+    if (input.onlyActive !== undefined && input.onlyActive !== null) {
+      params = params.set('OnlyActive', input.onlyActive.toString());
+    }
+
+    if (input.maxResultCount !== undefined && input.maxResultCount !== null) {
+      params = params.set('MaxResultCount', input.maxResultCount.toString());
+    }
+
+    return this.http.get<any>(`${this.baseUrl}/GetJobsStatus`, {
+      params,
+      headers: new HttpHeaders({
+        Accept: 'text/plain'
+      })
+    }).pipe(
+      map(response => response?.result ?? [])
+    );
+  }
+
+  cancelJob(input: CancelEcfVoucherJobInputDto): Observable<void> {
+    return this.http.post<any>(`${this.baseUrl}/CancelJob`, input, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Accept: 'text/plain'
+      })
+    }).pipe(
+      map(() => void 0)
+    );
+  }
 
 }
 

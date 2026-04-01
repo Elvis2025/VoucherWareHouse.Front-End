@@ -507,6 +507,47 @@ export interface LoadExcelInputDto {
     lineas: number;
   }
 
+export interface EcfVoucherJobStatusDto {
+    jobId: string;
+    fileName: string;
+    status: string;
+    errorMessage?: string | null;
+
+    totalRows: number;
+    processedRows: number;
+    successRows: number;
+    failedRows: number;
+
+    isCancellationRequested: boolean;
+    isCompleted: boolean;
+    isFailed: boolean;
+    isCancelled: boolean;
+    isActive: boolean;
+
+    progressPercentage: number;
+
+    creationTime: string;
+    startTime?: string | null;
+    endTime?: string | null;
+    lastModificationTime?: string | null;
+}
+
+export interface GetEcfVoucherJobsInputDto {
+    onlyActive: boolean;
+    maxResultCount: number;
+}
+
+export interface CancelEcfVoucherJobInputDto {
+    jobId: string;
+}
+
+export interface UploadJobResponseDto {
+    jobId?: string;
+    status?: string;
+    fileName?: string;
+}
+
+
   // =========================================================
   // ENUMS
   // =========================================================
