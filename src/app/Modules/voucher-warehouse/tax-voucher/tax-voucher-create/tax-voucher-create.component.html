@@ -71,14 +71,28 @@
 
 
   <div class="field-col">
-      <app-ibs-input
-        [label]="'Fecha de caducidad' | localize"
-        name="expirationDate"
-        [required]="true"
-        type="date"
-        [minLength]="0"
-        [(ngModel)]="taxVoucherCreate.expirationDate">
-      </app-ibs-input>
+     
+
+   
+
+<div class="input-group">
+  <input
+    type="text"
+    class="form-control"
+    bsDatepicker
+    #dp="bsDatepicker"
+    [(ngModel)]="taxVoucherCreate.expirationDate"
+    [bsConfig]="datePickerConfig"
+    readonly />
+
+  <button
+    type="button"
+    class="btn btn-outline-secondary"
+    (click)="openDatepicker(dp, $event)">
+    <i class="bi bi-calendar"></i>
+  </button>
+</div>
+
     </div>
     <div class="field-col">
       <app-ibs-input

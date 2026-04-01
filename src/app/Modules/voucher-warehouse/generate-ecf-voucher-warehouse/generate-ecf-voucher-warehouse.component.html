@@ -10,88 +10,143 @@
   [load]="loadEcfVouchers"
   [createPolicy]="'False'"
 >
-  @if (1 == 1) {
-    <section class="jobs-hud" aria-label="Progreso de jobs en segundo plano">
-      <div class="jobs-hud__top">
-        <div class="jobs-hud__headline">
-          <span class="jobs-hud__eyebrow">
-            <i class="bi bi-activity"></i>
-            Tiempo real
-          </span>
 
-          <div class="jobs-hud__titles">
-            <h3 class="jobs-hud__title">Procesamiento de comprobantes en segundo plano</h3>
-            <p class="jobs-hud__subtitle">
-              La vista se actualiza automáticamente a medida que cada fila se procesa.
-            </p>
-          </div>
-        </div>
 
-        <div class="jobs-hud__summary">
-          <div class="jobs-hud__summary-card">
-            <span class="jobs-hud__summary-label">Jobs activos</span>
-            <strong class="jobs-hud__summary-value">{{ activeJobsCount }}</strong>
-          </div>
+  
 
-          <div class="jobs-hud__summary-card">
-            <span class="jobs-hud__summary-label">Procesadas</span>
-            <strong class="jobs-hud__summary-value">{{ activeJobsProcessedRows }}</strong>
-          </div>
+  <div class="upload-excel-bar d-flex justify-content-end gap-2 mb-3">
+    @if (selectedFile) {
+      <button
+        type="button"
+        class="btn btn-outline-danger"
+        (click)="clearSelectedFile(fileInput)">
+        Quitar <i class="bi bi-trash-fill"></i>
+      </button>
 
-          <div class="jobs-hud__summary-card">
-            <span class="jobs-hud__summary-label">Pendientes</span>
-            <strong class="jobs-hud__summary-value">{{ activeJobsPendingRows }}</strong>
-          </div>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!selectedFile || isUploading"
+        (click)="uploadExcel(fileInput)">
+        @if (!isUploading) {
+          Enviar comprobantes <i class="bi bi-send-fill"></i>
+        } @else {
+          Subiendo... <i class="bi bi-spinner spinner-border-sm"></i>
+        }
+      </button>
+    }
+
+    <input
+      #fileInput
+      type="file"
+      accept=".xls,.xlsx"
+      class="form-control"
+      style="max-width: 320px;"
+      (change)="onExcelSelected($event)" />
+  </div>
+</app-ibs-grid>
+
+@if (activeJobs.length > 0) {
+  <section class="jobs-hud mt-4" aria-label="Progreso de jobs en segundo plano">
+    <div class="jobs-hud__top">
+      <div class="jobs-hud__headline">
+        <span class="jobs-hud__eyebrow">
+          <i class="bi bi-activity"></i>
+          Tiempo real
+        </span>
+
+        <div class="jobs-hud__titles">
+          <h3 class="jobs-hud__title">Procesamiento de comprobantes en segundo plano</h3>
+          <p class="jobs-hud__subtitle">
+            La vista se actualiza automáticamente a medida que cada fila se procesa.
+          </p>
         </div>
       </div>
 
-      <div class="jobs-hud__overall">
-        <div class="jobs-hud__overall-meta">
-          <span class="jobs-hud__overall-title">Progreso global</span>
-          <span class="jobs-hud__overall-percent">{{ overallProgressPercentage | number:'1.0-0' }}%</span>
+      <div class="jobs-hud__summary">
+        <div class="jobs-hud__summary-card">
+          <span class="jobs-hud__summary-label">Jobs</span>
+          <strong class="jobs-hud__summary-value">{{ activeJobsCount }}</strong>
         </div>
 
-        <div class="jobs-hud__overall-track">
-          <div
-            class="jobs-hud__overall-fill"
-            [style.width.%]="overallProgressPercentage">
-          </div>
+        <div class="jobs-hud__summary-card">
+          <span class="jobs-hud__summary-label">Procesadas</span>
+          <strong class="jobs-hud__summary-value">{{ activeJobsProcessedRows }}</strong>
+        </div>
+
+        <div class="jobs-hud__summary-card">
+          <span class="jobs-hud__summary-label">Pendientes</span>
+          <strong class="jobs-hud__summary-value">{{ activeJobsPendingRows }}</strong>
         </div>
       </div>
+    </div>
 
-      <div class="jobs-hud__list">
-        @for (job of activeJobs; track trackByJob($index, job)) {
-          <article class="job-card" [class.job-card--canceling]="job.isCancellationRequested">
-            <div class="job-card__header">
-              <div class="job-card__main">
-                <div class="job-card__file-wrap">
-                  <div class="job-card__file-icon">
-                    <i class="bi bi-file-earmark-spreadsheet"></i>
+    <div class="jobs-hud__overall">
+      <div class="jobs-hud__overall-meta">
+        <span class="jobs-hud__overall-title">Progreso global</span>
+        <span class="jobs-hud__overall-percent">{{ overallProgressPercentage | number:'1.0-0' }}%</span>
+      </div>
+
+      <div class="jobs-hud__overall-track">
+        <div
+          class="jobs-hud__overall-fill"
+          [style.width.%]="overallProgressPercentage">
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="jobs-hud__list"
+      [class.jobs-hud__list--scrollable]="activeJobs.length > 3">
+      @for (job of activeJobs; track trackByJob($index, job)) {
+        <article
+          class="job-card"
+          [class.job-card--canceling]="job.isCancellationRequested"
+          [class.job-card--expanded]="isJobExpanded(job.jobId)">
+
+          <div class="job-card__header job-card__header--compact">
+            <div class="job-card__main">
+              <div class="job-card__file-wrap">
+                <div class="job-card__file-icon">
+                  <i class="bi bi-file-earmark-spreadsheet"></i>
+                </div>
+
+                <div class="job-card__identity">
+                  <div class="job-card__file-name" [title]="job.fileName">
+                    {{ job.fileName }}
                   </div>
 
-                  <div class="job-card__identity">
-                    <div class="job-card__file-name" [title]="job.fileName">
-                      {{ job.fileName }}
-                    </div>
+                  <div class="job-card__meta-line">
+                    <span class="job-chip" [ngClass]="getStatusClass(job)">
+                      {{ getStatusLabel(job) }}
+                    </span>
 
-                    <div class="job-card__meta-line">
-                      <span class="job-chip" [ngClass]="getStatusClass(job)">
-                        {{ getStatusLabel(job) }}
-                      </span>
+                    <span class="job-card__meta-item">
+                      <i class="bi bi-clock-history"></i>
+                      {{ formatElapsed(job) }}
+                    </span>
 
-                      <span class="job-card__meta-item">
-                        <i class="bi bi-clock-history"></i>
-                        {{ formatElapsed(job) }}
-                      </span>
-
-                      <span class="job-card__meta-item">
-                        <i class="bi bi-list-task"></i>
-                        {{ job.totalRows || 0 }} filas
-                      </span>
-                    </div>
+                    <span class="job-card__meta-item">
+                      <i class="bi bi-list-task"></i>
+                      {{ job.totalRows || 0 }} filas
+                    </span>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="job-card__actions">
+              <button
+                type="button"
+                class="job-card__expand-btn"
+                [attr.aria-expanded]="isJobExpanded(job.jobId)"
+                [attr.aria-label]="isJobExpanded(job.jobId) ? 'Ocultar detalles' : 'Mostrar detalles'"
+                (click)="toggleJobExpanded(job.jobId)">
+                <i
+                  class="bi"
+                  [ngClass]="isJobExpanded(job.jobId) ? 'bi-chevron-up' : 'bi-chevron-down'">
+                </i>
+              </button>
 
               <div class="job-card__progress-side">
                 <div class="job-card__progress-value">
@@ -100,17 +155,19 @@
                 <div class="job-card__progress-label">avance</div>
               </div>
             </div>
+          </div>
 
+          <div
+            class="job-progress job-progress--compact"
+            [class.job-progress--indeterminate]="job.totalRows <= 0 && job.status !== 'CancellationRequested'">
             <div
-              class="job-progress"
-              [class.job-progress--indeterminate]="job.totalRows <= 0 && job.status !== 'CancellationRequested'">
-              <div
-                class="job-progress__fill"
-                [style.width.%]="getProgressValue(job)">
-              </div>
-              <div class="job-progress__glow"></div>
+              class="job-progress__fill"
+              [style.width.%]="getProgressValue(job)">
             </div>
+            <div class="job-progress__glow"></div>
+          </div>
 
+          <div class="job-card__details" [class.job-card__details--open]="isJobExpanded(job.jobId)">
             <div class="job-card__stats">
               <div class="job-stat job-stat--processed">
                 <span class="job-stat__label">Procesadas</span>
@@ -155,40 +212,9 @@
                 </button>
               }
             </div>
-          </article>
-        }
-      </div>
-    </section>
-  }
-
-  <div class="upload-excel-bar d-flex justify-content-end gap-2 mb-3">
-    @if (selectedFile) {
-      <button
-        type="button"
-        class="btn btn-outline-danger"
-        (click)="clearSelectedFile(fileInput)">
-        Quitar <i class="bi bi-trash-fill"></i>
-      </button>
-
-      <button
-        type="button"
-        class="btn btn-primary"
-        [disabled]="!selectedFile || isUploading"
-        (click)="uploadExcel(fileInput)">
-        @if (!isUploading) {
-          Enviar comprobantes <i class="bi bi-send-fill"></i>
-        } @else {
-          Subiendo... <i class="bi bi-spinner spinner-border-sm"></i>
-        }
-      </button>
-    }
-
-    <input
-      #fileInput
-      type="file"
-      accept=".xls,.xlsx"
-      class="form-control"
-      style="max-width: 320px;"
-      (change)="onExcelSelected($event)" />
-  </div>
-</app-ibs-grid>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+}

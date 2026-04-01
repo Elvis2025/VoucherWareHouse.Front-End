@@ -381,26 +381,41 @@ html[data-theme="dark"] .ibs-cell-link:hover {
 .ibs-qr-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1398;
-  background: rgba(15, 23, 42, 0.42);
+  z-index: -1;
+  background: transparent;
   backdrop-filter: blur(6px);
+
+    opacity: 0;
+  animation: ibsQrBackdropIn 220ms ease-out forwards;
 }
 
 .ibs-qr-panel {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  z-index: 1399;
+  top: 32%;
+  left: 54.5%;
+  z-index: 0;
   width: min(92vw, 360px);
   transform: translate(-50%, -50%);
   border-radius: 22px;
   border: 1px solid rgba(124, 92, 255, 0.18);
-  background: linear-gradient(180deg, var(--ibs-surface), var(--ibs-surface2));
+ background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ibs-card, var(--ibs-primary)) 100%, transparent),
+      color-mix(in srgb, var(--ibs-card, var(--ibs-primary)) 96.8%, transparent)
+    );
+
+
+
   box-shadow:
     0 24px 70px rgba(15, 23, 42, 0.28),
     0 14px 34px rgba(124, 92, 255, 0.12);
   padding: 18px 18px 16px;
   overflow: hidden;
+
+    opacity: 0;
+  animation: ibsQrPanelIn 260ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
 }
 
 .ibs-qr-panel__close {
@@ -458,9 +473,8 @@ html[data-theme="dark"] .ibs-cell-link:hover {
   margin-bottom: 14px;
   padding: 14px;
   border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.96));
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  background:transparent;
+  border: transparent;
 }
 
 .ibs-qr-panel__image {
@@ -987,4 +1001,40 @@ html[data-theme="light"] .ibs-table thead th {
 html[data-theme="dark"] .ibs-table thead th {
   color: rgba(235, 238, 255, 0.95);
   border-bottom: 1px solid rgba(124, 92, 255, 0.35);
+}
+
+:global(body.ibs-grid-qr-open) .ibs-fab {
+  z-index: 1 !important;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+:global(body.ibs-grid-qr-open) .ibs-hover-panel {
+  z-index: 1 !important;
+}
+
+@keyframes ibsQrBackdropIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+  }
+}
+
+@keyframes ibsQrPanelIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.88);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }

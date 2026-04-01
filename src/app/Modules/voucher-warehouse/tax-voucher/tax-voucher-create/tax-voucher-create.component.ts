@@ -1,4 +1,3 @@
-import { IbsDatepickerComponent } from './../../../../controls/ibs-datepicker/ibs-datepicker.component';
 import { IbsTextareaComponent } from './../../../../controls/ibs-textarea/ibs-textarea.component';
 import { IbsSelectComponent } from './../../../../controls/ibs-select/ibs-select.component';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, OnInit, Output } from "@angular/core";
@@ -19,7 +18,7 @@ import { TaxVoucherTypesService } from "@shared/service-proxies/services/voucher
 import { finalize, map, Observable, tap } from "rxjs";
 import { IbsGridQuery } from "@app/controls/ibs-grid/ibs-grid.component";
 import { TaxVoucherTypesInputDto } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher-types/tax-voucher-types.model.service";
-import { BsDatepickerConfig, BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { BsDatepickerConfig, BsDatepickerDirective, BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 
 
 
@@ -39,7 +38,6 @@ import { BsDatepickerConfig, BsDatepickerModule } from 'ngx-bootstrap/datepicker
     IbsInputComponent,
     IbsCheckBoxComponent,
     IbsSelectComponent,
-    IbsDatepickerComponent,
     IbsTextareaComponent,
     BsDatepickerModule
   ],
@@ -55,13 +53,21 @@ export class TaxVoucherCreateComponent extends AppComponentBase implements OnIni
     taxVoucherCreate: TaxVoucherCreateDto;
     keyword = '';
     isActive = true;
-dpConfig: Partial<BsDatepickerConfig> = {
-    containerClass: 'theme-dark-blue',
-    dateInputFormat: 'DD-MM-YYYY',
-    showWeekNumbers: false,
-    adaptivePosition: true,
-    isAnimated: false
-  };
+datePickerConfig: Partial<BsDatepickerConfig> = {
+  isAnimated: false,
+  adaptivePosition: true,
+  dateInputFormat: 'DD-MM-YYYY',
+  showWeekNumbers: false
+};
+
+openDatepicker(dp: BsDatepickerDirective, event?: Event): void {
+  event?.preventDefault();
+  event?.stopPropagation();
+
+  setTimeout(() => {
+    dp.show();
+  }, 0);
+}
     constructor(
         injector: Injector,
         private taxVoucherService: TaxVoucherService,

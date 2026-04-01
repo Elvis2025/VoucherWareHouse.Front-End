@@ -39,6 +39,7 @@
         "ngx-pagination": "^6.0.3",
         "primeng": "^19.0.9",
         "push.js": "1.0.12",
+        "qrcode": "^1.5.4",
         "rtl-detect": "^1.1.2",
         "rxjs": "^7.8.2",
         "sweetalert2": "^11.17.2",

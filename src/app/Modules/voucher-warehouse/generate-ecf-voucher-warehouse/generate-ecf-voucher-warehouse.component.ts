@@ -288,27 +288,41 @@ export class GenerateEcfVoucherWarehouseComponent
     }
 
     cancelJob(job: EcfVoucherJobStatusDto): void {
-        if (!job?.jobId || !this.canCancelJob(job)) {
-            return;
-        }
+        abp.message.confirm(
+            `¿Estás seguro de que deseas cancelar el procesamiento del archivo "${job.fileName}"?`,
+            'Confirmar cancelación',
+            (isConfirmed: boolean) => {
+                if (!isConfirmed) {
+                    return;
+                }
 
-        const payload: CancelEcfVoucherJobInputDto = {
-            jobId: job.jobId
-        };
+                const payload: CancelEcfVoucherJobInputDto = {
+                    jobId: job.jobId
+                };
 
-        this.cancelJobRequest(payload).subscribe({
-            next: () => {
-                abp.notify.info(`Se solicitó la cancelación del job: ${job.fileName}`);
-                this.refreshJobsNow();
-            },
-            error: (error) => {
-                const message =
-                    error?.error?.error?.message ||
-                    error?.error?.message ||
-                    'No se pudo cancelar el job.';
-                abp.message.error(message);
+                this.cancelJobRequest(payload).subscribe({
+                    next: () => {
+                        abp.notify.info(`Se solicitó la cancelación del job: ${job.fileName}`);
+
+                        // Lo quitamos inmediatamente del HUD
+                        this.activeJobs = this.activeJobs.filter(x => x.jobId !== job.jobId);
+                        this.expandedJobIds.delete(job.jobId);
+
+                        this.cd.detectChanges();
+
+                        // Refrescar estado desde backend
+                        this.refreshJobsNow();
+                    },
+                    error: (error) => {
+                        const message =
+                            error?.error?.error?.message ||
+                            error?.error?.message ||
+                            'No se pudo cancelar el job.';
+                        abp.message.error(message);
+                    }
+                });
             }
-        });
+        );
     }
 
     trackByJob(_: number, job: EcfVoucherJobStatusDto): string {
@@ -460,7 +474,7 @@ export class GenerateEcfVoucherWarehouseComponent
             )
             .subscribe({
                 next: (jobs) => {
-                    this.activeJobs = (jobs ?? []).filter(x => !!x?.isActive);
+                    this.setVisibleJobs(jobs);
                     this.cd.detectChanges();
                 },
                 error: () => {
@@ -476,8 +490,10 @@ export class GenerateEcfVoucherWarehouseComponent
             maxResultCount: 12
         }).subscribe({
             next: (jobs) => {
-                this.activeJobs = (jobs ?? []).filter(x => !!x?.isActive);
+                this.setVisibleJobs(jobs);
+                this.refresh();
                 this.cd.detectChanges();
+
             },
             error: () => {
                 this.cd.detectChanges();
@@ -522,5 +538,51 @@ export class GenerateEcfVoucherWarehouseComponent
         }
 
         return of(void 0);
+    }
+
+    expandedJobIds = new Set<string>();
+
+    toggleJobExpanded(jobId: string): void {
+        if (!jobId) {
+            return;
+        }
+
+        if (this.expandedJobIds.has(jobId)) {
+            this.expandedJobIds.delete(jobId);
+        } else {
+            this.expandedJobIds.add(jobId);
+        }
+
+        this.cd.detectChanges();
+    }
+
+    isJobExpanded(jobId: string): boolean {
+        return this.expandedJobIds.has(jobId);
+    }
+
+    private shouldDisplayJob(job: EcfVoucherJobStatusDto | null | undefined): boolean {
+        if (!job) {
+            return false;
+        }
+
+        if (!job.isActive) {
+            return false;
+        }
+
+        return job.status !== 'Cancelled'
+            && job.status !== 'Completed'
+            && job.status !== 'CompletedWithErrors'
+            && job.status !== 'Failed';
+    }
+
+    private setVisibleJobs(jobs: EcfVoucherJobStatusDto[] | null | undefined): void {
+        this.activeJobs = (jobs ?? []).filter(job => this.shouldDisplayJob(job));
+
+        const activeJobIds = new Set(this.activeJobs.map(x => x.jobId));
+        this.expandedJobIds.forEach(jobId => {
+            if (!activeJobIds.has(jobId)) {
+                this.expandedJobIds.delete(jobId);
+            }
+        });
     }
 }

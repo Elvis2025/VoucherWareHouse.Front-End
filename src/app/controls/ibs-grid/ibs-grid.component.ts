@@ -15,7 +15,7 @@ import {
   Injector,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import QRCode from 'qrcode';
 import { Observable, of, finalize } from 'rxjs';
 
 import {
@@ -731,7 +731,7 @@ export class IbsGridComponent<T>
     window.open(url, target, target === '_blank' ? 'noopener,noreferrer' : undefined);
   }
 
-  openQrPanel(event: MouseEvent, row: T, c: IbsGridResolvedColumn<T>): void {
+  async openQrPanel(event: MouseEvent, row: T, c: IbsGridResolvedColumn<T>): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
 
@@ -740,22 +740,27 @@ export class IbsGridComponent<T>
 
     if (!url) return;
 
-    const qrUrl =
-      'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' +
-      encodeURIComponent(url);
+    // Generar QR localmente (instantáneo)
+    const qrUrl = await QRCode.toDataURL(url, {
+        width: 220,
+        margin: 2,
+        color: {
+            dark: '#000000',
+            light: '#ffffff'
+        }
+    });
 
     this.qrPanel.set({
-      visible: true,
-      label: c.header,
-      text: text || url,
-      url,
-      qrUrl,
-      actionText: c.qrActionText?.trim() || 'Navegar al enlace',
+        visible: true,
+        label: c.header,
+        text: text || url,
+        url,
+        qrUrl,
+        actionText: c.qrActionText?.trim() || 'Navegar al enlace',
     });
 
     document.body.classList.add('ibs-grid-qr-open');
-  }
-
+}
   closeQrPanel(): void {
     const current = this.qrPanel();
     if (!current.visible) return;
