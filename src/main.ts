@@ -27,7 +27,8 @@ import { ServiceProxyModule } from '@shared/service-proxies/service-proxy.module
 import { RootRoutingModule } from './root-routing.module';
 import { RootComponent } from './root.component';
 import { providePrimeNG } from 'primeng/config';
-import Lara from '@primeng/themes/lara';
+import Aura from '@primeng/themes/aura';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 if (environment.production) {
     enableProdMode();
@@ -63,11 +64,11 @@ const bootstrap = () => {
                 provide: LOCALE_ID,
                 useFactory: getCurrentLanguage,
             },
-            provideAnimations(),
+            provideAnimationsAsync(),
             provideHttpClient(withInterceptorsFromDi()),
             providePrimeNG({
                 theme: {
-                    preset: Lara,
+                    preset: Aura,
                 },
             }),
         ],

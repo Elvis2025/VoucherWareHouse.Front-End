@@ -45,7 +45,15 @@ export class EcfVoucherWarehouseService {
     if (input.filterText !== undefined && input.filterText !== null) {
       params = params.set('FilterText', input.filterText.toString());
     }
-console.log(input,'Here is the data')
+    if (input.startDate !== undefined && input.startDate !== null) {
+      params = params.set('StartDate', input.startDate.toString());
+    }
+    if (input.endDate !== undefined && input.endDate !== null) {
+      params = params.set('EndDate', input.endDate.toString());
+    }
+
+
+    
     return this.http.get<any>(`${this.baseUrl}/GetAll`, {
       params,
       headers: new HttpHeaders({

@@ -1,7 +1,8 @@
 <app-ibs-modal-shell [wide]="false" (cancelled)="bsModalRef.hide()">
 
   <app-ibs-modal-header
-    [title]="'Actualizar secuencias de comprobantes electronicos' | localize"
+    [title]="'Actualizar secuenca del e-NCF' | localize"
+    [accent]="selectedTaxVoucherTypeName()"
     (closed)="bsModalRef.hide()">
   </app-ibs-modal-header>
 
@@ -11,11 +12,11 @@
     <div class="field-col">
       <app-ibs-select
         label="Tipo de comprobante"
-        [options]="taxVoucherTypeOptions"
+        [options]="taxVoucherTypeOptions()"
         bindLabel="codeAndDescription"
         bindValue="id"
         required="true"
-        [(ngModel)]=" taxVoucherUpdate.taxVoucherTypeId">
+        [ngModel]="model()?.taxVoucherTypeId">
         </app-ibs-select>
 
     </div>
@@ -46,14 +47,12 @@
   
     
 <div class="field-col">
-    <app-ibs-input
-    [label]="'Fecha de expedicion' | localize"
-    name="expeditionDate"
-        [required]="true"
-        type="date"
-        [minLength]="0"
-        [(ngModel)]="taxVoucherUpdate.expeditionDate">
-      </app-ibs-input>
+    
+        <app-ibs-datepicker
+      [(ngModel)]="taxVoucherUpdate.expeditionDate"
+      label="Fecha de expedicion">
+    </app-ibs-datepicker>
+
     </div>
 
     <div class="field-col">
@@ -71,14 +70,11 @@
 
 
   <div class="field-col">
-      <app-ibs-input
-        [label]="'Fecha de caducidad' | localize"
-        name="expirationDate"
-        [required]="true"
-        type="date"
-        [minLength]="0"
-        [(ngModel)]="taxVoucherUpdate.expirationDate">
-      </app-ibs-input>
+    
+             <app-ibs-datepicker
+      [(ngModel)]="taxVoucherUpdate.expirationDate"
+      label="Fecha de expiración">
+    </app-ibs-datepicker>
     </div>
     <div class="field-col">
       <app-ibs-input

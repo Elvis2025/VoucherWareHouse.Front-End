@@ -5,5 +5,7 @@ export abstract class BaseInputEntityDto<TPrimaryKey> extends BaseEntityDto<TPri
   defaultMaxResultCount: number;
   maxResultCount: number;
   sorting:string;
+  startDate: Date | null | string;
+  endDate: Date | null | string;
   filterText: string;
 }

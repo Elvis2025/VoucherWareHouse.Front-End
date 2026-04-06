@@ -1,3 +1,4 @@
+import { IbsDatepickerComponent } from './../../../../controls/ibs-datepicker/ibs-datepicker.component';
 import { IbsTextareaComponent } from './../../../../controls/ibs-textarea/ibs-textarea.component';
 import { IbsSelectComponent } from './../../../../controls/ibs-select/ibs-select.component';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Injector, OnInit, Output } from "@angular/core";
@@ -19,6 +20,8 @@ import { finalize, map, Observable, tap } from "rxjs";
 import { IbsGridQuery } from "@app/controls/ibs-grid/ibs-grid.component";
 import { TaxVoucherTypesInputDto } from "@shared/service-proxies/services/voucher-warehouse/tax-voucher-types/tax-voucher-types.model.service";
 import { BsDatepickerConfig, BsDatepickerDirective, BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { DatePickerModule } from 'primeng/datepicker';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 
 
@@ -39,7 +42,10 @@ import { BsDatepickerConfig, BsDatepickerDirective, BsDatepickerModule } from 'n
     IbsCheckBoxComponent,
     IbsSelectComponent,
     IbsTextareaComponent,
-    BsDatepickerModule
+    IbsDatepickerComponent,
+    BsDatepickerModule,
+    DatePickerModule,
+    FloatLabelModule
   ],
   templateUrl: './tax-voucher-create.component.html',
   styleUrls: ['./tax-voucher-create.component.scss'],

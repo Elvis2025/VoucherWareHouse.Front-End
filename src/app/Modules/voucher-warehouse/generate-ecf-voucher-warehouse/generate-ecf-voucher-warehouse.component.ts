@@ -45,6 +45,9 @@ import {
     IbsGridComponent,
     IbsGridQuery
 } from "../../../controls/ibs-grid/ibs-grid.component";
+import { DatePickerModule } from "primeng/datepicker";
+import { FloatLabelModule } from "primeng/floatlabel";
+import { FileSelectEvent, FileUpload, FileUploadHandlerEvent, FileUploadModule } from 'primeng/fileupload';
 
 
 
@@ -54,7 +57,10 @@ import {
     imports: [
         CommonModule,
         FormsModule,
-        IbsGridComponent
+        IbsGridComponent,
+        DatePickerModule,
+        FloatLabelModule,
+        FileUploadModule
     ],
     templateUrl: './generate-ecf-voucher-warehouse.component.html',
     styleUrls: ['./generate-ecf-voucher-warehouse.component.scss'],
@@ -67,11 +73,11 @@ export class GenerateEcfVoucherWarehouseComponent
     @ViewChild('activeTpl', { static: true }) activeTpl!: TemplateRef<{ $implicit: EcfVoucherWarehouseOutputDto }>;
     @ViewChild('nameTpl', { static: true }) nameTpl!: TemplateRef<{ $implicit: EcfVoucherWarehouseOutputDto }>;
     @ViewChild(IbsGridComponent) grid?: IbsGridComponent<EcfVoucherWarehouseOutputDto>;
-
+    rangeDates: Date[] | undefined;
     selectedFile: File | null = null;
     isUploading = false;
-
     activeJobs: EcfVoucherJobStatusDto[] = [];
+    private refreshSubscription!: Subscription;
     private readonly destroy$ = new Subject<void>();
     private jobsPollingSubscription?: Subscription;
 
@@ -101,7 +107,9 @@ export class GenerateEcfVoucherWarehouseComponent
             input.sorting = q.sorting ?? '';
             input.skipCount = q.skipCount ?? 0;
             input.filterText = q.filter ?? '';
-
+            input.startDate =  this.rangeDates?.[0] ?  this.toIsoLocal(new Date(this.rangeDates?.[0])) : null;
+            input.endDate = this.rangeDates?.[1] ?   this.toIsoLocal(new Date(this.rangeDates?.[1])) : null;
+            console.log('Loading with input:', input);
             return this.ecfVoucherWarehouseService
                 .getAll(input)
                 .pipe(
@@ -207,8 +215,108 @@ export class GenerateEcfVoucherWarehouseComponent
         ]);
 
         this.startJobsRealtimePolling();
+        // this.startAutoRefresh();
+    }
+    onEncfFileSelected(event: FileSelectEvent): void {
+            const file = event.files?.[0] ?? null;
+
+            if (!file) {
+                this.selectedFile = null;
+                return;
+            }
+
+            const fileName = file.name.toLowerCase();
+            const isValidExtension =
+                fileName.endsWith('.xls') ||
+                fileName.endsWith('.xlsx') ||
+                fileName.endsWith('.csv') ||
+                fileName.endsWith('.txt');
+
+            if (!isValidExtension) {
+                this.selectedFile = null;
+                abp.message.warn('Solo se permiten archivos .xls, .xlsx, .csv o .txt');
+                return;
+            }
+
+            this.selectedFile = file;
+        }
+uploadExcelPrime(event: FileUploadHandlerEvent): void {
+    const file = event.files?.[0] ?? this.selectedFile;
+
+    if (!file) {
+        abp.message.warn('Debe seleccionar un archivo Excel.');
+        return;
     }
 
+    const fileName = file.name.toLowerCase();
+    const isExcelFile = fileName.endsWith('.xls') || fileName.endsWith('.xlsx');
+
+    if (!isExcelFile) {
+        abp.message.warn('Solo se permiten archivos Excel (.xls, .xlsx).');
+        return;
+    }
+
+    this.selectedFile = file;
+    this.isUploading = true;
+
+    const dto: LoadExcelInputDto = {
+        file: this.selectedFile
+    };
+
+    (this.ecfVoucherWarehouseService.sendEcfExcel(dto) as Observable<UploadJobResponseDto | void>)
+        .pipe(
+            finalize(() => {
+                this.isUploading = false;
+                this.cd.detectChanges();
+            })
+        )
+        .subscribe({
+            next: () => {
+                abp.notify.success('Archivo cargado correctamente. El procesamiento fue enviado a segundo plano.');
+                this.clearSelectedPrimeFile();
+                this.grid?.reloadFirstPage();
+                this.refreshJobsNow();
+            },
+            error: (error) => {
+                const message =
+                    error?.error?.error?.message ||
+                    error?.error?.message ||
+                    'Ocurrió un error al cargar el archivo Excel.';
+                abp.message.error(message);
+            }
+        });
+}
+
+
+   clearSelectedPrimeFile(fileUpload?: FileUpload): void {
+    this.selectedFile = null;
+
+    if (fileUpload) {
+        fileUpload.clear();
+    }
+
+    this.cd.detectChanges();
+}
+
+onPrimeFileCleared(): void {
+    this.selectedFile = null;
+    this.cd.detectChanges();
+}
+    onEncfFileCleared(): void {
+        this.selectedFile = null;
+    }
+
+    formatBytes(bytes: number): string {
+        if (!bytes || bytes <= 0) {
+            return '0 B';
+        }
+
+        const units = ['B', 'KB', 'MB', 'GB'];
+        const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+        const value = bytes / Math.pow(1024, index);
+
+        return `${value.toFixed(index === 0 ? 0 : 2)} ${units[index]}`;
+    }
     ngOnDestroy(): void {
         this.jobsPollingSubscription?.unsubscribe();
         this.destroy$.next();
@@ -226,7 +334,16 @@ export class GenerateEcfVoucherWarehouseComponent
     loadFile(): void {
         abp.message.success("KLK");
     }
-
+    startAutoRefresh(): void {
+        this.refreshSubscription = interval(5000).subscribe(() => {
+            this.refreshJobsNow();
+        });
+    }
+    stopAutoRefresh(): void {
+        if (this.refreshSubscription) {
+            this.refreshSubscription.unsubscribe();
+        }
+    }
     onExcelSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         this.selectedFile = input.files?.[0] ?? null;
@@ -491,7 +608,7 @@ export class GenerateEcfVoucherWarehouseComponent
         }).subscribe({
             next: (jobs) => {
                 this.setVisibleJobs(jobs);
-                this.refresh();
+                //this.refresh();
                 this.cd.detectChanges();
 
             },
@@ -585,4 +702,54 @@ export class GenerateEcfVoucherWarehouseComponent
             }
         });
     }
+
+    showRangeDatepicker(){
+        abp.message.info(`${this.rangeDates}`,'Rango de fechas seleccionado');
+
+         if (!this.rangeDates || this.rangeDates.length !== 2) {
+    abp.message.warn('Debes seleccionar un rango completo.');
+    return;
+  }
+
+  const startDate = new Date(this.rangeDates[0]);
+  const endDate = new Date(this.rangeDates[1]);
+
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(23, 59, 59, 999);
+
+  const payload = {
+    startDate: this.toIsoLocal(startDate),
+    endDate: this.toIsoLocal(endDate)
+  };
+
+  abp.message.info(
+    `Desde: ${this.formatDate(startDate)} | Hasta: ${this.formatDate(endDate)}`,
+    'Rango de fechas seleccionado'
+  );
+
+  console.log(payload);
+
+
+    }
+
+
+    private formatDate(date: Date): string {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+}
+
+private toIsoLocal(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
+}
 }

@@ -156,7 +156,7 @@ export class IbsGridComponent<T>
   /**
    * Ancho constante para columnas tipo isActive/active/activo.
    */
-  @Input() activeColumnWidth = 72;
+  @Input() activeColumnWidth = 92;
 
   private _pageSize = 10;
   readonly pageSizeSig = signal(10);
@@ -315,7 +315,7 @@ export class IbsGridComponent<T>
   }
 
   fetch(): void {
-    this.loading.set(true);
+    this.loading.set(false);
 
     const q: IbsGridQuery = {
       filter: (this.search() ?? '').trim() || undefined,

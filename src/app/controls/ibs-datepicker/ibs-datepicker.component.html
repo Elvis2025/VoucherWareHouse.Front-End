@@ -1,70 +1,18 @@
-<div
-  class="ibs-dp-field"
-  [class.is-focused]="focused"
-  [class.is-disabled]="disabled"
-  [class.has-value]="hasValue"
-  [class.is-open]="isOpen"
->
-  <div class="ibs-dp-control" (click)="open($event)">
-    <div class="ibs-dp-icon" aria-hidden="true">
-      <i [class]="iconClass"></i>
-    </div>
+<!-- ibs-datepicker.component.html -->
+<p-floatlabel [variant]="variant" class="mt-sm-1">
+  <p-datepicker
+    [(ngModel)]="value"
+    (ngModelChange)="onModelChange($event)"
+    (onBlur)="onBlur()"
+    [showClear]="true"
+    [showIcon]="showIcon"
+    [iconDisplay]="iconDisplay"
+    [inputStyleClass]="inputStyleClass"
+    [styleClass]="styleClass"
+    [appendTo]="appendTo"
+    [dateFormat]="dateFormat"
+    [disabled]="disabled">
+  </p-datepicker>
 
-    <input
-      #inp
-      #dp="bsDatepicker"
-      type="text"
-      class="ibs-dp-input"
-      [id]="id"
-      [attr.name]="name || null"
-      [attr.placeholder]="resolvedPlaceholder"
-      [required]="required || null"
-      [disabled]="disabled || null"
-      [readonly]="readonly || null"
-      [attr.autocomplete]="autocomplete || 'off'"
-      [attr.aria-label]="ariaLabel || label || null"
-      bsDatepicker
-      container="body"
-      [bsConfig]="bsConfig"
-      [bsValue]="value"
-      [minDate]="minDate"
-      [maxDate]="maxDate"
-      [daysDisabled]="daysDisabled"
-      [datesDisabled]="datesDisabled"
-      [datesEnabled]="datesEnabled"
-      (bsValueChange)="onDateValueChange($event)"
-      (focus)="onFocus($event)"
-      (blur)="onBlur($event)"
-      (onShown)="onShown()"
-      (onHidden)="onHidden()"
-      autocomplete="off"
-      spellcheck="false"
-    />
-
-    <label class="ibs-dp-label" [for]="id">
-      {{ label }}
-      <span *ngIf="required" class="ibs-dp-required">*</span>
-    </label>
-
-    <div class="ibs-dp-actions">
-      <button
-        *ngIf="showClear"
-        type="button"
-        class="ibs-dp-clear"
-        (mousedown)="$event.preventDefault()"
-        (click)="clear($event)"
-      >
-        <i class="bi bi-x"></i>
-      </button>
-
-      <button
-        type="button"
-        class="ibs-dp-toggle"
-        (mousedown)="$event.preventDefault()"
-        (click)="toggle($event)"
-      >
-        <i class="bi bi-chevron-down"></i>
-      </button>
-    </div>
-  </div>
-</div>
+  <label>{{ label }}</label>
+</p-floatlabel>

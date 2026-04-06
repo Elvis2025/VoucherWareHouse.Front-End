@@ -5,7 +5,7 @@
 <app-ibs-grid
   [title]="'Comprobantes Ecf'"
   [subtitle]="'Mantenimiento para generar comprobantes Ecf'"
-  [placeholderSearch]="'Buscar...'"
+  [placeholderSearch]="'Buscar e-NCF...'"
   [columns]="columns()"
   [load]="loadEcfVouchers"
   [createPolicy]="'False'"
@@ -14,8 +14,9 @@
 
   
 
-  <div class="upload-excel-bar d-flex justify-content-end gap-2 mb-3">
-    @if (selectedFile) {
+  <div class="upload-excel-bar d-flex  mb-3">
+    <div class="d-flex justify-content-end gap-2">
+      @if (selectedFile) {
       <button
         type="button"
         class="btn btn-outline-danger"
@@ -36,14 +37,44 @@
       </button>
     }
 
-    <input
-      #fileInput
-      type="file"
-      accept=".xls,.xlsx"
-      class="form-control"
-      style="max-width: 320px;"
-      (change)="onExcelSelected($event)" />
+     <p-fileUpload
+        #fu
+        mode="basic"
+        name="file"
+        chooseLabel="Seleccionar archivo"
+        chooseIcon="pi pi-upload"
+        [customUpload]="true"
+        [multiple]="false"
+        accept=".xls,.xlsx,.csv,.txt"
+        [maxFileSize]="10000000"
+        [auto]="false"
+        [showUploadButton]="false"
+        [showCancelButton]="false"
+        (onSelect)="onEncfFileSelected($event)"
+        (uploadHandler)="uploadExcelPrime($event)"
+        (onClear)="onEncfFileCleared()"
+        styleClass="ibs-encf-upload">
+    </p-fileUpload>
+    </div>
+    
+      
+        <div class="d-flex mb-2 justify-content-start">
+          <p-float-label variant="on">
+            <p-datepicker [(ngModel)]="rangeDates" 
+            class="w-full"
+                          selectionMode="range" 
+                          dateFormat="dd-mm-yy" 
+                          showClear="true" 
+                          [showIcon]="true"
+                          inputId="on_label"
+                          iconDisplay="input"
+                          [readonlyInput]="true" 
+                          />
+            <label for="on_label">Filtrar por rango de fechas</label>
+          </p-float-label>
+
   </div>
+</div>
 </app-ibs-grid>
 
 @if (activeJobs.length > 0) {
@@ -190,13 +221,7 @@
               </div>
             </div>
 
-            @if (job.errorMessage) {
-              <div class="job-card__error">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <span>{{ job.errorMessage }}</span>
-              </div>
-            }
-
+        
             <div class="job-card__footer">
               @if (job.isCancellationRequested) {
                 <div class="job-card__cancel-hint">
