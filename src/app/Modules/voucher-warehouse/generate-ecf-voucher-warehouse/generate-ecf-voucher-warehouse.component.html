@@ -15,6 +15,24 @@
   
 
   <div class="upload-excel-bar d-flex  mb-3">
+     <div class="d-flex mb-2 justify-content-start mt-3">
+          <p-float-label variant="on">
+            <p-datepicker [(ngModel)]="rangeDates" 
+            class="w-full"
+                          selectionMode="range" 
+                          dateFormat="dd-mm-yy" 
+                          showClear="true" 
+                          [showIcon]="true"
+                          inputId="on_label"
+                          iconDisplay="input"
+                          [readonlyInput]="true" 
+                          />
+            <label for="on_label">Filtrar por rango de fechas</label>
+          </p-float-label>
+
+  </div>
+
+
     <div class="d-flex justify-content-end gap-2">
       @if (selectedFile) {
       <button
@@ -58,22 +76,7 @@
     </div>
     
       
-        <div class="d-flex mb-2 justify-content-start">
-          <p-float-label variant="on">
-            <p-datepicker [(ngModel)]="rangeDates" 
-            class="w-full"
-                          selectionMode="range" 
-                          dateFormat="dd-mm-yy" 
-                          showClear="true" 
-                          [showIcon]="true"
-                          inputId="on_label"
-                          iconDisplay="input"
-                          [readonlyInput]="true" 
-                          />
-            <label for="on_label">Filtrar por rango de fechas</label>
-          </p-float-label>
-
-  </div>
+       
 </div>
 </app-ibs-grid>
 

@@ -5,8 +5,10 @@ import {
   EventEmitter,
   Injector,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   computed,
   signal
 } from "@angular/core";
@@ -51,7 +53,10 @@ import { finalize } from "rxjs";
   styleUrls: ["./tax-voucher-update.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TaxVoucherUpdateComponent extends AppComponentBase implements OnInit, AfterViewInit {
+export class TaxVoucherUpdateComponent
+  extends AppComponentBase
+  implements OnInit, OnChanges, AfterViewInit
+{
   @Output() onSave = new EventEmitter<void>();
 
   @Input({ required: true }) id!: number;
@@ -60,7 +65,7 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
   saving = signal(false);
   loading = signal(false);
 
-  model = signal<TaxVoucherUpdateDto | null>(null);
+  model = signal<TaxVoucherUpdateDto>(this.createEmptyDto());
 
   taxVoucherTypeOptions = signal<{ id: number; codeAndDescription: string }[]>([]);
 
@@ -90,27 +95,37 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
   }
 
   ngOnInit(): void {
-    this.ensureModel();
-    this.normalizeDates();
+    this.syncModelFromInput();
     this.loadTaxVoucherTypes();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes["taxVoucherUpdate"] || changes["id"]) {
+      this.syncModelFromInput();
+    }
   }
 
   ngAfterViewInit(): void {}
 
-  private ensureModel(): void {
-    if (!this.taxVoucherUpdate) {
+  private syncModelFromInput(): void {
+    const source = this.taxVoucherUpdate;
+
+    if (!source) {
       this.model.set(this.createEmptyDto());
       return;
     }
 
     this.model.set({
-      ...this.taxVoucherUpdate,
+      ...source,
+      id: source.id ?? this.id,
       taxVoucherTypeId:
-        this.taxVoucherUpdate.taxVoucherTypeId !== null &&
-        this.taxVoucherUpdate.taxVoucherTypeId !== undefined
-          ? Number(this.taxVoucherUpdate.taxVoucherTypeId)
-          : null
-    });
+        source.taxVoucherTypeId !== null &&
+        source.taxVoucherTypeId !== undefined
+          ? Number(source.taxVoucherTypeId)
+          : null,
+      expeditionDate: this.toDate(source.expeditionDate),
+      expirationDate: this.toDate(source.expirationDate)
+    } as TaxVoucherUpdateDto);
   }
 
   private createEmptyDto(): TaxVoucherUpdateDto {
@@ -129,19 +144,6 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
       taxVoucherTypeId: null,
       isActive: true
     } as TaxVoucherUpdateDto;
-  }
-
-  private normalizeDates(): void {
-    const current = this.model();
-    if (!current) {
-      return;
-    }
-
-    this.model.set({
-      ...current,
-      expeditionDate: this.toDate(current.expeditionDate),
-      expirationDate: this.toDate(current.expirationDate)
-    });
   }
 
   private toDate(value: unknown): Date | null {
@@ -163,47 +165,78 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
     input.maxResultCount = 1000;
     input.sorting = "";
 
-    this.taxVoucherTypesService.getAll(input).subscribe({
-      next: (result: any) => {
-        const items = result?.items ?? result ?? [];
+    this.loading.set(true);
 
-        this.taxVoucherTypeOptions.set(
-          items.map((item: any) => ({
-            id: Number(item.id),
-            codeAndDescription:
-              item.codeAndDescription ??
-              item.description ??
-              item.name ??
-              `${item.code ?? ""} ${item.description ?? ""}`.trim()
-          }))
-        );
-      },
-      error: (error) => {
-        this.taxVoucherTypeOptions.set([]);
+    this.taxVoucherTypesService
+      .getAll(input)
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        })
+      )
+      .subscribe({
+        next: (result: any) => {
+          const items = result?.items ?? result ?? [];
 
-        const message =
-          error?.error?.error?.message ||
-          error?.error?.message ||
-          "No se pudieron cargar los tipos de comprobantes.";
+          this.taxVoucherTypeOptions.set(
+            items.map((item: any) => ({
+              id: Number(item.id),
+              codeAndDescription:
+                item.codeAndDescription ??
+                item.description ??
+                item.name ??
+                `${item.code ?? ""} ${item.description ?? ""}`.trim()
+            }))
+          );
+        },
+        error: (error) => {
+          this.taxVoucherTypeOptions.set([]);
 
-        abp.message.error(message);
-      }
-    });
+          const message =
+            error?.error?.error?.message ||
+            error?.error?.message ||
+            "No se pudieron cargar los tipos de comprobantes.";
+
+          abp.message.error(message);
+        }
+      });
   }
 
-  onTaxVoucherTypeChange(value: number | string | null): void {
+  updateField<K extends keyof TaxVoucherUpdateDto>(field: K, value: TaxVoucherUpdateDto[K]): void {
     const current = this.model();
-    if (!current) {
-      return;
-    }
 
     this.model.set({
       ...current,
-      taxVoucherTypeId:
-        value !== null && value !== undefined && value !== ""
-          ? Number(value)
-          : null
-    });
+      [field]: value
+    } as TaxVoucherUpdateDto);
+  }
+
+  updateNumberField(field: keyof TaxVoucherUpdateDto, value: number | string | null): void {
+    const parsedValue =
+      value === null || value === undefined || value === ""
+        ? null
+        : Number(value);
+
+    this.updateField(field, parsedValue as never);
+  }
+
+  updateTextField(field: keyof TaxVoucherUpdateDto, value: string | null): void {
+    this.updateField(field, ((value ?? "").trim()) as never);
+  }
+
+  updateDateField(field: keyof TaxVoucherUpdateDto, value: Date | string | null): void {
+    const parsedDate =
+      value instanceof Date
+        ? value
+        : value
+          ? this.toDate(value)
+          : null;
+
+    this.updateField(field, parsedDate as never);
+  }
+
+  onTaxVoucherTypeChange(value: number | string | null): void {
+    this.updateNumberField("taxVoucherTypeId", value);
   }
 
   save(): void {
@@ -212,12 +245,13 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
     }
 
     const current = this.model();
+
     if (!current) {
       abp.message.error("No hay datos para actualizar.");
       return;
     }
 
-    if (!this.validateForm()) {
+    if (!this.validateForm(current)) {
       return;
     }
 
@@ -232,6 +266,8 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
           ? Number(current.taxVoucherTypeId)
           : null
     } as TaxVoucherUpdateDto;
+
+    console.log("TaxVoucher update payload:", payload);
 
     this.taxVoucherService
       .update(payload)
@@ -257,7 +293,16 @@ export class TaxVoucherUpdateComponent extends AppComponentBase implements OnIni
       });
   }
 
-  private validateForm(): boolean {
+  private validateForm(model: TaxVoucherUpdateDto): boolean {
+
+    if (
+      model.taxVoucherTypeId === null ||
+      model.taxVoucherTypeId === undefined
+    ) {
+      abp.message.warn("Debe seleccionar un tipo de comprobante.");
+      return false;
+    }
+
     return true;
   }
 }

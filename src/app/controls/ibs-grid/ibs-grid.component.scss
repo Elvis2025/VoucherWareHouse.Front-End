@@ -392,6 +392,7 @@ html[data-theme="dark"] .ibs-cell-link:hover {
 .ibs-qr-panel {
   position: fixed;
   top: 32%;
+
   left: 54.5%;
   z-index: 0;
   width: min(92vw, 360px);
@@ -402,7 +403,7 @@ html[data-theme="dark"] .ibs-cell-link:hover {
     linear-gradient(
       180deg,
       color-mix(in srgb, var(--ibs-card, var(--ibs-primary)) 100%, transparent),
-      color-mix(in srgb, var(--ibs-card, var(--ibs-primary)) 96.8%, transparent)
+      color-mix(in srgb, var(--ibs-card, var(--ibs-primary)) 100%, transparent)
     );
 
 

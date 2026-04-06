@@ -1,7 +1,7 @@
 <app-ibs-modal-shell [wide]="false" (cancelled)="bsModalRef.hide()">
 
   <app-ibs-modal-header
-    [title]="'Crear nueva autenticacion para el Api de facturacion electronica' | localize"
+    [title]="'Crear nuevo tipo de comprobante fiscal' | localize"
     (closed)="bsModalRef.hide()">
   </app-ibs-modal-header>
 
@@ -9,23 +9,25 @@
     <div class="ibs-fields-stack">
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Codigo del comprobante Ej: E31'"
+                [label]="'Codigo del comprobante'"
                 name="lblcode"
                 [required]="true"
                 [maxLength]="64"
                 [(ngModel)]="taxVoucherCreate.code">
               </app-ibs-input>
+              <label class="ms-2 mb-2">(Ej: E31)</label>
             </div>
 
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Descripcion del comprobante (Ej: Factura de crédito fiscal )'"
+                [label]="'Descripcion del comprobante'"
                 name="lbldescription"
                 [required]="true"
                 [maxLength]="2000"
                 [minLength]="1"
                 [(ngModel)]="taxVoucherCreate.description">
               </app-ibs-input>
+               <label class="ms-2 mb-2">(Ej: Factura de crédito fiscal )</label>
             </div>
 
       
@@ -33,25 +35,27 @@
             
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Formato del comprobante (Ej: E310000000000)'"
+                [label]="'Formato del comprobante'"
                 name="lblformat"
                 [required]="true"
                 [minLength]="2"
                 [maxLength]="256"
                 [(ngModel)]="taxVoucherCreate.format">
               </app-ibs-input>
+              <label class="ms-2 mb-2">(Ej: E310000000000)</label>
             </div>
 
 
             <div class="ibs-field">
               <app-ibs-input
-                [label]="'Longitud del comprobante (Ej: E31 + 0000000000 = 12 caractres)'"
+                [label]="'Longitud del comprobante '"
                 name="lbltxl"
                 [required]="true"
                 [maxLength]="256"
                 type="number"
                 [(ngModel)]="taxVoucherCreate.taxVoucherLenght">
               </app-ibs-input>
+              <label class="ms-2 mb-2">(Ej: E31 + 0000000000 = 12 caractres)</label>
             </div>
 
             <app-ibs-check-box

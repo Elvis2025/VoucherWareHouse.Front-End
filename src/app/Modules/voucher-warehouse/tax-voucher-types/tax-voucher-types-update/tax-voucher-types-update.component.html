@@ -1,7 +1,7 @@
 <app-ibs-modal-shell [wide]="false" (cancelled)="bsModalRef.hide()">
 
   <app-ibs-modal-header
-    [title]="'Crear nueva autenticacion para el Api de facturacion electronica' | localize"
+    [title]="'Actualizar tipo de comprobante fiscal' | localize"
     (closed)="bsModalRef.hide()">
   </app-ibs-modal-header>
 
@@ -15,6 +15,7 @@
                 [maxLength]="64"
                 [(ngModel)]="taxVoucherUpdate.code">
               </app-ibs-input>
+              <label class="ms-2 mb-2">(Ej: E31)</label>
             </div>
 
             <div class="ibs-field">
@@ -25,6 +26,7 @@
                 [maxLength]="2000"
                 [(ngModel)]="taxVoucherUpdate.description">
               </app-ibs-input>
+                <label class="ms-2 mb-2">(Ej: Factura de crédito fiscal )</label>
             </div>
 
       
@@ -39,6 +41,7 @@
                 [maxLength]="256"
                 [(ngModel)]="taxVoucherUpdate.format">
               </app-ibs-input>
+              <label class="ms-2 mb-2">(Ej: E310000000000)</label>
             </div>
 
 
@@ -50,6 +53,7 @@
                 [maxLength]="256"
                 [(ngModel)]="taxVoucherUpdate.taxVoucherLenght">
               </app-ibs-input>
+              <label class="ms-2 mb-2">(Ej: E31 + 0000000000 = 12 caractres)</label>
             </div>
 
             <app-ibs-check-box
