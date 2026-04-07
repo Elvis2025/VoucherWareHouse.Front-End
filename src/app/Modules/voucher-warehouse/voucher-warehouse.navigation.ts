@@ -18,7 +18,7 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
           text: 'Autenticacion Ecf API',
           icon: 'bi bi-shield-lock-fill',
           route: 'voucher-warehouse/ecf-api-authentication',
-          requiredPolicy: 'Pages.Roles',
+          requiredPolicy: 'VoucherWarehouse.EcfApiAuthentication',
         },
         
         {
@@ -26,14 +26,14 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
           text: 'Comprobantes',
           icon: 'bi bi-receipt',
           route: 'voucher-warehouse/tax-vouchers',
-          requiredPolicy: 'Pages.Roles',
+          requiredPolicy: 'VoucherWarehouse.TaxVouchers',
         },
         {
           id: 'vou-war-tax-vou-typ',
           text: 'Tipos de comprobantes',
           icon: 'bi bi-collection',
           route: 'voucher-warehouse/tax-vouchers-types',
-          requiredPolicy: 'Pages.Roles',
+          requiredPolicy: 'VoucherWarehouse.TaxVouchersTypes',
         },
 
 
@@ -51,11 +51,21 @@ export const VOUCHER_WAREHOUSE_NAVIGATION: IbsNavModule = {
           text: 'Generar Comprobantes Electronicos',
           icon: 'bi bi-file-earmark-code',
           route: 'voucher-warehouse/ecf-voucher-warehouse',
-          requiredPolicy: 'Pages.Roles',
+          requiredPolicy: 'VoucherWarehouse.EcfVoucherWarehouse',
+        },
+        {
+          id: 'vou-war-ecf-vou-war',
+          text: 'Consultas de e-NCF',
+          icon: 'bi bi-database',
+          route: 'voucher-warehouse/ecf-queries',
+          requiredPolicy: 'VoucherWarehouse.EcfQueries',
         },
 
       ],
     },
+
+
+
   ],
-  requiredPolicy: 'Pages.Roles',
+  requiredPolicy: 'VoucherWarehouse',
 };

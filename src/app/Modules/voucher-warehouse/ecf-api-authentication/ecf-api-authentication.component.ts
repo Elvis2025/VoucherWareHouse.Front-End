@@ -50,9 +50,9 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
             this.activatedRoute.snapshot.queryParams['filterText'] ?? '';
     }
 
-    readonly createPolicy = "Pages.Users";
-    readonly updatePolicy = "Pages.Users";
-    readonly deletePolicy = "Pages.Users";
+    readonly createPolicy = "VoucherWarehouse.EcfApiAuthentication.Create";
+    readonly updatePolicy = "VoucherWarehouse.EcfApiAuthentication.Update";
+    readonly deletePolicy = "VoucherWarehouse.EcfApiAuthentication.Delete";
 
     readonly columns = signal<IbsGridColumn<EcfApiAuthenticationOutputDto>[]>([]);
     readonly actions = signal<IbsGridAction<EcfApiAuthenticationOutputDto>[]>([]);
@@ -136,7 +136,7 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
             {
                 id: 'edit',
                 text: 'Editar',
-                requiredPolicy: this.createPolicy,
+                requiredPolicy: this.updatePolicy,
                 run: (row) => this.onEdit(row)
             },
             
@@ -150,7 +150,7 @@ export class EcfApiAuthenticationComponent extends PagedListingComponentBase<Ecf
             {
                 id: 'delete',
                 text: 'Eliminar',
-                requiredPolicy: this.createPolicy,
+                requiredPolicy: this.deletePolicy,
                 danger: true,
                 run: (row) => this.delete(row)
             },

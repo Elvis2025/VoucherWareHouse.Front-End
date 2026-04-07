@@ -47,9 +47,13 @@ export class UsersComponent
 
     @ViewChild(IbsGridComponent) grid?: IbsGridComponent<UserDto>;
 
-    readonly createPolicy = 'Pages.Users';
-    readonly updatePolicy = 'Pages.Users';
-    readonly deletePolicy = 'Pages.Users';
+    readonly createPolicy = 'Pages.Users.Create';
+    readonly permissionsPolicy = 'Pages.Users.Permissions';
+    readonly assignmentRolePolicy = 'Pages.Users.AssignmentRole';
+    readonly changePasswordPolicy = 'Pages.Users.ChangePassword';
+    readonly resetPasswordPolicy = 'Pages.Users.ResetPassword';
+    readonly updatePolicy = 'Pages.Users.Edit';
+    readonly deletePolicy = 'Pages.Users.Delete';
 
     readonly columns = signal<IbsGridColumn<UserDto>[]>([]);
     readonly actions = signal<IbsGridAction<UserDto>[]>([]);
@@ -116,7 +120,7 @@ export class UsersComponent
                 id: 'permissions',
                 text: 'Permisos',
                 icon: 'bi bi-shield-lock',
-                requiredPolicy: this.updatePolicy,
+                requiredPolicy: this.permissionsPolicy,
                 run: (row) => this.openPermissions(row),
             },
             {
@@ -130,21 +134,21 @@ export class UsersComponent
                 id: 'assignUser',
                 text: 'Asignar roles',
                 icon: 'bi bi-person-gear',
-                requiredPolicy: this.updatePolicy,
+                requiredPolicy: this.assignmentRolePolicy,
                 run: (row) => this.usersAssignment(row),
             },
             {
                 id: 'changePass',
                 text: 'Change Password',
                 icon: 'bi bi-key',
-                requiredPolicy: this.updatePolicy,
+                requiredPolicy: this.changePasswordPolicy,
                 run: (row) => this.changePassword(row),
             },
             {
                 id: 'resetPass',
                 text: 'Reset Password',
                 icon: 'bi bi-arrow-clockwise',
-                requiredPolicy: this.updatePolicy,
+                requiredPolicy: this.resetPasswordPolicy,
                 run: (row) => this.resetPassword(row),
             },
             {

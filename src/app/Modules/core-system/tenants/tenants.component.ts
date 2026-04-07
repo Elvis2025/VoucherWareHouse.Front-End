@@ -42,9 +42,10 @@ export class TenantsComponent
 {
   @ViewChild(IbsGridComponent) grid?: IbsGridComponent<TenantDto>;
 
-  readonly createPolicy = 'Pages.Tenants';
-  readonly updatePolicy = 'Pages.Tenants';
-  readonly deletePolicy = 'Pages.Tenants';
+  readonly createPolicy = 'Pages.Tenants.Create';
+  readonly updatePolicy = 'Pages.Tenants.Edit';
+  readonly deletePolicy = 'Pages.Tenants.Delete';
+  readonly setConnectionStringsPolicy = 'Pages.Tenants.SetConnectionStrings';
 
   readonly columns = signal<IbsGridColumn<TenantDto>[]>([]);
   readonly actions = signal<IbsGridAction<TenantDto>[]>([]);

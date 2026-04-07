@@ -91,7 +91,11 @@ export class GenerateEcfVoucherWarehouseComponent
         super(injector, cd);
     }
 
-    readonly readPolicy = "Pages.Users";
+    readonly createPolicy = "VoucherWarehouse.EcfVoucherWarehouse.Create";
+    readonly editPolicy = "VoucherWarehouse.EcfVoucherWarehouse.Update";
+    readonly deletePolicy = "VoucherWarehouse.EcfVoucherWarehouse.Delete";
+
+
     readonly columns = signal<IbsGridColumn<EcfVoucherWarehouseOutputDto>[]>([]);
     readonly actions = signal<IbsGridAction<EcfVoucherWarehouseOutputDto>[]>([]);
 
@@ -240,52 +244,52 @@ export class GenerateEcfVoucherWarehouseComponent
 
             this.selectedFile = file;
         }
-uploadExcelPrime(event: FileUploadHandlerEvent): void {
-    const file = event.files?.[0] ?? this.selectedFile;
+    uploadExcelPrime(event: FileUploadHandlerEvent): void {
+        const file = event.files?.[0] ?? this.selectedFile;
 
-    if (!file) {
-        abp.message.warn('Debe seleccionar un archivo Excel.');
-        return;
+        if (!file) {
+            abp.message.warn('Debe seleccionar un archivo Excel.');
+            return;
+        }
+
+        const fileName = file.name.toLowerCase();
+        const isExcelFile = fileName.endsWith('.xls') || fileName.endsWith('.xlsx');
+
+        if (!isExcelFile) {
+            abp.message.warn('Solo se permiten archivos Excel (.xls, .xlsx).');
+            return;
+        }
+
+        this.selectedFile = file;
+        this.isUploading = true;
+
+        const dto: LoadExcelInputDto = {
+            file: this.selectedFile
+        };
+
+        (this.ecfVoucherWarehouseService.sendEcfExcel(dto) as Observable<UploadJobResponseDto | void>)
+            .pipe(
+                finalize(() => {
+                    this.isUploading = false;
+                    this.cd.detectChanges();
+                })
+            )
+            .subscribe({
+                next: () => {
+                    abp.notify.success('Archivo cargado correctamente. El procesamiento fue enviado a segundo plano.');
+                    this.clearSelectedPrimeFile();
+                    this.grid?.reloadFirstPage();
+                    this.refreshJobsNow();
+                },
+                error: (error) => {
+                    const message =
+                        error?.error?.error?.message ||
+                        error?.error?.message ||
+                        'Ocurrió un error al cargar el archivo Excel.';
+                    abp.message.error(message);
+                }
+            });
     }
-
-    const fileName = file.name.toLowerCase();
-    const isExcelFile = fileName.endsWith('.xls') || fileName.endsWith('.xlsx');
-
-    if (!isExcelFile) {
-        abp.message.warn('Solo se permiten archivos Excel (.xls, .xlsx).');
-        return;
-    }
-
-    this.selectedFile = file;
-    this.isUploading = true;
-
-    const dto: LoadExcelInputDto = {
-        file: this.selectedFile
-    };
-
-    (this.ecfVoucherWarehouseService.sendEcfExcel(dto) as Observable<UploadJobResponseDto | void>)
-        .pipe(
-            finalize(() => {
-                this.isUploading = false;
-                this.cd.detectChanges();
-            })
-        )
-        .subscribe({
-            next: () => {
-                abp.notify.success('Archivo cargado correctamente. El procesamiento fue enviado a segundo plano.');
-                this.clearSelectedPrimeFile();
-                this.grid?.reloadFirstPage();
-                this.refreshJobsNow();
-            },
-            error: (error) => {
-                const message =
-                    error?.error?.error?.message ||
-                    error?.error?.message ||
-                    'Ocurrió un error al cargar el archivo Excel.';
-                abp.message.error(message);
-            }
-        });
-}
 
 
    clearSelectedPrimeFile(fileUpload?: FileUpload): void {

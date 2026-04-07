@@ -135,7 +135,7 @@ export class RolesPermissionsModalComponent implements OnInit, AfterViewInit {
 
     return map;
   });
-
+  private permissionStore = new Map<string, LocalPermission>();
   readonly visibleRows = computed(() => {
     const rows: PermissionRowVm[] = [];
 
@@ -239,6 +239,9 @@ export class RolesPermissionsModalComponent implements OnInit, AfterViewInit {
 
           const permissions = this.buildPermissionStore(roleForEdit);
           this.allPermissions.set(permissions);
+          this.permissionStore = new Map<string, LocalPermission>(
+                permissions.map((p) => [p.name, p])
+              );
 
           this.rebuildModules(roleForEdit);
           this.ensureValidSelectedModule();
@@ -251,6 +254,7 @@ export class RolesPermissionsModalComponent implements OnInit, AfterViewInit {
           this.allPermissions.set([]);
           this.modules.set([]);
           this.selectedModuleKey.set('');
+          this.permissionStore.clear();
           this.rowViewportMap.set(new Map<string, RowViewportState>());
           this.lastHiddenParentTitle.set('');
         },
@@ -361,31 +365,31 @@ export class RolesPermissionsModalComponent implements OnInit, AfterViewInit {
     return row.key;
   }
 
-  saveAll(): void {
-    const currentRole = this.role();
-    if (!currentRole) {
-      this.error.set('No fue posible cargar el rol a actualizar.');
-      return;
-    }
-
-    this.loading.set(true);
-    this.error.set(null);
-
-    const grantedPermissions = (this.allPermissions() ?? [])
-      .filter((p) => p.isGranted === true)
-      .map((p) => p.name);
-
-    const input = currentRole.clone();
-    input.grantedPermissions = grantedPermissions;
-
-    this.roleService
-      .update(input)
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: () => this.saved.emit(),
-        error: (e) => this.error.set(e?.message ?? 'Error guardando permisos'),
-      });
+ saveAll(): void {
+  const currentRole = this.role();
+  if (!currentRole) {
+    this.error.set('No fue posible cargar el rol a actualizar.');
+    return;
   }
+
+  this.loading.set(true);
+  this.error.set(null);
+
+  const grantedPermissions = Array.from(this.permissionStore.values())
+    .filter((p) => p.isGranted === true)
+    .map((p) => p.name);
+
+  const input = currentRole.clone();
+  input.grantedPermissions = grantedPermissions;
+
+  this.roleService
+    .update(input)
+    .pipe(finalize(() => this.loading.set(false)))
+    .subscribe({
+      next: () => this.saved.emit(),
+      error: (e) => this.error.set(e?.message ?? 'Error guardando permisos'),
+    });
+}
 
   private getShiftLevelsForRow(row: PermissionRowVm): number {
     const viewportMap = this.rowViewportMap();
@@ -612,37 +616,51 @@ export class RolesPermissionsModalComponent implements OnInit, AfterViewInit {
     return modules;
   }
 
-  private mapTreeNode(
-    node: PermissionTreeDto,
-    level: number,
-    parentKey: string | null
-  ): PermissionTreeVm {
-    const permission: LocalPermission = {
-      name: (node.name ?? '').toString(),
-      displayName: (node.displayName ?? node.name ?? 'Permiso').toString(),
-      description: node.description ?? undefined,
-      isGranted: node.isGranted === true,
-    };
+ private mapTreeNode(
+  node: PermissionTreeDto,
+  level: number,
+  parentKey: string | null
+): PermissionTreeVm {
+  const permissionName = (node.name ?? '').toString();
+  const permission = this.getOrCreatePermission(node);
 
-    const currentKey = permission.name;
+  const children = (node.children ?? [])
+    .filter((x) => !!x?.name)
+    .map((x) => this.mapTreeNode(x, level + 1, permissionName))
+    .sort((a, b) => a.title.localeCompare(b.title));
 
-    const children = (node.children ?? [])
-      .filter((x) => !!x?.name)
-      .map((x) => this.mapTreeNode(x, level + 1, currentKey))
-      .sort((a, b) => a.title.localeCompare(b.title));
+  return {
+    key: permissionName,
+    title: permission.displayName,
+    perm: permission,
+    children,
+    level,
+    visibleChildrenCount: children.length,
+    searchMatch: false,
+    parentKey,
+  };
+}
 
-    return {
-      key: currentKey,
-      title: permission.displayName,
-      perm: permission,
-      children,
-      level,
-      visibleChildrenCount: children.length,
-      searchMatch: false,
-      parentKey,
-    };
+private getOrCreatePermission(node: PermissionTreeDto): LocalPermission {
+  const name = (node.name ?? '').toString();
+
+  const existing = this.permissionStore.get(name);
+  if (existing) {
+    existing.displayName = (node.displayName ?? node.name ?? 'Permiso').toString();
+    existing.description = node.description ?? undefined;
+    return existing;
   }
 
+  const created: LocalPermission = {
+    name,
+    displayName: (node.displayName ?? node.name ?? 'Permiso').toString(),
+    description: node.description ?? undefined,
+    isGranted: node.isGranted === true,
+  };
+
+  this.permissionStore.set(name, created);
+  return created;
+}
   private buildTreeFromFlat(perms: LocalPermission[]): PermissionTreeVm[] {
     const map = new Map<string, PermissionTreeVm>();
     const roots: PermissionTreeVm[] = [];

@@ -41,9 +41,11 @@ export class RolesComponent
 {
   @ViewChild(IbsGridComponent) grid?: IbsGridComponent<RoleDto>;
 
-  readonly createPolicy = 'Pages.Roles';
-  readonly updatePolicy = 'Pages.Roles';
-  readonly deletePolicy = 'Pages.Roles';
+  readonly createPolicy = 'Pages.Roles.Create';
+  readonly updatePolicy = 'Pages.Roles.Edit';
+  readonly deletePolicy = 'Pages.Roles.Delete';
+  readonly permissionsPolicy = 'Pages.Roles.Permissions';
+  readonly assignmentUserPolicy = 'Pages.Roles.AssignmentUser';
 
   readonly columns = signal<IbsGridColumn<RoleDto>[]>([]);
   readonly actions = signal<IbsGridAction<RoleDto>[]>([]);
@@ -162,7 +164,7 @@ export class RolesComponent
         id: 'permissions',
         text: 'Permissions',
         icon: 'bi bi-shield-lock',
-        requiredPolicy: this.updatePolicy,
+        requiredPolicy: this.permissionsPolicy,
         run: (row) => this.openPermissions(row),
       },
       {
@@ -176,7 +178,7 @@ export class RolesComponent
         id: 'roleAssignment',
         text: 'Asignación de Roles',
         icon: 'bi bi-person-badge',
-        requiredPolicy: this.updatePolicy,
+        requiredPolicy: this.assignmentUserPolicy,
         run: (row) => this.showRolesAssignmentDialog(row),
       },
       {

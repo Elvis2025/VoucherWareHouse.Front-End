@@ -68,9 +68,10 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
         this.keyword = this.activatedRoute.snapshot.queryParams["filterText"] ?? "";
     }
 
-    readonly createPolicy = "Pages.Users";
-    readonly updatePolicy = "Pages.Users";
-    readonly deletePolicy = "Pages.Users";
+    readonly createPolicy = "VoucherWarehouse.TaxVouchers.Create";
+    readonly readPolicy = "VoucherWarehouse.TaxVouchers.Read";
+    readonly updatePolicy = "VoucherWarehouse.TaxVouchers.Update";
+    readonly deletePolicy = "VoucherWarehouse.TaxVouchers.Delete";
 
     readonly columns = signal<IbsGridColumn<TaxVoucherOutputDto>[]>([]);
     readonly actions = signal<IbsGridAction<TaxVoucherOutputDto>[]>([]);
@@ -185,13 +186,13 @@ export class TaxVoucherComponent extends PagedListingComponentBase<TaxVoucherOut
             {
                 id: "edit",
                 text: "Editar",
-                requiredPolicy: this.createPolicy,
+                requiredPolicy: this.updatePolicy,
                 run: (row) => this.onEdit(row)
             },
             {
                 id: "delete",
                 text: "Eliminar",
-                requiredPolicy: this.createPolicy,
+                requiredPolicy: this.deletePolicy,
                 danger: true,
                 run: (row) => this.delete(row)
             }
